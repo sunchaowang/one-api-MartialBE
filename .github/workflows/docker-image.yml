@@ -1,5 +1,4 @@
-name: one-api docker image amd64
-
+name: Docker image 
 
 on:
   push:
