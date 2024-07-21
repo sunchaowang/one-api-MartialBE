@@ -192,7 +192,7 @@ func countOpenaiImageTokens(url, detail, modelName string) (_ int, err error) {
 	// var fetchSize = true
 	var width, height int
 	var openAIImageCost *OpenAIImageCost
-	if strings.HasPrefix(modelName, "gpt-4o-mini") {
+	if strings.Contains(modelName, "gpt-4o-mini") {
 		openAIImageCost = OpenAIImageCostMap["gpt-4o-mini"]
 	} else {
 		openAIImageCost = OpenAIImageCostMap["general"]

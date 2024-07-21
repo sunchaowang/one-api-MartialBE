@@ -186,7 +186,7 @@ func GetUserLogsList(userId int, params *LogsListParams) (*DataResult[Log], erro
 }
 
 func SearchAllLogs(keyword string) (logs []*Log, err error) {
-	err = DB.Where("type = ? or content LIKE ?", keyword, keyword+"%").Order("id desc").Limit(config.MaxRecentItems).Find(&logs).Error
+	err = DB.Where("type = ? or content LIKE ?", keyword, "%"+keyword+"%").Order("id desc").Limit(config.MaxRecentItems).Find(&logs).Error
 	return logs, err
 }
 

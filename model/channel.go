@@ -71,7 +71,7 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	}
 
 	if params.Name != "" {
-		db = db.Where("name LIKE ?", params.Name+"%")
+		db = db.Where("name LIKE ?", "%"+params.Name+"%")
 	}
 
 	if params.Group != "" {
@@ -83,7 +83,7 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	}
 
 	if params.Other != "" {
-		db = db.Where("other LIKE ?", params.Other+"%")
+		db = db.Where("other LIKE ?", "%"+params.Other+"%")
 	}
 
 	if params.Key != "" {
@@ -91,7 +91,7 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	}
 
 	if params.TestModel != "" {
-		db = db.Where("test_model LIKE ?", params.TestModel+"%")
+		db = db.Where("test_model LIKE ?", "%"+params.TestModel+"%")
 	}
 
 	if params.Tag != "" {

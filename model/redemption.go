@@ -44,7 +44,7 @@ func GetRedemptionsList(params *GenericParams) (*DataResult[Redemption], error) 
 	var redemptions []*Redemption
 	db := DB
 	if params.Keyword != "" {
-		db = db.Where("id = ? or name LIKE ?", utils.String2Int(params.Keyword), params.Keyword+"%")
+		db = db.Where("id = ? or name LIKE ?", utils.String2Int(params.Keyword), "%"+params.Keyword+"%")
 	}
 
 	return PaginateAndOrder[Redemption](db, &params.PaginationParams, &redemptions, allowedRedemptionslOrderFields)
