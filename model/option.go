@@ -93,6 +93,9 @@ func InitOptionMap() {
 	config.OptionMap["LinuxDoClientSecret"] = ""
 	config.OptionMap["LinuxDoMinLevel"] = strconv.Itoa(config.LinuxDoMinLevel)
 
+	config.OptionMap["CFWorkerImageUrl"] = config.CFWorkerImageUrl
+	config.OptionMap["CFWorkerImageKey"] = config.CFWorkerImageKey
+
 	config.OptionMapRWMutex.Unlock()
 	loadOptionsFromDatabase()
 }
@@ -189,6 +192,8 @@ var optionStringMap = map[string]*string{
 	"ChatImageRequestProxy":       &config.ChatImageRequestProxy,
 	"LinuxDoClientId":             &config.LinuxDoClientId,
 	"LinuxDoClientSecret":         &config.LinuxDoClientSecret,
+	"CFWorkerImageUrl":            &config.CFWorkerImageUrl,
+	"CFWorkerImageKey":            &config.CFWorkerImageKey,
 }
 
 func updateOptionMap(key string, value string) (err error) {

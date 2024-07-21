@@ -38,6 +38,8 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'react-i18next';
 import useCustomizeT from '@/hooks/useCustomizeT';
 
+import { PreCostType } from '../type/other';
+
 const pluginList = import.meta.glob('../type/Plugin.json', {
   eager: true
 });
@@ -509,7 +511,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 </FormControl>
               )}
 
-              <FormControl fullWidth sx={{ ...theme.typography.otherInput }} size={'small'}>
+              <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
                 <Autocomplete
                   multiple
                   id="channel-groups-label"
@@ -541,7 +543,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                 )}
               </FormControl>
 
-              <FormControl fullWidth sx={{ ...theme.typography.otherInput }} size={'small'}>
+              <FormControl fullWidth sx={{ ...theme.typography.otherInput }}>
                 <Autocomplete
                   multiple
                   freeSolo
@@ -590,11 +592,10 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   }}
                   renderOption={(props, option, { selected }) => (
                     <li {...props}>
-                      <Checkbox size="small" icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
+                      <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
                       {option.id}
                     </li>
                   )}
-                  size={'small'}
                 />
                 {errors.models ? (
                   <FormHelperText error id="helper-tex-channel-models-label">
@@ -758,6 +759,43 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                   )}
                 </FormControl>
               )}
+
+              {inputPrompt.pre_cost && (
+                <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
+                  <InputLabel htmlFor="channel-pre_cost-label">{customizeT(inputLabel.pre_cost)}</InputLabel>
+                  <Select
+                    id="channel-pre_cost-label"
+                    label={customizeT(inputLabel.pre_cost)}
+                    value={values.pre_cost}
+                    name="pre_cost"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    disabled={hasTag}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200
+                        }
+                      }
+                    }}
+                  >
+                    {PreCostType.map((option) => {
+                      return (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  {touched.pre_cost && errors.pre_cost ? (
+                    <FormHelperText error id="helper-tex-channel-pre_cost-label">
+                      {errors.pre_cost}
+                    </FormHelperText>
+                  ) : (
+                    <FormHelperText id="helper-tex-channel-pre_cost-label"> {customizeT(inputPrompt.pre_cost)} </FormHelperText>
+                  )}
+                </FormControl>
+              )}
               {inputPrompt.only_chat && (
                 <FormControl fullWidth>
                   <FormControlLabel
@@ -807,7 +845,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
                             <FormHelperText id="helper-tex-channel-key-label"> {customizeT(param.description)} </FormHelperText>
                           </FormControl>
                         ) : (
-                          <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }} size={'small'}>
+                          <FormControl key={name} fullWidth sx={{ ...theme.typography.otherInput }}>
                             <TextField
                               multiline
                               key={name}
