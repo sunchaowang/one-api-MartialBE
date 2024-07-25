@@ -214,5 +214,12 @@ export const CHANNEL_OPTIONS = {
     value: 44,
     color: 'orange',
     url: 'https://console.cloud.google.com/'
+  },
+  45: {
+    key: 45,
+    text: 'TogetherAI',
+    value: 45,
+    color: 'orange',
+    url: 'https://www.together.ai'
   }
 };

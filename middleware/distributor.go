@@ -119,3 +119,11 @@ func getModelRequest(c *gin.Context) (*ModelRequest, bool, error) {
 	}
 	return &modelRequest, shouldSelectChannel, nil
 }
+
+// 全局模型映射修改
+func handleRequestModel(model ModelRequest) (ModelRequest, error) {
+	if strings.Contains(model.Model, "gpt-3.5-turbo") {
+		model.Model = "gpt-3.5-turbo-0125"
+	}
+	return model, nil
+}

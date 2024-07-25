@@ -431,6 +431,20 @@ const typeConfig = {
       base_url: ''
     },
     modelGroup: 'VertexAI'
+  },
+  45: {
+    input: {
+      models: [
+        'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo'
+      ]
+    },
+    prompt: {
+      key: '',
+      base_url: ''
+    },
+    modelGroup: 'TogetherAI'
   }
 };
 
