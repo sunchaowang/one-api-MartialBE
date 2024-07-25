@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"one-api/common/logger"
+	"one-api/common/utils"
 	"time"
 
 	"go.uber.org/zap"
@@ -32,7 +33,7 @@ func GinzapWithConfig() gin.HandlerFunc {
 			zap.String("method", c.Request.Method),
 			zap.String("path", path),
 			zap.String("query", query),
-			zap.String("ip", c.ClientIP()),
+			zap.String("ip", utils.GetRequestIP(c)),
 			zap.String("user-agent", c.Request.UserAgent()),
 			zap.Duration("latency", latency),
 		}
