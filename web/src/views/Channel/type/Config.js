@@ -445,6 +445,20 @@ const typeConfig = {
       base_url: ''
     },
     modelGroup: 'TogetherAI'
+  },
+  46: {
+    input: {
+      models: [
+        'accounts/fireworks/models/llama-v3p1-8b-instruct',
+        'accounts/fireworks/models/llama-v3p1-70b-instruct',
+        'accounts/fireworks/models/llama-v3p1-405b-instruct'
+      ]
+    },
+    prompt: {
+      key: '',
+      base_url: ''
+    },
+    modelGroup: 'FireworksAI'
   }
 };
 

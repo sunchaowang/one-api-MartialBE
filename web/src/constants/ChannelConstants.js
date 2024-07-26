@@ -221,5 +221,12 @@ export const CHANNEL_OPTIONS = {
     value: 45,
     color: 'orange',
     url: 'https://www.together.ai'
+  },
+  46: {
+    key: 46,
+    text: 'FireworksAI',
+    value: 46,
+    color: 'orange',
+    url: 'https://fireworks.ai'
   }
 };

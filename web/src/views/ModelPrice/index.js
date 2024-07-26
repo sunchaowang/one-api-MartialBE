@@ -14,6 +14,7 @@ import { zhCN } from '@mui/x-data-grid/locales';
 import { API } from '@/utils/api';
 import { showError } from '@/utils/common';
 import { ValueFormatter, priceType } from '@/views/Pricing/component/util';
+import { isAdmin } from '@/utils/common';
 
 // ----------------------------------------------------------------------
 export default function ModelPrice() {
@@ -136,7 +137,8 @@ export default function ModelPrice() {
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
-        valueOptions: ownedby
+        valueOptions: ownedby,
+        needIsAdmin: true
       },
       {
         field: 'input',
@@ -160,6 +162,8 @@ export default function ModelPrice() {
     [ownedby, t]
   );
 
+  const userIsAdmin = isAdmin();
+
   function EditToolbar() {
     return (
       <GridToolbarContainer>
@@ -179,7 +183,7 @@ export default function ModelPrice() {
       <Card>
         <DataGrid
           rows={rows}
-          columns={modelRatioColumns}
+          columns={modelRatioColumns.filter((item) => (Object.hasOwn(item, 'needIsAdmin') ? item.needIsAdmin === userIsAdmin : false))}
           initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
           pageSizeOptions={[20, 30, 50, 100]}
           disableRowSelectionOnClick

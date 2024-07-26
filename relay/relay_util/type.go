@@ -36,6 +36,7 @@ func init() {
 		config.ChannelTypeSuno:         "Suno",
 		config.ChannelTypeDoubao:       "Doubao",
 		config.ChannelTypeVertexAI:     "VertexAI",
-		config.ChanneklTogetherAI:      "TogetherAI",
+		config.ChannelTogetherAI:       "TogetherAI",
+		config.ChannelTypeFireworksAI:  "FireworksAI",
 	}
 }

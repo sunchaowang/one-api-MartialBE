@@ -16,6 +16,7 @@ import (
 	"one-api/providers/coze"
 	"one-api/providers/deepseek"
 	"one-api/providers/doubao"
+	"one-api/providers/fireworks"
 	"one-api/providers/gemini"
 	"one-api/providers/groq"
 	"one-api/providers/hunyuan"
@@ -78,6 +79,7 @@ func init() {
 	providerFactories[config.ChannelTypeDoubao] = doubao.DoubaoProviderFactory{}
 	providerFactories[config.ChannelTypeVertexAI] = vertexai.VertexAIProviderFactory{}
 	providerFactories[config.ChannelTypeTogetherAI] = togetherai.TogethorProviderFactory{}
+	providerFactories[config.ChannelTypeFireworksAI] = fireworks.ProviderFactory{}
 
 }
 
