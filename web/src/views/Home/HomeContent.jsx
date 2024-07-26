@@ -148,8 +148,8 @@ const Index = () => {
               <Tag color={'error'} size="small" variant="outlined">
                 论坛等级
               </Tag>{' '}
-              的使用额度, 已注册本站的用户请在绑定 LD 授权后在论坛私信
-              <Tag size={'small'}>@sunnysun</Tag>UserId
+              的使用额度, 已注册本站的用户请在绑定 LD 授权后在论坛私信（Username为）
+              <Tag size={'small'}> @sunnysun</Tag>
             </List.Item>
             <List.Item>
               <Typography>
@@ -175,7 +175,7 @@ const Index = () => {
                 </Tag>
                 ，充值汇率为
                 <Tag color={'error'} size="small" variant="outlined">
-                  2元=1刀
+                  1.5元=1刀
                 </Tag>
                 （模型计费详情请查看下方表格）
               </Typography>
