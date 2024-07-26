@@ -146,7 +146,7 @@ const Index = () => {
               <Typography onClick={() => window.open('https://linux.do', 'blank')}>LinuxDO 论坛</Typography>
               用户可额外获得
               <Tag color={'error'} size="small" variant="outlined">
-                论坛等级 + 1
+                论坛等级
               </Tag>{' '}
               的使用额度, 已注册本站的用户请在绑定 LD 授权后在论坛私信
               <Tag size={'small'}>@sunnysun</Tag>UserId
@@ -228,10 +228,12 @@ const Index = () => {
         <Card bordered={false} title="可用模型及计费介绍">
           <Row bordered={false}>
             <Col span={24}>
-              <Typography type={'secondary'}>本页面更新可能存在延迟，实际可用模型及计费请以设置页以及日志页为准 <Button type="link" onClick={() => window.open('https://wochirou.com/panel/model_price')}>
+              <Typography type={'secondary'}>
+                本页面更新可能存在延迟，实际可用模型及计费请以设置页以及日志页为准{' '}
+                <Button type="link" onClick={() => window.open('https://wochirou.com/panel/model_price')}>
                   点击查看最新可用模型及计费列表
-                </Button></Typography>
-              
+                </Button>
+              </Typography>
             </Col>
             {renderModalTable(
               [
