@@ -97,7 +97,7 @@ const renderModalTable = (data, provider) => {
 };
 
 const Index = () => {
-  const changelog = ['即日起，截止到 2024.6.18，充值额度额外赠送25%', '已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为2元1刀'];
+  const changelog = ['已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为1元1刀'];
 
   const handleCopyQQGroupNumber = () => {
     copy('924076327');
