@@ -183,7 +183,7 @@ export default function ModelPrice() {
       <Card>
         <DataGrid
           rows={rows}
-          columns={modelRatioColumns.filter((item) => (Object.hasOwn(item, 'needIsAdmin') ? item.needIsAdmin === userIsAdmin : false))}
+          columns={modelRatioColumns.filter((item) => (Object.hasOwn(item, 'needIsAdmin') ? item.needIsAdmin === userIsAdmin : true))}
           initialState={{ pagination: { paginationModel: { pageSize: 20 } } }}
           pageSizeOptions={[20, 30, 50, 100]}
           disableRowSelectionOnClick
