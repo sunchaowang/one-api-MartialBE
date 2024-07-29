@@ -97,7 +97,7 @@ const renderModalTable = (data, provider) => {
 };
 
 const Index = () => {
-  const changelog = ['即日起，截止到 2024.6.18，充值额度额外赠送25%', '已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为2元1刀'];
+  const changelog = ['已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为1.5元1刀'];
 
   const handleCopyQQGroupNumber = () => {
     copy('924076327');
@@ -146,10 +146,10 @@ const Index = () => {
               <Typography onClick={() => window.open('https://linux.do', 'blank')}>LinuxDO 论坛</Typography>
               用户可额外获得
               <Tag color={'error'} size="small" variant="outlined">
-                论坛等级 + 1
+                论坛等级
               </Tag>{' '}
-              的使用额度, 已注册本站的用户请在绑定 LD 授权后在论坛私信
-              <Tag size={'small'}>@sunnysun</Tag>UserId
+              的使用额度, 已注册本站的用户请在绑定 LD 授权后在论坛私信（Username为）
+              <Tag size={'small'}> @sunnysun</Tag>
             </List.Item>
             <List.Item>
               <Typography>
@@ -175,7 +175,7 @@ const Index = () => {
                 </Tag>
                 ，充值汇率为
                 <Tag color={'error'} size="small" variant="outlined">
-                  2元=1刀
+                  1.5元=1刀
                 </Tag>
                 （模型计费详情请查看下方表格）
               </Typography>
@@ -228,10 +228,12 @@ const Index = () => {
         <Card bordered={false} title="可用模型及计费介绍">
           <Row bordered={false}>
             <Col span={24}>
-              <Typography type={'secondary'}>本页面更新可能存在延迟，实际可用模型及计费请以设置页以及日志页为准 <Button type="link" onClick={() => window.open('https://wochirou.com/panel/model_price')}>
+              <Typography type={'secondary'}>
+                本页面更新可能存在延迟，实际可用模型及计费请以设置页以及日志页为准{' '}
+                <Button type="link" onClick={() => window.open('https://wochirou.com/panel/model_price')}>
                   点击查看最新可用模型及计费列表
-                </Button></Typography>
-              
+                </Button>
+              </Typography>
             </Col>
             {renderModalTable(
               [

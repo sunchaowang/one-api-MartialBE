@@ -1,7 +1,6 @@
 package providers
 
 import (
-	"github.com/gin-gonic/gin"
 	"one-api/common/config"
 	"one-api/model"
 	"one-api/providers/ali"
@@ -17,6 +16,7 @@ import (
 	"one-api/providers/coze"
 	"one-api/providers/deepseek"
 	"one-api/providers/doubao"
+	"one-api/providers/fireworks"
 	"one-api/providers/gemini"
 	"one-api/providers/groq"
 	"one-api/providers/hunyuan"
@@ -31,9 +31,12 @@ import (
 	"one-api/providers/stabilityAI"
 	"one-api/providers/suno"
 	"one-api/providers/tencent"
+	"one-api/providers/togetherai"
 	"one-api/providers/vertexai"
 	"one-api/providers/xunfei"
 	"one-api/providers/zhipu"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 定义供应商工厂接口
@@ -75,6 +78,8 @@ func init() {
 	providerFactories[config.ChannelTypeSuno] = suno.SunoProviderFactory{}
 	providerFactories[config.ChannelTypeDoubao] = doubao.DoubaoProviderFactory{}
 	providerFactories[config.ChannelTypeVertexAI] = vertexai.VertexAIProviderFactory{}
+	providerFactories[config.ChannelTypeTogetherAI] = togetherai.TogethorProviderFactory{}
+	providerFactories[config.ChannelTypeFireworksAI] = fireworks.ProviderFactory{}
 
 }
 

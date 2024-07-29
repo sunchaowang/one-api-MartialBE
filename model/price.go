@@ -333,6 +333,12 @@ func GetDefaultPrice() []*Price {
 		"doubao-lite-32k":  {[]float64{0, 0}, config.ChannelTypeDoubao},
 		"doubao-lite-4k":   {[]float64{0, 0}, config.ChannelTypeDoubao},
 		"doubao-embedding": {[]float64{0, 0}, config.ChannelTypeDoubao},
+
+		// together
+		//"meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo":   {[]float64{0.09, 0.09}, config.ChannelTypeTogetherAI},
+		//"meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo":  {[]float64{0.44, 0.44}, config.ChannelTypeTogetherAI},
+		//"meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo": {[]float64{2.5, 2.5}, config.ChannelTypeTogetherAI},
+
 	}
 
 	var prices []*Price

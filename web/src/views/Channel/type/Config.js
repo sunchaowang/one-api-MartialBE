@@ -431,6 +431,34 @@ const typeConfig = {
       base_url: ''
     },
     modelGroup: 'VertexAI'
+  },
+  45: {
+    input: {
+      models: [
+        'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo'
+      ]
+    },
+    prompt: {
+      key: '',
+      base_url: ''
+    },
+    modelGroup: 'TogetherAI'
+  },
+  46: {
+    input: {
+      models: [
+        'accounts/fireworks/models/llama-v3p1-8b-instruct',
+        'accounts/fireworks/models/llama-v3p1-70b-instruct',
+        'accounts/fireworks/models/llama-v3p1-405b-instruct'
+      ]
+    },
+    prompt: {
+      key: '',
+      base_url: ''
+    },
+    modelGroup: 'FireworksAI'
   }
 };
 

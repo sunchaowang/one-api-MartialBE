@@ -35,5 +35,8 @@ func init() {
 		config.ChannelTypeHunyuan:      "Hunyuan",
 		config.ChannelTypeSuno:         "Suno",
 		config.ChannelTypeDoubao:       "Doubao",
+		config.ChannelTypeVertexAI:     "VertexAI",
+		config.ChannelTogetherAI:       "TogetherAI",
+		config.ChannelTypeFireworksAI:  "FireworksAI",
 	}
 }

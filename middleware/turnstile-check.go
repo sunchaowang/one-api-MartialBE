@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"encoding/json"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
 	"one-api/common/config"
 	"one-api/common/logger"
+	"one-api/common/utils"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 )
 
 type turnstileCheckResponse struct {
@@ -35,7 +37,7 @@ func TurnstileCheck() gin.HandlerFunc {
 			rawRes, err := http.PostForm("https://challenges.cloudflare.com/turnstile/v0/siteverify", url.Values{
 				"secret":   {config.TurnstileSecretKey},
 				"response": {response},
-				"remoteip": {c.ClientIP()},
+				"remoteip": {utils.GetRequestIP(c)},
 			})
 			if err != nil {
 				logger.SysError(err.Error())
