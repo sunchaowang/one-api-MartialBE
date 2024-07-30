@@ -1,6 +1,7 @@
-import { Button, Dialog, DialogContent, DialogContentText, DialogActions, Box } from '@mui/material';
+import { Dialog, DialogContent, DialogContentText, DialogActions, Box } from '@mui/material';
 import { useState } from 'react';
 import QQGroupQCode from '@/assets/images/qq-group.jpg?url';
+import { Button, Modal } from '@arco-design/web-react';
 import { copy } from '@/utils/common';
 
 export default function ContactButton() {
@@ -20,28 +21,29 @@ export default function ContactButton() {
 
   return (
     <>
-      <Button color="inherit" onClick={handleClickOpen}>
+      <Button type="text" onClick={handleClickOpen}>
         联系方式
       </Button>
-      <Dialog open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
-              {/*  QQ群*/}
-              <img
-                src={QQGroupQCode}
-                style={{
-                  maxHeight: '50vh'
-                }}
-              />
-            </Box>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCopyQQGroupNumber}>复制QQ群号</Button>
-          <Button onClick={handleClose}>知道了</Button>
-        </DialogActions>
-      </Dialog>
+      <Modal
+        visible={open}
+        onCancel={handleClose}
+        footer={[
+          <Button type="text" onClick={handleCopyQQGroupNumber}>
+            复制QQ群号
+          </Button>,
+          <Button type="primary" onClick={handleClose}>
+            知道了
+          </Button>
+        ]}
+      >
+        <img
+          src={QQGroupQCode}
+          style={{
+            maxHeight: '50vh',
+            width: '100%'
+          }}
+        />
+      </Modal>
     </>
   );
 }

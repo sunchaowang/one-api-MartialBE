@@ -30,7 +30,7 @@ export const theme = (customization) => {
       toolbar: {
         minHeight: '48px',
         padding: '16px',
-        '@media (min-width: 600px)': {
+        '@media (min-width: 800px)': {
           minHeight: '48px'
         }
       }

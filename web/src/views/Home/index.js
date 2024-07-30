@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { showError, showNotice } from '@/utils/common';
 import { API } from '@/utils/api';
 import { marked } from 'marked';
-import BaseIndex from './baseIndex';
-import { Box } from '@mui/material';
 import HomeContent from './HomeContent';
 import { useTranslation } from 'react-i18next';
+import { Modal } from '@arco-design/web-react';
 
 const Home = () => {
   const { t } = useTranslation();
   const [homePageContentLoaded, setHomePageContentLoaded] = useState(false);
   const [homePageContent, setHomePageContent] = useState('');
+  const [modal, contextHolder] = Modal.useModal();
+
   const displayNotice = async () => {
     try {
       const res = await API.get('/api/notice');
@@ -22,33 +23,20 @@ const Home = () => {
             localStorage.setItem('notice', data);
           }
           const htmlNotice = marked(data);
-          showNotice(htmlNotice, true);
-        }
-      } else {
-        showError(message);
-      }
-    } catch (error) {
-      return;
-    }
-  };
 
-  const displayHomePageContent = async () => {
-    setHomePageContent(localStorage.getItem('home_page_content') || '');
-    try {
-      const res = await API.get('/api/home_page_content');
-      const { success, message, data } = res.data;
-      if (success) {
-        let content = data;
-        if (!data.startsWith('https://')) {
-          content = marked.parse(data);
+          modal.success({
+            title: null,
+            icon: null,
+            content: <div dangerouslySetInnerHTML={{ __html: htmlNotice }} />,
+            style: {
+              maxWidth: '90vw',
+              padding: 20
+            }
+          });
         }
-        setHomePageContent(content);
-        localStorage.setItem('home_page_content', content);
       } else {
         showError(message);
-        setHomePageContent(t('home.loadingErr'));
       }
-      setHomePageContentLoaded(true);
     } catch (error) {
       return;
     }
@@ -56,11 +44,11 @@ const Home = () => {
 
   useEffect(() => {
     displayNotice().then();
-    displayHomePageContent().then();
   }, []);
 
   return (
     <>
+      {contextHolder}
       <HomeContent />
     </>
   );

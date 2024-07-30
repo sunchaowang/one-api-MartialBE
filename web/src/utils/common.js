@@ -2,7 +2,7 @@
 import { snackbarConstants } from '@/constants/SnackbarConstants';
 import { API } from './api';
 import { CHAT_LINKS } from '@/constants/chatLinks';
-import { notification } from 'antd';
+import { Message } from '@arco-design/web-react';
 
 export function getSystemName() {
   let system_name = localStorage.getItem('system_name');
@@ -281,9 +281,20 @@ export function replaceChatPlaceholders(text, key, server) {
   return text.replace('{key}', key).replace('{server}', server);
 }
 
-function enqueueSnackbar(message, type = 'info') {
-  notification.open({
-    description: message,
-    type
-  });
+function enqueueSnackbar(message, type = 'success') {
+  if (type === 'info') {
+    Message.info({
+      content: message
+    });
+  }
+  if (type === 'error') {
+    Message.error({
+      content: message
+    });
+  }
+  if (type === 'success') {
+    Message.success({
+      content: message
+    });
+  }
 }

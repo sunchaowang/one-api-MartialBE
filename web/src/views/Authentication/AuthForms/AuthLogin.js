@@ -1,21 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import {
-  Box,
-  Button,
-  FormControl,
-  FormHelperText,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Box, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, Typography } from '@mui/material';
+
+import { Button, Form, Input, Divider, Grid, Link } from '@arco-design/web-react';
 
 // third party
 import * as Yup from 'yup';
@@ -47,6 +38,8 @@ const LoginForm = ({ ...others }) => {
   const [turnstileEnabled, setTurnstileEnabled] = useState(false);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
+
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -96,67 +89,89 @@ const LoginForm = ({ ...others }) => {
         }}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-          <form noValidate onSubmit={handleSubmit} {...others}>
-            <FormControl fullWidth error={Boolean(touched.username && errors.username)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-username-login">{t('login.usernameOrEmail')}</InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-username-login"
-                type="text"
-                value={values.username}
-                name="username"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                label={t('login.usernameOrEmail')}
-                inputProps={{ autoComplete: 'username' }}
-              />
-              {touched.username && errors.username && (
-                <FormHelperText error id="standard-weight-helper-text-username-login">
-                  {errors.username}
-                </FormHelperText>
-              )}
-            </FormControl>
-
-            <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-password-login">{t('login.password')}</InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password-login"
-                type={showPassword ? 'text' : 'password'}
-                value={values.password}
-                name="password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                      size="large"
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
+          <Form noValidate {...others} size={'large'} layout={'vertical'}>
+            <Form.Item label={t('login.usernameOrEmail')}>
+              <Input
+                onChange={(e) =>
+                  handleChange({
+                    target: {
+                      value: e,
+                      name: 'username'
+                    }
+                  })
                 }
-                label="Password"
-              />
-              {touched.password && errors.password && (
-                <FormHelperText error id="standard-weight-helper-text-password-login">
-                  {errors.password}
-                </FormHelperText>
-              )}
-            </FormControl>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-              <Typography
-                component={Link}
-                to="/reset"
-                variant="subtitle1"
-                color="primary"
-                sx={{ textDecoration: 'none', cursor: 'pointer' }}
-              >
-                {t('login.forgetPassword')}
-              </Typography>
-            </Stack>
+                value={values.username}
+                name={'username'}
+                allowClear
+              ></Input>
+            </Form.Item>
+            <Form.Item label={t('login.password')}>
+              <Input.Password
+                onChange={(e) =>
+                  handleChange({
+                    target: {
+                      value: e,
+                      name: 'password'
+                    }
+                  })
+                }
+                name={'password'}
+                value={values.password}
+                allowClear
+              ></Input.Password>
+            </Form.Item>
+            {/*<FormControl fullWidth error={Boolean(touched.username && errors.username)} sx={{ ...theme.typography.customInput }}>*/}
+            {/*  <InputLabel htmlFor="outlined-adornment-username-login">{t('login.usernameOrEmail')}</InputLabel>*/}
+            {/*  <OutlinedInput*/}
+            {/*    id="outlined-adornment-username-login"*/}
+            {/*    type="text"*/}
+            {/*    value={values.username}*/}
+            {/*    name="username"*/}
+            {/*    onBlur={handleBlur}*/}
+            {/*    onChange={handleChange}*/}
+            {/*    label={t('login.usernameOrEmail')}*/}
+            {/*    inputProps={{ autoComplete: 'username' }}*/}
+            {/*  />*/}
+            {/*  {touched.username && errors.username && (*/}
+            {/*    <FormHelperText error id="standard-weight-helper-text-username-login">*/}
+            {/*      {errors.username}*/}
+            {/*    </FormHelperText>*/}
+            {/*  )}*/}
+            {/*</FormControl>*/}
+
+            {/*<FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>*/}
+            {/*  <InputLabel htmlFor="outlined-adornment-password-login">{t('login.password')}</InputLabel>*/}
+            {/*  <OutlinedInput*/}
+            {/*    id="outlined-adornment-password-login"*/}
+            {/*    type={showPassword ? 'text' : 'password'}*/}
+            {/*    value={values.password}*/}
+            {/*    name="password"*/}
+            {/*    onBlur={handleBlur}*/}
+            {/*    onChange={handleChange}*/}
+            {/*    endAdornment={*/}
+            {/*      <InputAdornment position="end">*/}
+            {/*        <IconButton*/}
+            {/*          aria-label="toggle password visibility"*/}
+            {/*          onClick={handleClickShowPassword}*/}
+            {/*          onMouseDown={handleMouseDownPassword}*/}
+            {/*          edge="end"*/}
+            {/*          size="large"*/}
+            {/*        >*/}
+            {/*          {showPassword ? <Visibility /> : <VisibilityOff />}*/}
+            {/*        </IconButton>*/}
+            {/*      </InputAdornment>*/}
+            {/*    }*/}
+            {/*    label="Password"*/}
+            {/*  />*/}
+            {/*  {touched.password && errors.password && (*/}
+            {/*    <FormHelperText error id="standard-weight-helper-text-password-login">*/}
+            {/*      {errors.password}*/}
+            {/*    </FormHelperText>*/}
+            {/*  )}*/}
+            {/*</FormControl>*/}
+            <Link type="text" onClick={() => navigate('/reset')}>
+              {t('login.forgetPassword')}
+            </Link>
             {errors.submit && (
               <Box sx={{ mt: 3 }}>
                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -173,14 +188,12 @@ const LoginForm = ({ ...others }) => {
             ) : (
               <></>
             )}
-            <Box sx={{ mt: 2 }}>
-              <AnimateButton>
-                <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                  {t('menu.login')}
-                </Button>
-              </AnimateButton>
-            </Box>
-          </form>
+            <Grid.Row sx={{ mt: 2 }}>
+              <Button onClick={handleSubmit} long loading={isSubmitting} fullWidth size="large" type="primary">
+                {t('menu.login')}
+              </Button>
+            </Grid.Row>
+          </Form>
         )}
       </Formik>
     </>

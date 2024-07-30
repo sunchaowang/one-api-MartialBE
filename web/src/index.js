@@ -13,14 +13,31 @@ import { store } from './store';
 import '@/assets/scss/style.scss';
 import config from './config';
 
-import { ConfigProvider } from 'antd'
+import '@arco-design/web-react/dist/css/arco.css';
+import { ConfigProvider } from '@arco-design/web-react';
+import zhCN from '@arco-design/web-react/es/locale/zh-CN';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
 
 const container = document.getElementById('root');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
+
+function getArcoLocale() {
+  return zhCN;
+}
+
 root.render(
-  <ConfigProvider>
+  <ConfigProvider
+    locale={getArcoLocale()}
+    componentConfig={{
+      Card: {
+        bordered: false
+      },
+      List: {
+        bordered: false
+      }
+    }}
+  >
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />

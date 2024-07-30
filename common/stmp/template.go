@@ -67,7 +67,7 @@ func getDefaultTemplate(content string) string {
 			line-height: 25px;
 			font-size: 16px;
 			text-align: start;
-			width: 600px;
+			width: 800px;
 			}
 		  .button {
 			background-color: #000000;

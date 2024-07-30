@@ -3,7 +3,8 @@ import logoLight from '@/assets/images/logo.svg';
 import logoDark from '@/assets/images/logo-white.svg';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography } from '@arco-design/web-react';
+import { Space } from '@arco-design/web-react';
 
 /**
  * if you want to use image instead of <svg> uncomment following.
@@ -25,19 +26,19 @@ const Logo = () => {
   }
 
   return (
-    <>
+    <Space direction={'horizontal'} size={16}>
       <img
         src={defaultLogo}
         alt={siteInfo.system_name}
-        height="40"
+        height="32"
         style={{
           borderRadius: '50%'
         }}
       />
-      <Button size="large" variant="h6">
-        <Typography variant="h5">{siteInfo.system_name}</Typography>
-      </Button>
-    </>
+      <Typography.Text>
+        <strong>{siteInfo.system_name}</strong>
+      </Typography.Text>
+    </Space>
   );
 };
 

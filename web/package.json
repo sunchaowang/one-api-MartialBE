@@ -5,6 +5,7 @@
   "private": true,
   "homepage": "",
   "dependencies": {
+    "@arco-design/web-react": "^2.63.1",
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
@@ -21,6 +22,7 @@
     "antd": "^5.17.3",
     "apexcharts": "3.35.3",
     "axios": "^0.28.0",
+    "classnames": "^2.5.1",
     "dayjs": "^1.11.10",
     "formik": "^2.4.5",
     "framer-motion": "^11.0.3",

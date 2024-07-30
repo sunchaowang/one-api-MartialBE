@@ -28,6 +28,8 @@ import (
 
 const TokenCacheKey = "api_token:vertexai"
 const defaultScope = "https://www.googleapis.com/auth/cloud-platform"
+const defaultBaseUrl = "https://%s-aiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:%s"
+const defaultMetaBaseUrl = "https://%s-aiplatform.googleapis.com/v1beta1/projects/%s/locations/%s/endpoints/openapi/chat/completions"
 
 type VertexAIProviderFactory struct{}
 
@@ -55,7 +57,8 @@ type VertexAIProvider struct {
 
 func getConfig() base.ProviderConfig {
 	return base.ProviderConfig{
-		BaseURL:         "https://%s-aiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:%s",
+		// https://${endpoint}/v1beta1/projects/${PROJECT_ID}/locations/${region}/endpoints/openapi/chat/completions
+		BaseURL:         defaultBaseUrl,
 		ChatCompletions: "/",
 	}
 }
@@ -71,6 +74,9 @@ func getKeyConfig(vertexAI *VertexAIProvider) {
 }
 
 func (p *VertexAIProvider) GetFullRequestURL(modelName string, other string) string {
+	if strings.Contains("meta/llama", modelName) {
+		return fmt.Sprintf(defaultMetaBaseUrl, p.Region, p.ProjectID, p.Region)
+	}
 	return fmt.Sprintf(p.GetBaseURL(), p.Region, p.ProjectID, p.Region, modelName, other)
 }
 

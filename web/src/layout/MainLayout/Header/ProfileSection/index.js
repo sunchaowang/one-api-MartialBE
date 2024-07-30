@@ -4,18 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import {
-  Avatar,
-  Chip,
-  ClickAwayListener,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Paper,
-  Popper,
-  Typography
-} from '@mui/material';
+import { Chip, ClickAwayListener, List, ListItemButton, ListItemIcon, ListItemText, Paper, Popper } from '@mui/material';
 
 // project imports
 import MainCard from '@/ui-component/cards/MainCard';
@@ -27,9 +16,10 @@ import useLogin from '@/hooks/useLogin';
 import { IconLogout, IconSettings, IconUserScan, IconLicense } from '@tabler/icons-react';
 import { showError, showSuccess } from '@/utils/common';
 import { API } from '@/utils/api';
-import BaseCheckin from '@/ui-component/BaseCheckInButton';
+import CheckInModal from '@/ui-component/CheckInModal';
 
 import { useTranslation } from 'react-i18next';
+import { Modal, Dropdown, Avatar, Menu, Space, Typography } from '@arco-design/web-react';
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -41,6 +31,7 @@ const ProfileSection = () => {
   const { logout } = useLogin();
 
   const [open, setOpen] = useState(false);
+  const [checkinModalVisible, setCheckinModalVisible] = useState(false);
   /**
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
@@ -81,50 +72,54 @@ const ProfileSection = () => {
     prevOpen.current = open;
   }, [open]);
 
+  function onMenuClick(key) {
+    if (key === 'menu.setting') {
+      navigate('/panel/profile');
+    }
+    if (key === 'menu.checkin') {
+      // handleUserOperationCheckIn();
+      setCheckinModalVisible(true);
+    }
+    if (key === 'menu.signout') {
+      handleLogout();
+    }
+  }
+
+  const droplist = (
+    <Menu onClickMenuItem={onMenuClick}>
+      <Menu.Item key="menu.setting">
+        <Space>
+          <IconUserScan stroke={1.5} size="1.3rem" />
+          <Typography.Text>{t('setting')}</Typography.Text>
+        </Space>
+      </Menu.Item>
+      <Menu.Item key="menu.checkin">
+        <Space>
+          <IconLicense stroke={1.5} size="1.3rem" />
+          立即签到
+        </Space>
+      </Menu.Item>
+      <Menu.Item key="menu.signout">
+        <Space>
+          <IconLogout stroke={1.5} size="1.3rem" />
+          {t('menu.signout')}
+        </Space>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <>
-      <Chip
-        sx={{
-          height: '48px',
-          alignItems: 'center',
-          borderRadius: '27px',
-          transition: 'all .2s ease-in-out',
-          borderColor: theme.typography.menuChip.background,
-          backgroundColor: theme.typography.menuChip.background,
-          '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.primary.main,
-            background: `${theme.palette.primary.main}!important`,
-            color: theme.palette.primary.light,
-            '& svg': {
-              stroke: theme.palette.primary.light
-            }
-          },
-          '& .MuiChip-label': {
-            lineHeight: 0
-          }
-        }}
-        icon={
-          <Avatar
-            src={User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: '8px 0 8px 8px !important',
-              cursor: 'pointer'
-            }}
-            ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
-        label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
-        variant="outlined"
-        ref={anchorRef}
-        aria-controls={open ? 'menu-list-grow' : undefined}
-        aria-haspopup="true"
-        onClick={handleToggle}
-        color="primary"
+      <CheckInModal
+        visible={checkinModalVisible}
+        onCancel={() => setCheckinModalVisible(false)}
+        onClose={() => setCheckinModalVisible(false)}
       />
+      <Dropdown icon={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />} droplist={droplist} position="br">
+        <Avatar size={32} src={User1} ref={anchorRef} aria-controls={open ? 'menu-list-grow' : undefined}>
+          <img width={32} height={32} alt="avatar" src={User1} />
+        </Avatar>
+      </Dropdown>
       <Popper
         placement="bottom-end"
         open={open}

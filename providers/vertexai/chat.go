@@ -44,7 +44,7 @@ func (p *VertexAIProvider) Send(request *types.ChatCompletionRequest) (*http.Res
 func (p *VertexAIProvider) getChatRequest(request *types.ChatCompletionRequest) (*http.Request, *types.OpenAIErrorWithStatusCode) {
 	var err error
 	p.Category, err = category.GetCategory(request.Model)
-	if err != nil || p.Category.ChatComplete == nil || p.Category.ResponseChatComplete == nil {
+	if err != nil {
 		return nil, common.StringErrorWrapperLocal("vertexAI provider not found", "vertexAI_err", http.StatusInternalServerError)
 	}
 

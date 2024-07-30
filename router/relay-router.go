@@ -37,6 +37,7 @@ func setOpenAIRouter(router *gin.Engine) {
 		relayV1Router.POST("/images/variations", relay.Relay)
 		relayV1Router.POST("/embeddings", relay.Relay)
 		// relayV1Router.POST("/engines/:model/embeddings", controller.RelayEmbeddings)
+
 		relayV1Router.POST("/audio/transcriptions", relay.Relay)
 		relayV1Router.POST("/audio/translations", relay.Relay)
 		relayV1Router.POST("/audio/speech", relay.Relay)
@@ -54,6 +55,7 @@ func setOpenAIRouter(router *gin.Engine) {
 			relayV1Router.Any("/batches/*any", relay.RelayOnly)
 			relayV1Router.Any("/vector_stores/*any", relay.RelayOnly)
 			relayV1Router.DELETE("/models/:model", relay.RelayOnly)
+
 		}
 	}
 }
@@ -96,6 +98,7 @@ func setSunoRouter(router *gin.Engine) {
 		relaySunoRouter.POST("/submit/:action", task.RelayTaskSubmit)
 		relaySunoRouter.POST("/fetch", suno.GetFetch)
 		relaySunoRouter.GET("/fetch/:id", suno.GetFetchByID)
+
 	}
 }
 

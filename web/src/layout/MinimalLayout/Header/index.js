@@ -14,6 +14,7 @@ import {
   Divider,
   ClickAwayListener
 } from '@mui/material';
+import { Grid, Space, Card } from '@arco-design/web-react';
 import LogoSection from '@/layout/MainLayout/LogoSection';
 import { Link } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -26,8 +27,9 @@ import { IconMenu2 } from '@tabler/icons-react';
 import Transitions from '@/ui-component/extended/Transitions';
 import MainCard from '@/ui-component/cards/MainCard';
 import { useMediaQuery } from '@mui/material';
-import { Button } from 'antd';
+import { Button } from '@arco-design/web-react';
 import { useTranslation } from 'react-i18next';
+import styled from './style.module.scss';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -50,64 +52,54 @@ const Header = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          width: 228,
-          display: 'flex',
-          [theme.breakpoints.down('md')]: {
-            width: 'auto'
-          }
-        }}
-      >
-        <Box component="span" sx={{ flexGrow: 1 }}>
+      <Grid.Row style={{ width: '100%' }} align="center" justify="space-around">
+        <Grid.Col flex={'150px'}>
           <LogoSection />
-        </Box>
-      </Box>
-
-      <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ flexGrow: 1 }} />
-      <Stack spacing={2} direction="row" justifyContent="center" alignItems="center">
-        {isMobile ? (
-          <>
-            <ThemeButton />
-            <I18nButton />
-            <IconButton onClick={handleOpenMenu}>
-              <IconMenu2 />
-            </IconButton>
-          </>
-        ) : (
-          <>
-            <Button variant="text" onClick={() => navigate('/')} type={pathname === '/' ? 'link' : 'text'}>
-              {t('menu.home')}
-            </Button>
-            {account.user && (
-              <Button variant="text" onClick={() => navigate('/playground')} type={pathname === '/playground' ? 'link' : 'text'}>
-                Playground
-              </Button>
-            )}
-            <Button variant="text" onClick={() => navigate('/about')} type={pathname === '/about' ? 'link' : 'text'}>
-              {t('menu.about')}
-            </Button>
-            <ContactButton />
-            <ThemeButton />
-            <I18nButton />
-            {account.user ? (
-              <>
-                <Button type="primary" variant="contained" onClick={() => navigate('/panel/dashboard')} color="primary">
-                  {t('menu.console')}
-                </Button>
-                <ProfileSection />
-              </>
+        </Grid.Col>
+        <Grid.Col flex={'auto'}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+            {isMobile ? (
+              <Space size={16}>
+                <ThemeButton />
+                <I18nButton />
+                <IconButton onClick={handleOpenMenu}>
+                  <IconMenu2 />
+                </IconButton>
+              </Space>
             ) : (
-              <Button component={Link} variant="contained" onClick={() => navigate('/login')} color="primary">
-                {t('menu.login')}
-              </Button>
+              <Space size={16}>
+                <Button onClick={() => navigate('/')} type={pathname === '/' ? 'primary' : 'text'}>
+                  {t('menu.home')}
+                </Button>
+                {account.user && (
+                  <Button onClick={() => navigate('/playground')} type={pathname === '/playground' ? 'primary' : 'text'}>
+                    Playground
+                  </Button>
+                )}
+                <Button onClick={() => navigate('/about')} type={pathname === '/about' ? 'primary' : 'text'}>
+                  {t('menu.about')}
+                </Button>
+                <ContactButton />
+                <ThemeButton />
+                <I18nButton />
+                {account.user ? (
+                  <>
+                    <Button type={'outline'} onClick={() => navigate('/panel/dashboard')}>
+                      {t('menu.console')}
+                    </Button>
+                    <ProfileSection />
+                  </>
+                ) : (
+                  <Button onClick={() => navigate('/login')} type="primary">
+                    {t('menu.login')}
+                  </Button>
+                )}
+              </Space>
             )}
-          </>
-        )}
-      </Stack>
-
-      <Popper
+          </div>
+        </Grid.Col>
+      </Grid.Row>
+      {/* <Popper
         open={!!open}
         anchorEl={open}
         transition
@@ -174,7 +166,7 @@ const Header = () => {
             </ClickAwayListener>
           </Transitions>
         )}
-      </Popper>
+      </Popper> */}
     </>
   );
 };
