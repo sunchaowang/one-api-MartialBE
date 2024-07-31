@@ -73,6 +73,7 @@ export default function CheckInModal(props) {
     <Modal
       visible={props.visible}
       maskClosable={false}
+      onCancel={handleClose}
       footer={[
         <Button onClick={() => handleClose()}>取消</Button>,
         <Button disabled={!turnstileToken} loading={checkinLoading} onClick={() => handleUserOperationCheckIn()} type="primary">

@@ -89,19 +89,19 @@ const ProfileSection = () => {
     <Menu onClickMenuItem={onMenuClick}>
       <Menu.Item key="menu.setting">
         <Space>
-          <IconUserScan stroke={1.5} size="1.3rem" />
+          <IconUserScan stroke={1.5} size="1.3rem" className="arco-icon" />
           <Typography.Text>{t('setting')}</Typography.Text>
         </Space>
       </Menu.Item>
       <Menu.Item key="menu.checkin">
         <Space>
-          <IconLicense stroke={1.5} size="1.3rem" />
+          <IconLicense stroke={1.5} size="1.3rem" className="arco-icon" />
           立即签到
         </Space>
       </Menu.Item>
       <Menu.Item key="menu.signout">
         <Space>
-          <IconLogout stroke={1.5} size="1.3rem" />
+          <IconLogout stroke={1.5} size="1.3rem" className="arco-icon" />
           {t('menu.signout')}
         </Space>
       </Menu.Item>

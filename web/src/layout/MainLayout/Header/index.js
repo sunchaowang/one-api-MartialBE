@@ -14,51 +14,63 @@ import styled from './style.module.scss';
 
 // assets
 import { IconMenu2 } from '@tabler/icons-react';
-import { Grid, Space, Card } from '@arco-design/web-react';
+import { Grid, Space, Card, Button } from '@arco-design/web-react';
+import { IconMenuFold, IconMenuUnfold } from '@arco-design/web-react/icon';
+import { useDispatch, useSelector } from 'react-redux';
+import { SET_MENU } from '@/store/actions';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
-const Header = ({ handleLeftDrawerToggle }) => {
+const Header = ({ handleLeftDrawerToggle, showLogo = true, showMenuCollapse = false }) => {
   const theme = useTheme();
+  const leftDrawerOpened = useSelector((state) => state.customization.opened);
+  const dispatch = useDispatch();
+
+  function onCollapseChange(colapsed) {
+    console.log('collapsed', colapsed);
+    dispatch({ type: SET_MENU, opened: !colapsed });
+  }
 
   return (
-    <>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+      <div className={'header-left'} style={{ width: 'max-content', flex: 1 }}>
+        {showLogo && <LogoSection />}
+        {showMenuCollapse && (
+          <Button shape={'circle'} type={'primary'} onClick={() => onCollapseChange(leftDrawerOpened)}>
+            {!leftDrawerOpened ? <IconMenuUnfold></IconMenuUnfold> : <IconMenuFold></IconMenuFold>}
+          </Button>
+        )}
+      </div>
       {/* logo & toggler button */}
-      <Grid.Row style={{ width: '100%' }} align="center" justify="space-around">
-        <Grid.Col flex={'150px'}>
-          <LogoSection />
-        </Grid.Col>
-        <Grid.Col flex={'auto'}>
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-            <Space size={16}>
-              <ContactButton />
-              <ThemeButton />
-              <I18nButton />
-              <ProfileSection />
-            </Space>
-          </div>
-        </Grid.Col>
-        {/*<ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>*/}
-        {/*  <Avatar*/}
-        {/*    variant="rounded"*/}
-        {/*    sx={{*/}
-        {/*      ...theme.typography.commonAvatar,*/}
-        {/*      ...theme.typography.mediumAvatar,*/}
-        {/*      ...theme.typography.menuButton,*/}
-        {/*      transition: 'all .2s ease-in-out',*/}
-        {/*      '&:hover': {*/}
-        {/*        background: `${theme.palette.primary.main}!important`,*/}
-        {/*        color: theme.palette.primary.light*/}
-        {/*      }*/}
-        {/*    }}*/}
-        {/*    onClick={handleLeftDrawerToggle}*/}
-        {/*    color="inherit"*/}
-        {/*  >*/}
-        {/*    <IconMenu2 stroke={1.5} size="1.3rem" />*/}
-        {/*  </Avatar>*/}
-        {/*</ButtonBase>*/}
-      </Grid.Row>
-    </>
+
+      <div className={'header-right'} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Space size={16}>
+          <ContactButton />
+          {/*<ThemeButton />*/}
+          <I18nButton />
+          <ProfileSection />
+        </Space>
+      </div>
+      {/*<ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>*/}
+      {/*  <Avatar*/}
+      {/*    variant="rounded"*/}
+      {/*    sx={{*/}
+      {/*      ...theme.typography.commonAvatar,*/}
+      {/*      ...theme.typography.mediumAvatar,*/}
+      {/*      ...theme.typography.menuButton,*/}
+      {/*      transition: 'all .2s ease-in-out',*/}
+      {/*      '&:hover': {*/}
+      {/*        background: `${theme.palette.primary.main}!important`,*/}
+      {/*        color: theme.palette.primary.light*/}
+      {/*      }*/}
+      {/*    }}*/}
+      {/*    onClick={handleLeftDrawerToggle}*/}
+      {/*    color="inherit"*/}
+      {/*  >*/}
+      {/*    <IconMenu2 stroke={1.5} size="1.3rem" />*/}
+      {/*  </Avatar>*/}
+      {/*</ButtonBase>*/}
+    </div>
   );
 };
 

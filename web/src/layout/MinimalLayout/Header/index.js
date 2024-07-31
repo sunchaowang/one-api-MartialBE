@@ -60,7 +60,7 @@ const Header = () => {
           <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
             {isMobile ? (
               <Space size={16}>
-                <ThemeButton />
+                {/*<ThemeButton />*/}
                 <I18nButton />
                 <IconButton onClick={handleOpenMenu}>
                   <IconMenu2 />
@@ -80,7 +80,7 @@ const Header = () => {
                   {t('menu.about')}
                 </Button>
                 <ContactButton />
-                <ThemeButton />
+                {/*<ThemeButton />*/}
                 <I18nButton />
                 {account.user ? (
                   <>

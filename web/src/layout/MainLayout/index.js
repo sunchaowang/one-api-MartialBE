@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import AuthGuard from '@/utils/route-guard/AuthGuard';
-import styled from '../style.module.scss';
+import styled from './style.module.scss';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { AppBar, Box, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
@@ -14,44 +14,7 @@ import Sidebar from './Sidebar';
 import navigation from '@/menu-items';
 import { drawerWidth } from '@/store/constant';
 import { SET_MENU } from '@/store/actions';
-import { Layout, Card } from '@arco-design/web-react';
-
-// assets
-import { IconChevronRight } from '@tabler/icons-react';
-
-// styles
-// const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
-//   ...theme.typography.mainContent,
-//   borderBottomLeftRadius: 0,
-//   borderBottomRightRadius: 0,
-//   transition: theme.transitions.create(
-//     'margin',
-//     open
-//       ? {
-//           easing: theme.transitions.easing.easeOut,
-//           duration: theme.transitions.duration.enteringScreen
-//         }
-//       : {
-//           easing: theme.transitions.easing.sharp,
-//           duration: theme.transitions.duration.leavingScreen
-//         }
-//   ),
-//   [theme.breakpoints.up('md')]: {
-//     marginLeft: open ? 0 : -(drawerWidth - 20),
-//     width: `calc(100% - ${drawerWidth}px)`
-//   },
-//   [theme.breakpoints.down('md')]: {
-//     marginLeft: '20px',
-//     width: `calc(100% - ${drawerWidth}px)`,
-//     padding: '16px'
-//   },
-//   [theme.breakpoints.down('sm')]: {
-//     marginLeft: '10px',
-//     width: `calc(100% - ${drawerWidth}px)`,
-//     padding: '16px',
-//     marginRight: '10px'
-//   }
-// }));
+import { Layout, Card, Drawer } from '@arco-design/web-react';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -67,54 +30,40 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    // <Box sx={{ display: 'flex' }}>
-    //   <CssBaseline />
-    //   {/* header */}
-    //   <AppBar
-    //     enableColorOnDark
-    //     position="fixed"
-    //     color="inherit"
-    //     elevation={0}
-    //     sx={{
-    //       bgcolor: theme.palette.background.default,
-    //       transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
-    //     }}
-    //   >
-    //     <Toolbar>
-    //       <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
-    //     </Toolbar>
-    //   </AppBar>
-    //   {/* drawer */}
-    //   <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
-    //   {/* main content */}
-    //   <Main theme={theme} open={leftDrawerOpened}>
-    //     {/* breadcrumb */}
-    //     <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-    //     <AuthGuard>
-    //       <AdminContainer>
-    //         <Outlet />
-    //       </AdminContainer>
-    //     </AuthGuard>
-    //   </Main>
-    // </Box>
     <Layout className={styled.layout}>
-      <Layout.Header className={styled['layout-header']}>
-        <Header></Header>
-      </Layout.Header>
+      {!isMobile ? (
+        <Layout.Sider className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
+          <Sidebar
+            isMobile={false}
+            drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}
+            drawerToggle={handleLeftDrawerToggle}
+          />
+        </Layout.Sider>
+      ) : (
+        <Drawer visible={leftDrawerOpened} footer={null} title={null} closeIcon={null} placement={'left'} onCancel={handleLeftDrawerToggle}>
+          <Sidebar
+            isMobile={isMobile}
+            drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}
+            drawerToggle={handleLeftDrawerToggle}
+            onCloseDrawer={handleLeftDrawerToggle}
+          />
+        </Drawer>
+      )}
+
       <Layout.Content className={styled['layout-content']}>
-        <Layout>
-          {!isMobile && (
-            <Layout.Sider className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
-              <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
-            </Layout.Sider>
-          )}
-          <Layout.Content>
-            <Card>
-              <AuthGuard>
-                <AdminContainer>
-                  <Outlet></Outlet>
-                </AdminContainer>
-              </AuthGuard>
+        <Layout style={{ width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#eef2f6' }}>
+          <Layout.Header className={styled['layout-header']}>
+            <Header showMenuCollapse={true} showLogo={false}></Header>
+          </Layout.Header>
+          <Layout.Content style={{ width: '100%', height: '100%' }}>
+            <Card style={{ width: '100%', height: '100%', overflow: 'scroll', backgroundColor: '#eef2f6' }}>
+              <div style={{ width: '100%', height: '100%', paddingBottom: 68 }}>
+                <AuthGuard>
+                  <AdminContainer>
+                    <Outlet></Outlet>
+                  </AdminContainer>
+                </AuthGuard>
+              </div>
             </Card>
           </Layout.Content>
         </Layout>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Grid, Typography, Button } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
+import { Button } from '@arco-design/web-react';
 import { gridSpacing } from '@/store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from '@/ui-component/chart/ApexCharts';
@@ -9,6 +10,7 @@ import { API } from '@/utils/api';
 import { showError, calculateQuota, renderNumber } from '@/utils/common';
 import UserCard from '@/ui-component/cards/UserCard';
 import BaseCheckInButton from '@/ui-component/BaseCheckInButton';
+import CheckInModal from '@/ui-component/CheckInModal';
 import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
@@ -18,6 +20,8 @@ const Dashboard = () => {
   const [quotaChart, setQuotaChart] = useState(null);
   const [tokenChart, setTokenChart] = useState(null);
   const [users, setUsers] = useState([]);
+  const [checkinModalVisible, setCheckinModalVisible] = useState(false);
+
   const { t } = useTranslation();
 
   const userDashboard = async () => {
@@ -36,8 +40,7 @@ const Dashboard = () => {
         showError(message);
       }
       setLoading(false);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const loadUser = async () => {
@@ -49,8 +52,7 @@ const Dashboard = () => {
       } else {
         showError(message);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -124,8 +126,19 @@ const Dashboard = () => {
                   <Typography variant="h4">签到:</Typography>
                 </Grid>
                 <Grid item xs={8}>
-                  <Button variant="contained" disabled={!!users?.check_in}>
-                    <BaseCheckInButton check_in={!!users?.check_in} loadUser={loadUser}></BaseCheckInButton>
+                  <CheckInModal
+                    visible={checkinModalVisible}
+                    onCancel={() => {
+                      setCheckinModalVisible(false);
+                      loadUser().then();
+                    }}
+                    onClose={() => {
+                      setCheckinModalVisible(false);
+                      loadUser().then();
+                    }}
+                  />
+                  <Button onClick={() => setCheckinModalVisible(true)} type={'primary'} disabled={!!users?.check_in}>
+                    {!users?.check_in ? '立即签到' : '已签到'}
                   </Button>
                 </Grid>
               </Grid>

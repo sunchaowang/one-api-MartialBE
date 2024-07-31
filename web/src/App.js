@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, useTheme } from '@mui/material/styles';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
 import { SET_THEME } from '@/store/actions';
 import { I18nextProvider } from 'react-i18next';
@@ -37,6 +37,28 @@ const App = () => {
       dispatch({ type: SET_THEME, theme: storedTheme });
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    onChangeTheme();
+  }, [customization]);
+
+  function onChangeTheme() {
+    // const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)');
+    //
+    // darkThemeMq.addListener((e) => {
+    //   if (e.matches) {
+    //     document.body.setAttribute('arco-theme', 'dark');
+    //   } else {
+    //     document.body.removeAttribute('arco-theme');
+    //   }
+    // });
+    console.log('theme', customization.theme);
+    if (customization.theme === 'dark') {
+      document.body.setAttribute('arco-theme', 'dark');
+    } else {
+      document.body.removeAttribute('arco-theme');
+    }
+  }
 
   return (
     <StyledEngineProvider injectFirst>

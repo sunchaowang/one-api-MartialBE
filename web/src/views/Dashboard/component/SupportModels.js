@@ -4,6 +4,7 @@ import SubCard from '@/ui-component/cards/SubCard';
 import { API } from '@/utils/api';
 import { showError, copy } from '@/utils/common';
 import { Typography, Accordion, AccordionSummary, AccordionDetails, Box, Stack } from '@mui/material';
+import { Tag, Card } from '@arco-design/web-react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Label from '@/ui-component/Label';
 import { useTranslation } from 'react-i18next';
@@ -44,22 +45,22 @@ const SupportModels = () => {
       <AccordionDetails>
         <Stack spacing={1}>
           {Object.entries(modelList).map(([title, models]) => (
-            <SubCard key={title} title={title === 'null' ? t('dashboard_index.other_models') : title}>
+            <Card key={title} title={title === 'null' ? t('dashboard_index.other_models') : title}>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {models.map((model) => (
-                  <Label
-                    variant="outlined"
-                    color="primary"
+                  <Tag
+                    type="primary"
+                    color="arcoblue"
                     key={model}
                     onClick={() => {
                       copy(model, t('dashboard_index.model_name'));
                     }}
                   >
                     {model}
-                  </Label>
+                  </Tag>
                 ))}
               </Box>
-            </SubCard>
+            </Card>
           ))}
         </Stack>
       </AccordionDetails>
