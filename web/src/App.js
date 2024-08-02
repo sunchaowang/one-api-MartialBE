@@ -52,7 +52,8 @@ const App = () => {
     //     document.body.removeAttribute('arco-theme');
     //   }
     // });
-    console.log('theme', customization.theme);
+    // 获取主题
+
     if (customization.theme === 'dark') {
       document.body.setAttribute('arco-theme', 'dark');
     } else {

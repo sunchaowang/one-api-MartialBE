@@ -10,7 +10,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 
-import { Button, Card, Stack, Container, Typography, Box } from '@mui/material';
+import { Stack, Container, Typography, Box } from '@mui/material';
 import LogTableRow from './component/TableRow';
 import KeywordTableHead from '@/ui-component/TableHead';
 import TableToolBar from './component/TableToolBar';
@@ -20,6 +20,7 @@ import { ITEMS_PER_PAGE } from '@/constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { Button, Card, Form, Grid, Pagination, Space, Tag } from '@arco-design/web-react';
 
 export default function Log() {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ export default function Log() {
   const [toolBarValue, setToolBarValue] = useState(originalKeyword);
   const [searchKeyword, setSearchKeyword] = useState(originalKeyword);
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [searchTimestamp, setSearchTimestamp] = useState(0);
 
   const [logs, setLogs] = useState([]);
   const userIsAdmin = isAdmin();
@@ -56,18 +58,21 @@ export default function Log() {
     }
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (newPage, pageSize) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (size) => {
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(parseInt(size, 10));
   };
 
   const searchLogs = async () => {
-    setPage(0);
-    setSearchKeyword(toolBarValue);
+    // setPage(0);
+    setSearchTimestamp(dayjs().valueOf());
+    setTimeout(() => {
+      setSearchKeyword(toolBarValue);
+    });
   };
 
   const handleToolBarValue = (event) => {
@@ -93,6 +98,7 @@ export default function Log() {
             page: page + 1,
             size: rowsPerPage,
             order: orderBy,
+            _t: dayjs().valueOf(),
             ...keyword
           }
         });
@@ -122,38 +128,29 @@ export default function Log() {
 
   useEffect(() => {
     fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
-  }, [page, rowsPerPage, searchKeyword, order, orderBy, fetchData, refreshFlag]);
+  }, [page, rowsPerPage, searchKeyword, order, orderBy, fetchData, refreshFlag, searchTimestamp]);
 
   return (
-    <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('logPage.title')}</Typography>
-      </Stack>
-      <Card>
-        <Box component="form" noValidate>
-          <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} userIsAdmin={userIsAdmin} />
-        </Box>
-        <Toolbar
-          sx={{
-            textAlign: 'right',
-            height: 50,
-            display: 'flex',
-            justifyContent: 'space-between',
-            p: (theme) => theme.spacing(0, 1, 0, 3)
-          }}
-        >
-          <Container>
-            <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
+    <Card title={<Typography variant="h4">{t('logPage.title')}</Typography>}>
+      <>
+        <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} userIsAdmin={userIsAdmin} />
+        <Grid.Row justify={'end'}>
+          <Form.Item>
+            <Space>
+              <Button loading={searching} onClick={handleRefresh} icon={<IconRefresh width={'18px'} className={'arco-icon'} />}>
                 {t('logPage.refreshButton')}
               </Button>
-
-              <Button onClick={searchLogs} startIcon={<IconSearch width={'18px'} />}>
+              <Button
+                loading={searching}
+                type={'primary'}
+                onClick={searchLogs}
+                icon={<IconSearch width={'18px'} className={'arco-icon'} />}
+              >
                 {t('logPage.searchButton')}
               </Button>
-            </ButtonGroup>
-          </Container>
-        </Toolbar>
+            </Space>
+          </Form.Item>
+        </Grid.Row>
         {searching && <LinearProgress />}
         <PerfectScrollbar component="div">
           <TableContainer sx={{ overflow: 'unset' }}>
@@ -231,18 +228,22 @@ export default function Log() {
             </Table>
           </TableContainer>
         </PerfectScrollbar>
-        <TablePagination
-          page={page}
-          component="div"
-          count={listCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          showFirstButton
-          showLastButton
-        />
-      </Card>
-    </>
+        <Card>
+          <Grid.Row justify={'end'}>
+            <Pagination
+              current={page}
+              total={listCount}
+              pageSize={rowsPerPage}
+              onChange={handleChangePage}
+              sizeOptions={[10, 25, 30]}
+              onPageSizeChange={handleChangeRowsPerPage}
+              showTotal
+              showJumper
+              sizeCanChange
+            />
+          </Grid.Row>
+        </Card>
+      </>
+    </Card>
   );
 }

@@ -5,51 +5,42 @@ import { TableRow, TableCell, Stack } from '@mui/material';
 import { timestamp2string, renderQuota } from '@/utils/common';
 import Label from '@/ui-component/Label';
 import LogType from '../type/LogType';
+import { Button, Card, Grid, Table, Tag } from '@arco-design/web-react';
 
 function renderType(type) {
   const typeOption = LogType[type];
   if (typeOption) {
-    return (
-      <Label variant="filled" color={typeOption.color}>
-        {' '}
-        {typeOption.text}{' '}
-      </Label>
-    );
+    return <Tag color={typeOption.color}> {typeOption.text} </Tag>;
   } else {
-    return (
-      <Label variant="filled" color="error">
-        {' '}
-        未知{' '}
-      </Label>
-    );
+    return <Tag color="red"> 未知 </Tag>;
   }
 }
 
 function requestTimeLabelOptions(request_time) {
-  let color = 'error';
+  let color = 'red';
   if (request_time === 0) {
-    color = 'default';
+    color = '';
   } else if (request_time <= 1000) {
-    color = 'success';
+    color = 'green';
   } else if (request_time <= 3000) {
-    color = 'primary';
+    color = 'green';
   } else if (request_time <= 5000) {
-    color = 'secondary';
+    color = 'arcoblue';
   }
 
   return color;
 }
 
 function requestTSLabelOptions(request_ts) {
-  let color = 'success';
+  let color = 'green';
   if (request_ts === 0) {
-    color = 'default';
+    color = '';
   } else if (request_ts <= 10) {
-    color = 'error';
+    color = 'red';
   } else if (request_ts <= 15) {
     color = 'secondary';
   } else if (request_ts <= 20) {
-    color = 'primary';
+    color = 'arcoblue';
   }
 
   return color;
@@ -76,10 +67,7 @@ export default function LogTableRow({ item, userIsAdmin }) {
               {item.type === 2 ? (
                 <>
                   <div>
-                    <Label color={'default'} variant={'outlined'}>
-                      {' '}
-                      {item.channel_id}{' '}
-                    </Label>
+                    <Tag>{item.channel_id} </Tag>
                   </div>
                   {item.channel?.name}
                 </>
@@ -93,33 +81,30 @@ export default function LogTableRow({ item, userIsAdmin }) {
           <TableCell>
             <Stack direction={'column'} width={'auto'}>
               <div>
-                <Label color={'default'} variant={'outlined'}>
-                  {item.user_id}
-                </Label>
+                <Tag variant={'outlined'}>{item.user_id}</Tag>
               </div>
               {item.username}
             </Stack>
           </TableCell>
         )}
-        <TableCell>
-          {item.token_name && (
-            <Label color="default" variant="soft">
-              {item.token_name}
-            </Label>
-          )}
-        </TableCell>
+        <TableCell>{item.token_name && <Tag size={'small'}>{item.token_name}</Tag>}</TableCell>
         <TableCell>{renderType(item.type)}</TableCell>
         <TableCell>
           {item.model_name && (
-            <Label color="primary" variant="outlined">
+            <Tag color="arcoblue" bordered>
               {item.model_name}
-            </Label>
+            </Tag>
           )}
         </TableCell>
         <TableCell>
           <Stack direction="row" spacing={1}>
-            <Label color={requestTimeLabelOptions(item.request_time)}> {item.request_time == 0 ? '无' : request_time_str} </Label>
-            {request_ts_str && <Label color={requestTSLabelOptions(request_ts)}> {request_ts_str} </Label>}
+            <Tag color={requestTimeLabelOptions(item.request_time)}> {item.request_time == 0 ? '无' : request_time_str} </Tag>
+            {request_ts_str && (
+              <Tag size={'small'} color={requestTSLabelOptions(request_ts)}>
+                {' '}
+                {request_ts_str}{' '}
+              </Tag>
+            )}
           </Stack>
         </TableCell>
         <TableCell>{String(item.type) === LogType['2'].value ? item.prompt_tokens || '0' : ''}</TableCell>

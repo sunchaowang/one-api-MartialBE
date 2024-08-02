@@ -32,12 +32,14 @@ const MainLayout = () => {
   return (
     <Layout className={styled.layout}>
       {!isMobile ? (
-        <Layout.Sider className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
-          <Sidebar
-            isMobile={false}
-            drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}
-            drawerToggle={handleLeftDrawerToggle}
-          />
+        <Layout.Sider collapsedWidth={80} className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
+          <Card>
+            <Sidebar
+              isMobile={false}
+              drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}
+              drawerToggle={handleLeftDrawerToggle}
+            />
+          </Card>
         </Layout.Sider>
       ) : (
         <Drawer visible={leftDrawerOpened} footer={null} title={null} closeIcon={null} placement={'left'} onCancel={handleLeftDrawerToggle}>
