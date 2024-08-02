@@ -37,7 +37,8 @@ func (r *ChatCacheRedis) Set(hash string, props *ChatCacheProps, expire int64) e
 		return errors.New("marshal error")
 	}
 
-	return redis.RedisSet(r.getKey(hash, props.UserId), data, time.Duration(expire)*time.Hour*24)
+	//return redis.RedisSet(r.getKey(hash, props.UserId), data, time.Duration(expire)*time.Hour*24)
+	return redis.RedisSet(r.getKey(props.RequestId, props.UserId), data, time.Duration(expire)*time.Hour*24)
 }
 
 func (r *ChatCacheRedis) getKey(hash string, userId int) string {
