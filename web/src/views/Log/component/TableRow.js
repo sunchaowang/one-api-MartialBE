@@ -38,9 +38,9 @@ function requestTSLabelOptions(request_ts) {
   } else if (request_ts <= 10) {
     color = 'red';
   } else if (request_ts <= 15) {
-    color = 'secondary';
+    color = 'green';
   } else if (request_ts <= 20) {
-    color = 'arcoblue';
+    color = 'green';
   }
 
   return color;
@@ -48,7 +48,7 @@ function requestTSLabelOptions(request_ts) {
 
 export default function LogTableRow({ item, userIsAdmin }) {
   let request_time = item.request_time / 1000;
-  let request_time_str = request_time.toFixed(2) + ' 秒';
+  let request_time_str = request_time.toFixed(2) + ' s';
   let request_ts = 0;
   let request_ts_str = '';
   if (request_time > 0 && item.completion_tokens > 0) {
