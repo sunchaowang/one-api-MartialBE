@@ -42,7 +42,14 @@ const MainLayout = () => {
           </Card>
         </Layout.Sider>
       ) : (
-        <Drawer visible={leftDrawerOpened} footer={null} title={null} closeIcon={null} placement={'left'} onCancel={handleLeftDrawerToggle}>
+        <Drawer
+          visible={!leftDrawerOpened}
+          footer={null}
+          title={null}
+          closeIcon={null}
+          placement={'left'}
+          onCancel={handleLeftDrawerToggle}
+        >
           <Sidebar
             isMobile={isMobile}
             drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}

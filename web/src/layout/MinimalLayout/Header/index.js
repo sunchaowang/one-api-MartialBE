@@ -1,20 +1,8 @@
 // material-ui
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import {
-  Box,
-  Stack,
-  Popper,
-  IconButton,
-  List,
-  ListItemButton,
-  Paper,
-  ListItemText,
-  Typography,
-  Divider,
-  ClickAwayListener
-} from '@mui/material';
-import { Grid, Space, Card } from '@arco-design/web-react';
+import { Popper, List, ListItemButton, Paper, ListItemText, Divider, ClickAwayListener } from '@mui/material';
+import { Grid, Space, Card, Menu } from '@arco-design/web-react';
 import LogoSection from '@/layout/MainLayout/LogoSection';
 import { Link } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -27,7 +15,7 @@ import { IconMenu2 } from '@tabler/icons-react';
 import Transitions from '@/ui-component/extended/Transitions';
 import MainCard from '@/ui-component/cards/MainCard';
 import { useMediaQuery } from '@mui/material';
-import { Button } from '@arco-design/web-react';
+import { Button, Dropdown, Typography } from '@arco-design/web-react';
 import { useTranslation } from 'react-i18next';
 import styled from './style.module.scss';
 
@@ -50,6 +38,59 @@ const Header = () => {
     setOpen(null);
   };
 
+  const onClickMenuItem = (key) => {
+    switch (key) {
+      case 'menu.home':
+        navigate('/');
+        return;
+      case 'menu.playground':
+        navigate('/playground');
+        return;
+      case 'menu.about':
+        navigate('/about');
+        return;
+      case 'menu.console':
+        navigate('/panel/dashboard');
+        return;
+      case 'menu.login':
+        navigate('/login');
+        return;
+      default:
+        return;
+    }
+  };
+
+  const renderDropMenuList = (
+    <Menu
+      onClickMenuItem={onClickMenuItem}
+      style={{
+        width: '100vw'
+      }}
+    >
+      <Menu.Item key={'menu.home'}>
+        <Typography.Text variant="body2">{t('menu.home')}</Typography.Text>
+      </Menu.Item>
+
+      <Menu.Item key={'menu.about'}>
+        <Typography.Text variant="body2">{t('menu.about')}</Typography.Text>
+      </Menu.Item>
+      {account.user ? (
+        [
+          <Menu.Item key={'menu.playground'}>
+            <Typography.Text>Playground</Typography.Text>
+          </Menu.Item>,
+          <Menu.Item key={'menu.console'}>
+            <Typography.Text variant="body2">{t('menu.console')}</Typography.Text>
+          </Menu.Item>
+        ]
+      ) : (
+        <Menu.Item key={'menu.login'}>
+          <Typography.Text variant="body2">{t('menu.login')}</Typography.Text>
+        </Menu.Item>
+      )}
+    </Menu>
+  );
+
   return (
     <>
       <Grid.Row style={{ width: '100%' }} align="center" justify="space-around">
@@ -62,9 +103,12 @@ const Header = () => {
               <Space size={16}>
                 {/*<ThemeButton />*/}
                 <I18nButton />
-                <IconButton onClick={handleOpenMenu}>
-                  <IconMenu2 />
-                </IconButton>
+                <Dropdown droplist={renderDropMenuList}>
+                  <Button shape={'circle'}>
+                    <IconMenu2 className={'arco-icon'} />
+                  </Button>
+                </Dropdown>
+                {/*<Button shape={'circle'} onClick={handleOpenMenu}></Button>*/}
               </Space>
             ) : (
               <Space size={16}>
@@ -99,7 +143,7 @@ const Header = () => {
           </div>
         </Grid.Col>
       </Grid.Row>
-      {/* <Popper
+      <Popper
         open={!!open}
         anchorEl={open}
         transition
@@ -166,7 +210,7 @@ const Header = () => {
             </ClickAwayListener>
           </Transitions>
         )}
-      </Popper> */}
+      </Popper>
     </>
   );
 };

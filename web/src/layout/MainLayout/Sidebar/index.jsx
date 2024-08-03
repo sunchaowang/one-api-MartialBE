@@ -69,7 +69,7 @@ export default function MenuSider({ isMobile, onCloseDrawer }) {
     <>
       <div style={{ width: '100%', height: '100%', overflowY: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <Card>
-          <div style={{ height: '36px' }}>{leftDrawerOpened ? <LogoSection /> : <></>}</div>
+          <div style={{ height: '36px' }}>{isMobile || leftDrawerOpened ? <LogoSection /> : <></>}</div>
         </Card>
 
         <div style={{ width: '100%', height: '100%', overflowY: 'scroll' }}>

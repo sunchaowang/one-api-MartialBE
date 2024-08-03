@@ -271,6 +271,18 @@ const Index = () => {
                     isSupport: '支持'
                   },
                   {
+                    name: 'gpt-4o,gpt-4o-2024-05-13',
+                    inputTokens: '$0.005',
+                    outputTokens: '$0.015',
+                    isSupport: '支持'
+                  },
+                  {
+                    name: 'gpt-4o-mini,gpt-4o-mini-2024-07-18',
+                    inputTokens: '$0.00015',
+                    outputTokens: '$0.0006',
+                    isSupport: '支持'
+                  },
+                  {
                     name: 'dall-e-3 1024x1024',
                     timesPrice: '$0.04 每次',
                     isSupport: '支持'
@@ -366,6 +378,12 @@ const Index = () => {
               {renderModalTable(
                 [
                   {
+                    name: 'claude-3-5-sonnet-20240620',
+                    inputTokens: '$0.003',
+                    outputTokens: '$0.015',
+                    isSupport: '支持'
+                  },
+                  {
                     name: 'claude-3-opus-20240229',
                     inputTokens: '$0.015',
                     outputTokens: '$0.075',
@@ -418,9 +436,21 @@ const Index = () => {
               {renderModalTable(
                 [
                   {
-                    name: 'llama2-70b-4096',
-                    inputTokens: '$0.0007',
-                    outputTokens: '$0.0007',
+                    name: 'meta-llama/llama-3.1-405b-instruct',
+                    inputTokens: '$0.003',
+                    outputTokens: '$0.003',
+                    isSupport: '支持'
+                  },
+                  {
+                    name: 'meta-llama/llama-3.1-70b-instruct',
+                    inputTokens: '$0.0009',
+                    outputTokens: '$0.0009',
+                    isSupport: '支持'
+                  },
+                  {
+                    name: 'meta-llama/llama-3.1-8b-instruct',
+                    inputTokens: '$0.0002',
+                    outputTokens: '$0.0002',
                     isSupport: '支持'
                   },
                   {
