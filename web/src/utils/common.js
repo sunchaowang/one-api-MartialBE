@@ -2,7 +2,7 @@
 import { snackbarConstants } from '@/constants/SnackbarConstants';
 import { API } from './api';
 import { CHAT_LINKS } from '@/constants/chatLinks';
-import { Message } from '@arco-design/web-react';
+import { message } from 'antd';
 
 export function getSystemName() {
   let system_name = localStorage.getItem('system_name');
@@ -98,9 +98,13 @@ export async function getOAuthState() {
   }
 }
 
-export async function onGitHubOAuthClicked(github_client_id, openInNewTab = false) {
+export async function onGitHubOAuthClicked(github_client_id, openInNewTab = false, githubLoading, setGithubLoading) {
+  setGithubLoading(true);
   const state = await getOAuthState();
-  if (!state) return;
+  if (!state) {
+    setGithubLoading(false);
+    return;
+  }
   let url = `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`;
   if (openInNewTab) {
     window.open(url);
@@ -233,9 +237,13 @@ export function trims(values) {
 }
 
 // LinkDO auth
-export async function onLinuxDOAuthClicked(linuxdo_client_id, openInNewTab) {
+export async function onLinuxDOAuthClicked(linuxdo_client_id, openInNewTab, linuxDoLoading, setLinuxDoLoading) {
+  setLinuxDoLoading(true);
   const state = await getOAuthState();
-  if (!state) return;
+  if (!state) {
+    setLinuxDoLoading(false);
+    return;
+  }
   let url = `https://connect.linux.do/oauth2/authorize?client_id=${linuxdo_client_id}&response_type=code&state=${state}&scope=user:profile`;
   if (openInNewTab) {
     window.open(url);
@@ -281,20 +289,20 @@ export function replaceChatPlaceholders(text, key, server) {
   return text.replace('{key}', key).replace('{server}', server);
 }
 
-function enqueueSnackbar(message, type = 'success') {
+function enqueueSnackbar(content, type = 'success') {
   if (type === 'info') {
-    Message.info({
-      content: message
+    message.info({
+      content: content
     });
   }
   if (type === 'error') {
-    Message.error({
-      content: message
+    message.error({
+      content: content
     });
   }
   if (type === 'success') {
-    Message.success({
-      content: message
+    message.success({
+      content: content
     });
   }
 }

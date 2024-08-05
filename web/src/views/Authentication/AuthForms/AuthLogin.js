@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput, Stack, Typography } from '@mui/material';
+import { Box, FormControl, FormHelperText } from '@mui/material';
 
-import { Button, Form, Input, Divider, Grid, Link } from '@arco-design/web-react';
+import { Button, Form, Input, Divider, Row, Col, Typography } from 'antd';
 
 // third party
 import * as Yup from 'yup';
@@ -95,7 +95,7 @@ const LoginForm = ({ ...others }) => {
                 onChange={(e) =>
                   handleChange({
                     target: {
-                      value: e,
+                      value: e.target.value,
                       name: 'username'
                     }
                   })
@@ -110,7 +110,7 @@ const LoginForm = ({ ...others }) => {
                 onChange={(e) =>
                   handleChange({
                     target: {
-                      value: e,
+                      value: e.target.value,
                       name: 'password'
                     }
                   })
@@ -169,9 +169,9 @@ const LoginForm = ({ ...others }) => {
             {/*    </FormHelperText>*/}
             {/*  )}*/}
             {/*</FormControl>*/}
-            <Link type="text" onClick={() => navigate('/reset')}>
+            <Typography.Link type="text" onClick={() => navigate('/reset')}>
               {t('login.forgetPassword')}
-            </Link>
+            </Typography.Link>
             {errors.submit && (
               <Box sx={{ mt: 3 }}>
                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -188,11 +188,13 @@ const LoginForm = ({ ...others }) => {
             ) : (
               <></>
             )}
-            <Grid.Row sx={{ mt: 2 }}>
-              <Button onClick={handleSubmit} long loading={isSubmitting} fullWidth size="large" type="primary">
-                {t('menu.login')}
-              </Button>
-            </Grid.Row>
+            <Row>
+              <Col span={24}>
+                <Button block onClick={handleSubmit} long loading={isSubmitting} fullWidth size={'large'} type="primary">
+                  {t('menu.login')}
+                </Button>
+              </Col>
+            </Row>
           </Form>
         )}
       </Formik>

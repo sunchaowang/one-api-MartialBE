@@ -10,7 +10,7 @@ import AuthCardWrapper from '../AuthCardWrapper';
 import AuthLogin from '../AuthForms/AuthLogin';
 import Logo from '@/ui-component/Logo';
 
-import { Card, Grid, Divider } from '@arco-design/web-react';
+import { Card, Row, Col, Divider } from 'antd';
 
 import { useTranslation } from 'react-i18next';
 
@@ -22,33 +22,33 @@ const Login = () => {
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <Card>
-      <Grid.Row justify={'center'} align={'center'}>
-        <Grid.Col xs={24} lg={12}>
-          <Grid.Col lg={24} xs={24}>
-            <Card>
-              <Grid.Row align={'center'} justify={'center'}>
+    <Card bordered={false}>
+      <Row justify={'center'} align={'center'}>
+        <Col xs={24} sm={18} md={12} lg={8} xl={6} xxl={4} xxxl={2}>
+          <Col lg={24} xs={24}>
+            <Card bordered={false}>
+              <Row align={'center'} justify={'center'}>
                 <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
                   {t('menu.login')}
                 </Typography>
-              </Grid.Row>
+              </Row>
             </Card>
-          </Grid.Col>
-          <Grid.Col lg={24} xs={24}>
+          </Col>
+          <Col lg={24} xs={24}>
             <AuthLogin />
-          </Grid.Col>
-          <Grid.Col lg={24} xs={24}>
+          </Col>
+          <Col lg={24} xs={24}>
             <Divider />
-          </Grid.Col>
-          <Grid.Col lg={24} xs={24}>
-            <Grid.Row align={'center'} justify={'center'}>
+          </Col>
+          <Col lg={24} xs={24}>
+            <Row align={'center'} justify={'center'}>
               <Typography component={Link} to="/register" variant="subtitle1" sx={{ textDecoration: 'none' }}>
                 {t('menu.signup')}
               </Typography>
-            </Grid.Row>
-          </Grid.Col>
-        </Grid.Col>
-      </Grid.Row>
+            </Row>
+          </Col>
+        </Col>
+      </Row>
     </Card>
   );
 };

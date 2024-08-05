@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Popper, List, ListItemButton, Paper, ListItemText, Divider, ClickAwayListener } from '@mui/material';
-import { Grid, Space, Card, Menu } from '@arco-design/web-react';
+import { Grid, Space, Row, Col, Menu } from 'antd';
 import LogoSection from '@/layout/MainLayout/LogoSection';
 import { Link } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ import { IconMenu2 } from '@tabler/icons-react';
 import Transitions from '@/ui-component/extended/Transitions';
 import MainCard from '@/ui-component/cards/MainCard';
 import { useMediaQuery } from '@mui/material';
-import { Button, Dropdown, Typography } from '@arco-design/web-react';
+import { Button, Dropdown, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import styled from './style.module.scss';
 
@@ -93,11 +93,11 @@ const Header = () => {
 
   return (
     <>
-      <Grid.Row style={{ width: '100%' }} align="center" justify="space-around">
-        <Grid.Col flex={'150px'}>
+      <Row style={{ width: '100%' }} align="middle" justify="space-around">
+        <Col flex={'150px'}>
           <LogoSection />
-        </Grid.Col>
-        <Grid.Col flex={'auto'}>
+        </Col>
+        <Col flex={'auto'}>
           <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
             {isMobile ? (
               <Space size={16}>
@@ -141,8 +141,8 @@ const Header = () => {
               </Space>
             )}
           </div>
-        </Grid.Col>
-      </Grid.Row>
+        </Col>
+      </Row>
       <Popper
         open={!!open}
         anchorEl={open}

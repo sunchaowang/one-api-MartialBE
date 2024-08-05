@@ -4,7 +4,7 @@ import { API } from '@/utils/api';
 import { marked } from 'marked';
 import HomeContent from './HomeContent';
 import { useTranslation } from 'react-i18next';
-import { Modal } from '@arco-design/web-react';
+import { Modal } from 'antd';
 
 const Home = () => {
   const { t } = useTranslation();

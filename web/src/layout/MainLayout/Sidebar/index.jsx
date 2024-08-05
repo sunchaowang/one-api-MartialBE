@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { Card, Menu, Message, Space } from '@arco-design/web-react';
+import { Card, Menu } from 'antd';
 
 import menuItem from '@/menu-items';
 import { useTranslation } from 'react-i18next';
-import { Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_MENU } from '@/store/actions';
 import LogoSection from '@/layout/MainLayout/LogoSection';
@@ -36,12 +35,11 @@ function BaseMenu(props) {
   }, [location, panelMenus]);
 
   return (
-    <Menu mode={'pop'} selectedKeys={selectedMenuItemKeys} {...props}>
+    <Menu selectedKeys={selectedMenuItemKeys} {...props}>
       {panelMenus.children.map((child) => (
-        <MenuItem key={`${child.id}`} title={child.title}>
-          {child.icon && <child.icon className="arco-icon" />}
+        <Menu.Item key={`${child.id}`} title={child.title} icon={<child.icon className="arco-icon" />}>
           {child.title}
-        </MenuItem>
+        </Menu.Item>
       ))}
     </Menu>
   );
@@ -53,7 +51,7 @@ export default function MenuSider({ isMobile, onCloseDrawer }) {
 
   const dispatch = useDispatch();
 
-  function onClickMenuItem(key) {
+  function onClickMenuItem({ key }) {
     console.log('key', key);
     navigate(`/panel/${key}`);
     if (isMobile) {
@@ -68,12 +66,20 @@ export default function MenuSider({ isMobile, onCloseDrawer }) {
   return (
     <>
       <div style={{ width: '100%', height: '100%', overflowY: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <Card>
+        <Card
+          bordered={false}
+          styles={{
+            body: { boxShadow: 'none' }
+          }}
+          style={{
+            boxShadow: 'none'
+          }}
+        >
           <div style={{ height: '36px' }}>{isMobile || leftDrawerOpened ? <LogoSection /> : <></>}</div>
         </Card>
 
         <div style={{ width: '100%', height: '100%', overflowY: 'scroll' }}>
-          <BaseMenu onClickMenuItem={onClickMenuItem} onCollapseChange={onCollapseChange} style={{ width: '100%', height: '100%' }} />
+          <BaseMenu onClick={onClickMenuItem} onCollapseChange={onCollapseChange} style={{ width: '100%', height: '100%' }} />
         </div>
       </div>
     </>

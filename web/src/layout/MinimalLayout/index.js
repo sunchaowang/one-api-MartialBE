@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import Header from './Header';
 import Footer from '@/ui-component/Footer';
-import { Layout, Space } from '@arco-design/web-react';
+import { Layout } from 'antd';
 import styled from '../style.module.scss';
 
 // ==============================|| MINIMAL LAYOUT ||============================== //

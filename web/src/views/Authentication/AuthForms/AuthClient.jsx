@@ -1,13 +1,13 @@
 import { Box, useMediaQuery } from '@mui/material';
 import AnimateButton from '@/ui-component/extended/AnimateButton';
-import { Button, Grid, Space, Divider } from '@arco-design/web-react';
+import { Button, Row, Col, Space, Divider } from 'antd';
 import { onGitHubOAuthClicked, onLarkOAuthClicked, onLinuxDOAuthClicked } from '@/utils/common';
 import Github from '@/assets/images/icons/github.svg';
 import LinuxDo from '@/assets/images/icons/linuxdo.svg?react';
 import Wechat from '@/assets/images/icons/wechat.svg';
 import WechatModal from '@/views/Authentication/AuthForms/WechatModal';
 import Lark from '@/assets/images/icons/lark.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useLogin from '@/hooks/useLogin';
 import { useTheme } from '@mui/material/styles';
@@ -21,6 +21,9 @@ const AuthClient = () => {
   const customization = useSelector((state) => state.customization);
   const siteInfo = useSelector((state) => state.siteInfo);
   // const [checked, setChecked] = useState(true);
+  const [githubLoading, setGithubLoading] = useState(false);
+  const [linuxDoLoading, setLinuxDoLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
 
   let tripartiteLogin = false;
   if (siteInfo.github_oauth || siteInfo.linuxdo_oauth || siteInfo.wechat_login || siteInfo.lark_client_id) {
@@ -40,14 +43,29 @@ const AuthClient = () => {
     setOpenWechat(false);
   };
 
+  useEffect(() => {
+    if (githubLoading || linuxDoLoading) {
+      setAuthLoading(true);
+    } else {
+      setAuthLoading(false);
+    }
+  }, [githubLoading, linuxDoLoading]);
+
   return (
     <>
       {tripartiteLogin ? (
-        <Grid.Row>
+        <Row>
           <Space direction={'vertical'} style={{ width: '100%' }}>
             {siteInfo.github_oauth && (
-              <Grid.Col>
-                <Button onClick={() => onGitHubOAuthClicked(siteInfo.github_client_id)} long size={'large'}>
+              <Col>
+                <Button
+                  disabled={authLoading || githubLoading}
+                  loading={githubLoading}
+                  block
+                  onClick={() => onGitHubOAuthClicked(siteInfo.github_client_id, true, githubLoading, setGithubLoading)}
+                  long
+                  size={'large'}
+                >
                   <Space align={'center'}>
                     <img
                       src={Github}
@@ -59,20 +77,29 @@ const AuthClient = () => {
                     使用 Github 登录
                   </Space>
                 </Button>
-              </Grid.Col>
+              </Col>
             )}
             {siteInfo.linuxdo_oauth && (
-              <Grid.Col>
-                <Button disableElevation fullWidth onClick={() => onLinuxDOAuthClicked(siteInfo.linuxdo_client_id, true)} size="large" long>
+              <Col>
+                <Button
+                  disabled={authLoading || linuxDoLoading}
+                  loading={linuxDoLoading}
+                  block
+                  disableElevation
+                  fullWidth
+                  onClick={() => onLinuxDOAuthClicked(siteInfo.linuxdo_client_id, true, linuxDoLoading, setLinuxDoLoading)}
+                  size="large"
+                  long
+                >
                   <Space>
                     <LinuxDo style={{ width: '25px', height: '25px' }} />
                     使用 LinuxDO 登录
                   </Space>
                 </Button>
-              </Grid.Col>
+              </Col>
             )}
             {siteInfo.wechat_login && (
-              <Grid item xs={12}>
+              <Col item xs={12}>
                 <AnimateButton>
                   <Button
                     disableElevation
@@ -91,10 +118,10 @@ const AuthClient = () => {
                   </Button>
                 </AnimateButton>
                 <WechatModal open={openWechat} handleClose={handleWechatClose} wechatLogin={wechatLogin} qrCode={siteInfo.wechat_qrcode} />
-              </Grid>
+              </Col>
             )}
             {siteInfo.lark_login && (
-              <Grid item xs={12}>
+              <Col item xs={12}>
                 <AnimateButton>
                   <Button
                     disableElevation
@@ -112,44 +139,42 @@ const AuthClient = () => {
                     使用飞书登录
                   </Button>
                 </AnimateButton>
-              </Grid>
+              </Col>
             )}
-            <Grid item xs={12}>
+            <Col item xs={12}>
               <Box
                 sx={{
                   alignItems: 'center',
                   display: 'flex'
                 }}
               >
-                <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
+                {/*<Divider sx={{ flexGrow: 1 }} orientation="horizontal" />*/}
 
-                <Button
-                  variant="outlined"
-                  sx={{
-                    cursor: 'unset',
-                    m: 2,
-                    py: 0.5,
-                    px: 7,
-                    borderColor: `${theme.palette.grey[100]} !important`,
-                    color: `${theme.palette.grey[900]}!important`,
-                    fontWeight: 500,
-                    borderRadius: `${customization.borderRadius}px`
-                  }}
-                  disableRipple
-                  disabled
-                >
-                  OR
-                </Button>
+                {/*<Button*/}
+                {/*  variant="outlined"*/}
+                {/*  sx={{*/}
+                {/*    cursor: 'unset',*/}
+                {/*    m: 2,*/}
+                {/*    py: 0.5,*/}
+                {/*    px: 7,*/}
+                {/*    borderColor: `${theme.palette.grey[100]} !important`,*/}
+                {/*    color: `${theme.palette.grey[900]}!important`,*/}
+                {/*    fontWeight: 500,*/}
+                {/*    borderRadius: `${customization.borderRadius}px`*/}
+                {/*  }}*/}
+                {/*  disableRipple*/}
+                {/*  disabled*/}
+                {/*>*/}
+                {/*  OR*/}
+                {/*</Button>*/}
 
-                <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
+                {/*<Divider sx={{ flexGrow: 1 }} orientation="horizontal" />*/}
               </Box>
-            </Grid>
+            </Col>
           </Space>
           <Divider />
-        </Grid.Row>
-      ) : (
-        []
-      )}
+        </Row>
+      ) : null}
     </>
   );
 };

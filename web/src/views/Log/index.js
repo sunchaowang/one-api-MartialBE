@@ -1,18 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { showError, trims } from '@/utils/common';
+import { showError, timestamp2string, trims } from '@/utils/common';
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableContainer from '@mui/material/TableContainer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import TablePagination from '@mui/material/TablePagination';
+// import Table from '@mui/material/Table';
 import LinearProgress from '@mui/material/LinearProgress';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Toolbar from '@mui/material/Toolbar';
 
 import { Stack, Container, Typography, Box } from '@mui/material';
-import LogTableRow from './component/TableRow';
-import KeywordTableHead from '@/ui-component/TableHead';
+import LogTableRow, { tableRowColumns } from './component/TableRow';
 import TableToolBar from './component/TableToolBar';
 import { API } from '@/utils/api';
 import { isAdmin } from '@/utils/common';
@@ -20,7 +13,7 @@ import { ITEMS_PER_PAGE } from '@/constants';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Form, Grid, Pagination, Space, Tag } from '@arco-design/web-react';
+import { Button, Card, Form, Row, Col, Pagination, Space, Table, Tag } from 'antd';
 
 export default function Log() {
   const { t } = useTranslation();
@@ -62,8 +55,8 @@ export default function Log() {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (size) => {
-    setPage(0);
+  const handleChangeRowsPerPage = (current, size) => {
+    setPage(1);
     setRowsPerPage(parseInt(size, 10));
   };
 
@@ -78,6 +71,12 @@ export default function Log() {
   const handleToolBarValue = (event) => {
     setToolBarValue({ ...toolBarValue, [event.target.name]: event.target.value });
   };
+
+  const [pagination, setPagination] = useState({
+    total: 0,
+    pageSize: 10,
+    current: 1
+  });
 
   const fetchData = useCallback(
     async (page, rowsPerPage, keyword, order, orderBy) => {
@@ -95,7 +94,7 @@ export default function Log() {
 
         const res = await API.get(url, {
           params: {
-            page: page + 1,
+            page: page,
             size: rowsPerPage,
             order: orderBy,
             _t: dayjs().valueOf(),
@@ -106,6 +105,14 @@ export default function Log() {
         if (success) {
           setListCount(data.total_count ?? 0);
           setLogs(data.data ?? []);
+          setPagination((c) => {
+            return {
+              ...c,
+              pageSize: rowsPerPage,
+              current: page,
+              total: data.total_count ?? 0
+            };
+          });
         } else {
           showError(message);
         }
@@ -119,6 +126,8 @@ export default function Log() {
 
   // 处理刷新
   const handleRefresh = async () => {
+    setPage(1);
+    setRowsPerPage(10);
     setOrderBy('created_at');
     setOrder('desc');
     setToolBarValue(originalKeyword);
@@ -134,7 +143,7 @@ export default function Log() {
     <Card title={<Typography variant="h4">{t('logPage.title')}</Typography>}>
       <>
         <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} userIsAdmin={userIsAdmin} />
-        <Grid.Row justify={'end'}>
+        <Row justify={'end'}>
           <Form.Item>
             <Space>
               <Button loading={searching} onClick={handleRefresh} icon={<IconRefresh width={'18px'} className={'arco-icon'} />}>
@@ -150,99 +159,46 @@ export default function Log() {
               </Button>
             </Space>
           </Form.Item>
-        </Grid.Row>
+        </Row>
         {searching && <LinearProgress />}
-        <PerfectScrollbar component="div">
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }} size="small">
-              <KeywordTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleSort}
-                headLabel={[
-                  {
-                    id: 'created_at',
-                    label: t('logPage.timeLabel'),
-                    disableSort: false
-                  },
-                  {
-                    id: 'channel_id',
-                    label: t('logPage.channelLabel'),
-                    disableSort: false,
-                    hide: !userIsAdmin
-                  },
-                  {
-                    id: 'user_id',
-                    label: t('logPage.userLabel'),
-                    disableSort: false,
-                    hide: !userIsAdmin
-                  },
-                  {
-                    id: 'token_name',
-                    label: t('logPage.tokenLabel'),
-                    disableSort: false
-                  },
-                  {
-                    id: 'type',
-                    label: t('logPage.typeLabel'),
-                    disableSort: false
-                  },
-                  {
-                    id: 'model_name',
-                    label: t('logPage.modelLabel'),
-                    disableSort: false
-                  },
-                  {
-                    id: 'duration',
-                    label: t('logPage.durationLabel'),
-                    tooltip: t('logPage.durationTooltip'),
-                    disableSort: true
-                  },
-                  {
-                    id: 'message',
-                    label: t('logPage.inputLabel'),
-                    disableSort: true
-                  },
-                  {
-                    id: 'completion',
-                    label: t('logPage.outputLabel'),
-                    disableSort: true
-                  },
-                  {
-                    id: 'quota',
-                    label: t('logPage.quotaLabel'),
-                    disableSort: true
-                  },
-                  {
-                    id: 'detail',
-                    label: t('logPage.detailLabel'),
-                    disableSort: true
-                  }
-                ]}
-              />
-              <TableBody>
-                {logs?.map((row, index) => (
-                  <LogTableRow item={row} key={`${row.id}_${index}`} userIsAdmin={userIsAdmin} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </PerfectScrollbar>
-        <Card>
-          <Grid.Row justify={'end'}>
-            <Pagination
-              current={page}
-              total={listCount}
-              pageSize={rowsPerPage}
-              onChange={handleChangePage}
-              sizeOptions={[10, 25, 30]}
-              onPageSizeChange={handleChangeRowsPerPage}
-              showTotal
-              showJumper
-              sizeCanChange
-            />
-          </Grid.Row>
-        </Card>
+        <Table
+          columns={tableRowColumns(t, userIsAdmin)}
+          dataSource={logs}
+          pagination={{
+            ...pagination,
+            showQuickJumper: true,
+            onChange: handleChangePage,
+            onShowSizeChange: handleChangeRowsPerPage
+          }}
+          scroll={{ x: true }}
+        >
+          {/*<KeywordTableHead*/}
+          {/*  order={order}*/}
+          {/*  orderBy={orderBy}*/}
+          {/*  onRequestSort={handleSort}*/}
+          {/*  headLabel={}*/}
+          {/*/>*/}
+          {/*<TableBody>*/}
+          {/*  {logs?.map((row, index) => (*/}
+          {/*    <LogTableRow item={row} key={`${row.id}_${index}`} userIsAdmin={userIsAdmin} />*/}
+          {/*  ))}*/}
+          {/*</TableBody>*/}
+        </Table>
+        {/*<Card>*/}
+        {/*  <Row justify={'end'}>*/}
+        {/*    <Pagination*/}
+        {/*      current={page}*/}
+        {/*      total={listCount}*/}
+        {/*      pageSize={rowsPerPage}*/}
+        {/*      onChange={handleChangePage}*/}
+        {/*      sizeOptions={[10, 25, 30]}*/}
+        {/*      onPageSizeChange={handleChangeRowsPerPage}*/}
+        {/*      showTotal*/}
+        {/*      showJumper*/}
+        {/*      sizeCanChange*/}
+        {/*    />*/}
+        {/*  </Row>*/}
+        {/*</Card>*/}
       </>
     </Card>
   );

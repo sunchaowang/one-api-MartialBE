@@ -1,8 +1,5 @@
-import { copy } from '@/utils/common';
-import { Card, Table, Space, Tag, Typography, Grid, Button } from '@arco-design/web-react';
+import { Card, Table, Space, Tag, Typography, Row, Button } from 'antd';
 const { Title, Paragraph, Text } = Typography;
-
-const Row = Grid.Row;
 
 const renderModalTable = (data, provider) => {
   function renderReplayTokensColumn(record) {
@@ -76,7 +73,7 @@ const renderModalTable = (data, provider) => {
           //   }
           // }
         ]}
-        data={data}
+        dataSource={data}
         pagination={false}
         scroll={{ x: 'max-content' }}
       ></Table>
@@ -88,10 +85,10 @@ const Index = () => {
   const changelog = ['已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为1.5元1刀'];
 
   return (
-    <Card bordered={false}>
+    <Card bordered={false} bodyStyle={{ paddingLeft: 24, paddingRight: 24 }}>
       <Space direction={'vertical'} style={{ width: '100%' }}>
         <Typography>
-          <Title heading={'3'}>更新日志</Title>
+          <Title level={3}>更新日志</Title>
           {changelog.map((item, index) => (
             <Paragraph key={index}>
               {index + 1}.{item}
@@ -100,7 +97,7 @@ const Index = () => {
         </Typography>
 
         <Typography>
-          <Title heading={'3'}>介绍说明</Title>
+          <Title level={3}>介绍说明</Title>
           <Paragraph>1.OpenAI 接口转发站</Paragraph>
           <Paragraph>2.本站渠道来源：OP、AZ、AWS渠道 、 逆向渠道 、 上游代理渠道</Paragraph>
           <Paragraph>3.接口服务含官网直连以及整理了一些比较优秀的三方渠道商，所以能保持相对低价</Paragraph>
@@ -128,18 +125,19 @@ const Index = () => {
           </Paragraph>
           <Paragraph>
             7.
-            <Button type="text" onClick={() => window.open('https://linux.do', 'blank')}>
-              LinuxDO 论坛
-            </Button>
-            用户可额外获得
+            <Tag type="text" onClick={() => window.open('https://linux.do', 'blank')}>
+              LinuxDo 论坛
+            </Tag>
+            用户注册时可额外获得
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
               论坛等级
             </Tag>{' '}
-            的使用额度, 已注册本站的用户请在绑定 LD 授权后在论坛私信（Username为）
+            的使用额度。通过其他渠道注册本站的用户，请在绑定LinuxDo授权后在论坛私信（Username为）
             <Tag color={'red'} defaultChecked>
               {' '}
               @sunnysun
             </Tag>
+            补发对应的奖励额度
           </Paragraph>
           <Paragraph>
             8. 当前仅支持{' '}
@@ -169,7 +167,7 @@ const Index = () => {
         </Typography>
 
         <Typography>
-          <Title heading={3}>使用方法</Title>
+          <Title level={3}>使用方法</Title>
           <Paragraph>1.注册完成后，创建一个令牌，复制令牌的 key 填写到对应的地方</Paragraph>
           <Paragraph>
             2.接口转发地址请修改为：
@@ -187,7 +185,7 @@ const Index = () => {
         </Typography>
 
         <Typography>
-          <Title heading={3}>可用模型及计费介绍</Title>
+          <Title level={3}>可用模型及计费介绍</Title>
           <Row bordered={false}>
             <Paragraph span={24}>
               本页面更新可能存在延迟，实际可用模型及计费请以设置页以及日志页为准{' '}

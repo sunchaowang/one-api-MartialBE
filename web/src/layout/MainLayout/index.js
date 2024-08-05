@@ -14,7 +14,7 @@ import Sidebar from './Sidebar';
 import navigation from '@/menu-items';
 import { drawerWidth } from '@/store/constant';
 import { SET_MENU } from '@/store/actions';
-import { Layout, Card, Drawer } from '@arco-design/web-react';
+import { Layout, Card, Drawer } from 'antd';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -30,25 +30,24 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Layout className={styled.layout}>
+    <Layout className={styled.layout} style={!isMobile ? { minWidth: 1400, overflow: 'scroll' } : {}}>
       {!isMobile ? (
-        <Layout.Sider collapsedWidth={80} className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
-          <Card>
-            <Sidebar
-              isMobile={false}
-              drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}
-              drawerToggle={handleLeftDrawerToggle}
-            />
-          </Card>
+        <Layout.Sider theme={'light'} collapsedWidth={80} className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
+          <Sidebar
+            isMobile={false}
+            drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened}
+            drawerToggle={handleLeftDrawerToggle}
+          />
         </Layout.Sider>
       ) : (
         <Drawer
-          visible={!leftDrawerOpened}
+          width={260}
+          open={!leftDrawerOpened}
           footer={null}
           title={null}
           closeIcon={null}
           placement={'left'}
-          onCancel={handleLeftDrawerToggle}
+          onClose={handleLeftDrawerToggle}
         >
           <Sidebar
             isMobile={isMobile}
@@ -65,7 +64,13 @@ const MainLayout = () => {
             <Header showMenuCollapse={true} showLogo={false}></Header>
           </Layout.Header>
           <Layout.Content style={{ width: '100%', height: '100%' }}>
-            <Card style={{ width: '100%', height: '100%', overflow: 'scroll', backgroundColor: '#eef2f6' }}>
+            <Card
+              bordered={false}
+              styles={{
+                body: { boxShadow: 'none', padding: 16 }
+              }}
+              style={{ width: '100%', height: '100%', overflow: 'scroll', backgroundColor: '#eef2f6' }}
+            >
               <div style={{ width: '100%', height: '100%', paddingBottom: 68 }}>
                 <AuthGuard>
                   <AdminContainer>

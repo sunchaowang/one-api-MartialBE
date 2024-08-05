@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Turnstile from 'react-turnstile';
 import { API } from '@/utils/api';
-import { Typography, Modal, Button, Space, Spin } from '@arco-design/web-react';
+import { Typography, Modal, Button, Space, Spin } from 'antd';
 
 import { showError, showSuccess, showInfo } from '@/utils/common';
 
@@ -26,12 +26,10 @@ export default function CheckInModal(props) {
 
   const handleTurnStileOnLoad = (widgetId, bound) => {
     // before:
-    // window.turnstile.execute(widgetId);
+    window.turnstile.execute(widgetId);
     // now:
-    // bound.execute();
-    setTimeout(() => {
-      setTurnstileLoaded(true);
-    }, 1);
+    bound.execute();
+    setTurnstileLoaded(true);
   };
 
   // 签到
@@ -71,7 +69,7 @@ export default function CheckInModal(props) {
 
   return (
     <Modal
-      visible={props.visible}
+      open={props.visible}
       maskClosable={false}
       onCancel={handleClose}
       footer={[
@@ -80,21 +78,22 @@ export default function CheckInModal(props) {
           立即签到
         </Button>
       ]}
-      unmountOnExit={true}
       afterClose={afterClose}
+      destroyOnClose
     >
       <Space direction={'vertical'} size={16}>
         <Typography.Paragraph heading={4}>正在检查用户环境</Typography.Paragraph>
         <Typography>温馨提示：每日签到获得的额度以前一日的总消耗额度为基础获得随机返赠🤓</Typography>
         {turnstileEnabled ? (
-          <Spin>
+          <Spin spinning={!turnstileLoaded}>
             <div style={{ width: 300, height: 65 }}>
               <Turnstile
                 sitekey={turnstileSiteKey}
                 onVerify={(token) => {
                   setTurnstileToken(token);
                 }}
-                onLoad={() => handleTurnStileOnLoad()}
+                onLoad={handleTurnStileOnLoad}
+                executution="execute"
               />
             </div>
           </Spin>

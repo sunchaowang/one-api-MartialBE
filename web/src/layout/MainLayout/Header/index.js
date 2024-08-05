@@ -32,8 +32,16 @@ const Header = ({ handleLeftDrawerToggle, showLogo = true, showMenuCollapse = fa
   }
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-      <div className={'header-left'} style={{ width: 'max-content', flex: 1 }}>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+      }}
+    >
+      <div className={'header-left'} style={{ width: 'max-content', flex: 1, display: 'flex' }}>
         {showLogo && <LogoSection />}
         {showMenuCollapse && (
           <Button shape={'circle'} type={'primary'} onClick={() => onCollapseChange(leftDrawerOpened)}>

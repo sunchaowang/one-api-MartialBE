@@ -5,7 +5,7 @@ import { TableRow, TableCell, Stack } from '@mui/material';
 import { timestamp2string, renderQuota } from '@/utils/common';
 import Label from '@/ui-component/Label';
 import LogType from '../type/LogType';
-import { Button, Card, Grid, Table, Tag } from '@arco-design/web-react';
+import { Space, Tag } from 'antd';
 
 function renderType(type) {
   const typeOption = LogType[type];
@@ -25,7 +25,7 @@ function requestTimeLabelOptions(request_time) {
   } else if (request_time <= 3000) {
     color = 'green';
   } else if (request_time <= 5000) {
-    color = 'arcoblue';
+    color = 'blue';
   }
 
   return color;
@@ -44,6 +44,23 @@ function requestTSLabelOptions(request_ts) {
   }
 
   return color;
+}
+
+function requestTsText(item) {
+  let request_time = item.request_time / 1000;
+  let request_time_str = request_time.toFixed(2) + ' s';
+  let request_ts = 0;
+  let request_ts_str = '';
+  if (request_time > 0 && item.completion_tokens > 0) {
+    request_ts = (item.completion_tokens ? item.completion_tokens : 1) / request_time;
+    request_ts_str = request_ts.toFixed(2) + ' t/s';
+  }
+  return {
+    request_ts,
+    request_ts_str,
+    request_time,
+    request_time_str
+  };
 }
 
 export default function LogTableRow({ item, userIsAdmin }) {
@@ -114,6 +131,165 @@ export default function LogTableRow({ item, userIsAdmin }) {
       </TableRow>
     </>
   );
+}
+
+export function tableRowColumns(t, userIsAdmin) {
+  return [
+    {
+      id: 'created_at',
+      label: t('logPage.timeLabel'),
+      disableSort: false,
+      render: (col, item, index) => timestamp2string(item.created_at),
+      width: 120,
+      onCell: (record) => {
+        return {
+          style: {
+            minWidth: 200
+          }
+        };
+      }
+    },
+    {
+      id: 'channel_id',
+      label: t('logPage.channelLabel'),
+      disableSort: false,
+      hide: !userIsAdmin,
+      width: 250,
+      render: (col, item, index) =>
+        item.type === 2 ? (
+          <>
+            <div>
+              <Tag>{item.channel_id} </Tag>
+            </div>
+            {item.channel?.name}
+          </>
+        ) : (
+          ''
+        )
+    },
+    {
+      id: 'user_id',
+      label: t('logPage.userLabel'),
+      disableSort: false,
+      hide: !userIsAdmin,
+      render: (col, item) => (
+        <>
+          <div>
+            <Tag>{item.user_id} </Tag>
+          </div>
+          {item.username}
+        </>
+      ),
+      onCell: (record) => {
+        return {
+          style: {
+            minWidth: 100
+          }
+        };
+      }
+    },
+    {
+      id: 'token_name',
+      label: t('logPage.tokenLabel'),
+      disableSort: false,
+      render: (col, item, index) => item.token_name && <Tag size={'small'}>{item.token_name}</Tag>,
+      width: 120
+    },
+    {
+      id: 'type',
+      label: t('logPage.typeLabel'),
+      disableSort: false,
+      render: (col, item, index) => item.type && renderType(item.type)
+    },
+    {
+      id: 'model_name',
+      label: t('logPage.modelLabel'),
+      disableSort: false,
+      render: (col, item, index) => {
+        return (
+          item.model_name && (
+            <Tag color="blue" bordered>
+              {item.model_name}
+            </Tag>
+          )
+        );
+      }
+    },
+    {
+      id: 'duration',
+      label: t('logPage.durationLabel'),
+      tooltip: t('logPage.durationTooltip'),
+      disableSort: true,
+      render: (col, item, index) => (
+        <Space direction={'vertical'} size={5}>
+          <Tag color={requestTimeLabelOptions(item.request_time)}>
+            {' '}
+            {item.request_time == 0 ? '无' : requestTsText(item).request_time_str}{' '}
+          </Tag>
+          {requestTsText(item).request_ts_str && (
+            <Tag size={'small'} color={requestTSLabelOptions(requestTsText(item).request_ts)}>
+              {' '}
+              {requestTsText(item).request_ts_str}{' '}
+            </Tag>
+          )}
+        </Space>
+      )
+    },
+    {
+      id: 'message',
+      label: t('logPage.inputLabel'),
+      disableSort: true,
+      render: (col, item, index) => (String(item.type) === LogType['2'].value ? item.prompt_tokens || '0' : ''),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 80
+          }
+        };
+      }
+    },
+    {
+      id: 'completion',
+      label: t('logPage.outputLabel'),
+      disableSort: true,
+      render: (col, item, index) => (String(item.type) === LogType['2'].value ? item.completion_tokens || '0' : ''),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 80
+          }
+        };
+      }
+    },
+    {
+      id: 'quota',
+      label: t('logPage.quotaLabel'),
+      disableSort: true,
+      render: (col, item, index) => (String(item.type) === LogType['2'].value ? (item.quota ? renderQuota(item.quota, 6) : '$0') : ''),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 100
+          }
+        };
+      }
+    },
+    {
+      id: 'detail',
+      label: t('logPage.detailLabel'),
+      disableSort: true,
+      render: (col, item, index) => item.content,
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 250
+          }
+        };
+      }
+    }
+  ]
+    .filter((c) => !c.hide)
+    .map((c) => ({ ...c, title: c.label, dataIndex: c.id }));
 }
 
 LogTableRow.propTypes = {

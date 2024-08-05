@@ -14,8 +14,13 @@ import '@/assets/scss/style.scss';
 import config from './config';
 
 import '@arco-design/web-react/dist/css/arco.css';
-import { ConfigProvider } from '@arco-design/web-react';
-import zhCN from '@arco-design/web-react/es/locale/zh-CN';
+import zhCN from 'antd/locale/zh_CN';
+
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+dayjs.locale('zh-cn');
+
+import { ConfigProvider } from 'antd';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
 
@@ -27,17 +32,7 @@ function getArcoLocale() {
 }
 
 root.render(
-  <ConfigProvider
-    locale={getArcoLocale()}
-    componentConfig={{
-      Card: {
-        bordered: false
-      },
-      List: {
-        bordered: false
-      }
-    }}
-  >
+  <ConfigProvider locale={getArcoLocale()} prefixCls={'chirou'}>
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />
