@@ -98,8 +98,8 @@ const Index = () => {
 
         <Typography>
           <Title level={3}>介绍说明</Title>
-          <Paragraph>1.OpenAI 接口转发站</Paragraph>
-          <Paragraph>2.本站渠道来源：OP、AZ、AWS渠道 、 逆向渠道 、 上游代理渠道</Paragraph>
+          <Paragraph>1.AI API接口转发站</Paragraph>
+          <Paragraph>2.本站渠道来源：OpenAI、Azure、AWS、GCP、逆向、上游代理</Paragraph>
           <Paragraph>3.接口服务含官网直连以及整理了一些比较优秀的三方渠道商，所以能保持相对低价</Paragraph>
           <Paragraph>4.支持模型请查看下方模型介绍</Paragraph>
           <Paragraph>
@@ -332,6 +332,26 @@ const Index = () => {
                   }
                 ],
                 'OpenAI'
+              )}
+              {renderModalTable(
+                [
+                  {
+                    name: 'gemini-1.5-pro,gemini-1.5-pro-latest,gemini-1.5-pro-exp-0801',
+                    inputTokens: '$0.0035',
+                    outputTokens: '$0.0105'
+                  },
+                  {
+                    name: 'gemini-1.5-flash,gemini-1.5-flash-latest',
+                    inputTokens: '$0.00035',
+                    outputTokens: '$0.00105'
+                  },
+                  {
+                    name: 'gemini-1.0-pro,gemini-1.0-pro-latest',
+                    inputTokens: '$0.0005',
+                    outputTokens: '$0.0015'
+                  }
+                ],
+                'Gemini'
               )}
               {renderModalTable(
                 [
