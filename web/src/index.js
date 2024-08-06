@@ -32,7 +32,7 @@ function getArcoLocale() {
 }
 
 root.render(
-  <ConfigProvider locale={getArcoLocale()} prefixCls={'chirou'}>
+  <ConfigProvider locale={getArcoLocale()} prefixCls={'chirou'} componentSize={'middle'}>
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />

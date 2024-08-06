@@ -146,16 +146,16 @@ export default function Log() {
         <Row justify={'end'}>
           <Form.Item>
             <Space>
-              <Button loading={searching} onClick={handleRefresh} icon={<IconRefresh width={'18px'} className={'arco-icon'} />}>
-                {t('logPage.refreshButton')}
-              </Button>
               <Button
                 loading={searching}
                 type={'primary'}
                 onClick={searchLogs}
                 icon={<IconSearch width={'18px'} className={'arco-icon'} />}
               >
-                {t('logPage.searchButton')}
+                搜索
+              </Button>
+              <Button loading={searching} onClick={handleRefresh} icon={<IconRefresh width={'18px'} className={'arco-icon'} />}>
+                重置
               </Button>
             </Space>
           </Form.Item>
@@ -168,37 +168,11 @@ export default function Log() {
             ...pagination,
             showQuickJumper: true,
             onChange: handleChangePage,
-            onShowSizeChange: handleChangeRowsPerPage
+            onShowSizeChange: handleChangeRowsPerPage,
+            showTotal: (total) => <span>{total}条</span>
           }}
           scroll={{ x: true }}
-        >
-          {/*<KeywordTableHead*/}
-          {/*  order={order}*/}
-          {/*  orderBy={orderBy}*/}
-          {/*  onRequestSort={handleSort}*/}
-          {/*  headLabel={}*/}
-          {/*/>*/}
-          {/*<TableBody>*/}
-          {/*  {logs?.map((row, index) => (*/}
-          {/*    <LogTableRow item={row} key={`${row.id}_${index}`} userIsAdmin={userIsAdmin} />*/}
-          {/*  ))}*/}
-          {/*</TableBody>*/}
-        </Table>
-        {/*<Card>*/}
-        {/*  <Row justify={'end'}>*/}
-        {/*    <Pagination*/}
-        {/*      current={page}*/}
-        {/*      total={listCount}*/}
-        {/*      pageSize={rowsPerPage}*/}
-        {/*      onChange={handleChangePage}*/}
-        {/*      sizeOptions={[10, 25, 30]}*/}
-        {/*      onPageSizeChange={handleChangeRowsPerPage}*/}
-        {/*      showTotal*/}
-        {/*      showJumper*/}
-        {/*      sizeCanChange*/}
-        {/*    />*/}
-        {/*  </Row>*/}
-        {/*</Card>*/}
+        ></Table>
       </>
     </Card>
   );
