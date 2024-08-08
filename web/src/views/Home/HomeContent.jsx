@@ -115,7 +115,7 @@ const Index = () => {
           <Paragraph>
             6.每位注册用户都将获得{' '}
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              $1
+              $0.5
             </Tag>{' '}
             的初始使用额度, 邀请新用户奖励
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
@@ -152,7 +152,7 @@ const Index = () => {
             </Tag>
             的账号注册 ，谢谢🙏
           </Paragraph>
-          <Paragraph>9.为了维持转发服务正常使用，将不定期清除非法用户，请使用真实邮箱注册</Paragraph>
+          <Paragraph>9.为了维持转发服务正常使用，将不定期清除非法用户（包括重复注册等任何形式的小号）；请使用真实邮箱注册</Paragraph>
           <Paragraph>
             10.受供应商和OpenAI政策影响，价格会随时调整，本站计价分组倍率
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
