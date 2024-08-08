@@ -100,7 +100,7 @@ const Index = () => {
           <Title level={3}>介绍说明</Title>
           <Paragraph>1.AI API接口转发站</Paragraph>
           <Paragraph>2.本站渠道来源：OpenAI、Azure、AWS、GCP、逆向、上游代理</Paragraph>
-          <Paragraph>3.接口服务含官网直连以及整理了一些比较优秀的三方渠道商，所以能保持相对低价</Paragraph>
+          <Paragraph>3.接口服务含官网直连以及其他渠道，如需完全官网直连，请联系站长修改分组。</Paragraph>
           <Paragraph>4.支持模型请查看下方模型介绍</Paragraph>
           <Paragraph>
             5.使用过程中有问题请发邮件至
