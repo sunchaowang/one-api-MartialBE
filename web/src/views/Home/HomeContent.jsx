@@ -115,7 +115,7 @@ const Index = () => {
           <Paragraph>
             6.每位注册用户都将获得{' '}
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              $0.5
+              $1
             </Tag>{' '}
             的初始使用额度, 邀请新用户奖励
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
