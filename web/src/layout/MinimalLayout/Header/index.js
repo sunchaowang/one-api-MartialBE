@@ -1,7 +1,6 @@
 // material-ui
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Popper, List, ListItemButton, Paper, ListItemText, Divider, ClickAwayListener } from '@mui/material';
 import { Grid, Space, Row, Col, Menu } from 'antd';
 import LogoSection from '@/layout/MainLayout/LogoSection';
 import { Link } from 'react-router-dom';
@@ -60,36 +59,37 @@ const Header = () => {
     }
   };
 
-  const renderDropMenuList = (
-    <Menu
-      onClickMenuItem={onClickMenuItem}
-      style={{
-        width: '100vw'
-      }}
-    >
-      <Menu.Item key={'menu.home'}>
-        <Typography.Text variant="body2">{t('menu.home')}</Typography.Text>
-      </Menu.Item>
-
-      <Menu.Item key={'menu.about'}>
-        <Typography.Text variant="body2">{t('menu.about')}</Typography.Text>
-      </Menu.Item>
-      {account.user ? (
-        [
-          <Menu.Item key={'menu.playground'}>
-            <Typography.Text>Playground</Typography.Text>
-          </Menu.Item>,
-          <Menu.Item key={'menu.console'}>
-            <Typography.Text variant="body2">{t('menu.console')}</Typography.Text>
-          </Menu.Item>
+  const renderDropMenuItems = [
+    {
+      key: 'menu.home',
+      label: <Typography.Text variant="body2">{t('menu.home')}</Typography.Text>
+    },
+    {
+      key: 'menu.about',
+      label: <Typography.Text variant="body2">{t('menu.about')}</Typography.Text>
+    }
+  ].concat(
+    account.user
+      ? [
+          {
+            key: 'menu.playground',
+            label: <Typography.Text>Playground</Typography.Text>
+          },
+          {
+            key: 'menu.console',
+            label: <Typography.Text variant="body2">{t('menu.console')}</Typography.Text>
+          }
         ]
-      ) : (
-        <Menu.Item key={'menu.login'}>
-          <Typography.Text variant="body2">{t('menu.login')}</Typography.Text>
-        </Menu.Item>
-      )}
-    </Menu>
+      : [
+          {
+            key: 'menu.login',
+            label: <Typography.Text variant="body2">{t('menu.login')}</Typography.Text>
+          }
+        ]
   );
+  const renderDropMenuOnClick = ({ key }) => {
+    onClickMenuItem(key);
+  };
 
   return (
     <>
@@ -103,10 +103,13 @@ const Header = () => {
               <Space size={16}>
                 {/*<ThemeButton />*/}
                 <I18nButton />
-                <Dropdown droplist={renderDropMenuList}>
-                  <Button shape={'circle'}>
-                    <IconMenu2 className={'arco-icon'} />
-                  </Button>
+                <Dropdown
+                  menu={{
+                    items: renderDropMenuItems,
+                    onClick: renderDropMenuOnClick
+                  }}
+                >
+                  <Button shape={'circle'} icon={<IconMenu2 className={'arco-icon'} />}></Button>
                 </Dropdown>
                 {/*<Button shape={'circle'} onClick={handleOpenMenu}></Button>*/}
               </Space>
@@ -143,74 +146,74 @@ const Header = () => {
           </div>
         </Col>
       </Row>
-      <Popper
-        open={!!open}
-        anchorEl={open}
-        transition
-        disablePortal
-        popperOptions={{
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, 14]
-              }
-            }
-          ]
-        }}
-        style={{ width: '100vw' }}
-      >
-        {({ TransitionProps }) => (
-          <Transitions in={open} {...TransitionProps}>
-            <ClickAwayListener onClickAway={handleCloseMenu}>
-              <Paper style={{ width: '100%' }}>
-                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                  <List
-                    component="nav"
-                    sx={{
-                      width: '100%',
-                      maxWidth: '100%',
-                      minWidth: '100%',
-                      backgroundColor: theme.palette.background.paper,
+      {/*<Popper*/}
+      {/*  open={!!open}*/}
+      {/*  anchorEl={open}*/}
+      {/*  transition*/}
+      {/*  disablePortal*/}
+      {/*  popperOptions={{*/}
+      {/*    modifiers: [*/}
+      {/*      {*/}
+      {/*        name: 'offset',*/}
+      {/*        options: {*/}
+      {/*          offset: [0, 14]*/}
+      {/*        }*/}
+      {/*      }*/}
+      {/*    ]*/}
+      {/*  }}*/}
+      {/*  style={{ width: '100vw' }}*/}
+      {/*>*/}
+      {/*  {({ TransitionProps }) => (*/}
+      {/*    <Transitions in={open} {...TransitionProps}>*/}
+      {/*      <ClickAwayListener onClickAway={handleCloseMenu}>*/}
+      {/*        <Paper style={{ width: '100%' }}>*/}
+      {/*          <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>*/}
+      {/*            <List*/}
+      {/*              component="nav"*/}
+      {/*              sx={{*/}
+      {/*                width: '100%',*/}
+      {/*                maxWidth: '100%',*/}
+      {/*                minWidth: '100%',*/}
+      {/*                backgroundColor: theme.palette.background.paper,*/}
 
-                      '& .MuiListItemButton-root': {
-                        mt: 0.5
-                      }
-                    }}
-                    onClick={handleCloseMenu}
-                  >
-                    <ListItemButton component={Link} variant="text" to="/">
-                      <ListItemText primary={<Typography variant="body2">{t('menu.home')}</Typography>} />
-                    </ListItemButton>
+      {/*                '& .MuiListItemButton-root': {*/}
+      {/*                  mt: 0.5*/}
+      {/*                }*/}
+      {/*              }}*/}
+      {/*              onClick={handleCloseMenu}*/}
+      {/*            >*/}
+      {/*              <ListItemButton component={Link} variant="text" to="/">*/}
+      {/*                <ListItemText primary={<Typography variant="body2">{t('menu.home')}</Typography>} />*/}
+      {/*              </ListItemButton>*/}
 
-                    {account.user && (
-                      <ListItemButton component={Link} variant="text" to="/playground">
-                        <ListItemText primary={<Typography variant="body2">Playground</Typography>} />
-                      </ListItemButton>
-                    )}
+      {/*              {account.user && (*/}
+      {/*                <ListItemButton component={Link} variant="text" to="/playground">*/}
+      {/*                  <ListItemText primary={<Typography variant="body2">Playground</Typography>} />*/}
+      {/*                </ListItemButton>*/}
+      {/*              )}*/}
 
-                    <ListItemButton component={Link} variant="text" to="/about">
-                      <ListItemText primary={<Typography variant="body2">{t('menu.about')}</Typography>} />
-                    </ListItemButton>
-                    <Divider />
-                    {account.user ? (
-                      <>
-                        <ListItemButton component={Link} variant="contained" to="/panel" color="primary">
-                          {t('menu.console')}
-                        </ListItemButton>
-                      </>
-                    ) : (
-                      <ListItemButton component={Link} variant="contained" to="/login" color="primary">
-                        {t('menu.login')}
-                      </ListItemButton>
-                    )}
-                  </List>
-                </MainCard>
-              </Paper>
-            </ClickAwayListener>
-          </Transitions>
-        )}
-      </Popper>
+      {/*              <ListItemButton component={Link} variant="text" to="/about">*/}
+      {/*                <ListItemText primary={<Typography variant="body2">{t('menu.about')}</Typography>} />*/}
+      {/*              </ListItemButton>*/}
+      {/*              <Divider />*/}
+      {/*              {account.user ? (*/}
+      {/*                <>*/}
+      {/*                  <ListItemButton component={Link} variant="contained" to="/panel" color="primary">*/}
+      {/*                    {t('menu.console')}*/}
+      {/*                  </ListItemButton>*/}
+      {/*                </>*/}
+      {/*              ) : (*/}
+      {/*                <ListItemButton component={Link} variant="contained" to="/login" color="primary">*/}
+      {/*                  {t('menu.login')}*/}
+      {/*                </ListItemButton>*/}
+      {/*              )}*/}
+      {/*            </List>*/}
+      {/*          </MainCard>*/}
+      {/*        </Paper>*/}
+      {/*      </ClickAwayListener>*/}
+      {/*    </Transitions>*/}
+      {/*  )}*/}
+      {/*</Popper>*/}
     </>
   );
 };

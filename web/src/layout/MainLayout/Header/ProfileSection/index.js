@@ -115,7 +115,7 @@ const ProfileSection = () => {
         onCancel={() => setCheckinModalVisible(false)}
         onClose={() => setCheckinModalVisible(false)}
       />
-      <Dropdown icon={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />} droplist={droplist} position="br">
+      <Dropdown droplist={droplist} position="br">
         <Avatar size={32} src={User1} ref={anchorRef} aria-controls={open ? 'menu-list-grow' : undefined}>
           <img width={32} height={32} alt="avatar" src={User1} />
         </Avatar>
