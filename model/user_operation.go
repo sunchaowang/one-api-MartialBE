@@ -85,9 +85,11 @@ func IsCheckInToday(userId int) (checkInTime string, lastDayUsed int64, err erro
 
 // 获取昨日的累计使用额度
 func GetUserQuotaUsedByPeriod(userId int, zeroTime time.Time) (used int64, err error) {
-	endOfDay := zeroTime.Unix()
-	startOfDay := zeroTime.AddDate(0, 0, -1).Unix()
-	dashboards, err := GetUserModelExpensesByPeriod(userId, int(startOfDay), int(endOfDay))
+	now := time.Now()
+	toDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	endOfDay := toDay.Add(-time.Second).Add(time.Hour * 24).Format("2006-01-02")
+	startOfDay := toDay.AddDate(0, 0, -1).Format("2006-01-02")
+	dashboards, err := GetUserModelStatisticsByPeriod(userId, startOfDay, endOfDay)
 	if err != nil {
 		return -1, err
 	}
