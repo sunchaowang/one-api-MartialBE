@@ -22,11 +22,19 @@ const Login = () => {
   const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <Card bordered={false}>
+    <Card
+      bordered={false}
+      styles={{
+        body: {
+          bordered: false,
+          boxShadow: 'none'
+        }
+      }}
+    >
       <Row justify={'center'} align={'center'}>
         <Col xs={24} sm={18} md={12} lg={8} xl={6} xxl={4} xxxl={2}>
           <Col lg={24} xs={24}>
-            <Card bordered={false}>
+            <Card bordered={false} style={{ boxShadow: 'none' }}>
               <Row align={'center'} justify={'center'}>
                 <Typography color={theme.palette.primary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
                   {t('menu.login')}

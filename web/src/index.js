@@ -20,19 +20,25 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
 
 const container = document.getElementById('root');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
 
-function getArcoLocale() {
+function getLocale() {
   return zhCN;
 }
 
 root.render(
-  <ConfigProvider locale={getArcoLocale()} prefixCls={'chirou'} componentSize={'middle'}>
+  <ConfigProvider
+    locale={getLocale()}
+    prefixCls={'chirou'}
+    theme={{
+      algorithm: theme.compactAlgorithm
+    }}
+  >
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />

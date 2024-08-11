@@ -1,5 +1,6 @@
 // import { enqueueSnackbar } from 'notistack';
 import { snackbarConstants } from '@/constants/SnackbarConstants';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { API } from './api';
 import { CHAT_LINKS } from '@/constants/chatLinks';
 import { message } from 'antd';
@@ -305,4 +306,23 @@ function enqueueSnackbar(content, type = 'success') {
       content: content
     });
   }
+}
+
+export function useStateWithCallback(initialState) {
+  const [state, setState] = useState(initialState);
+  const cbRef = useRef(null);
+
+  const setStateCallback = useCallback((newState, cb) => {
+    cbRef.current = cb;
+    setState(newState);
+  }, []);
+
+  useEffect(() => {
+    if (cbRef.current) {
+      cbRef.current(state);
+      cbRef.current = null;
+    }
+  }, [state]);
+
+  return [state, setStateCallback];
 }

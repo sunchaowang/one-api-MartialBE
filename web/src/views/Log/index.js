@@ -143,24 +143,18 @@ export default function Log() {
     <Card title={<Typography variant="h4">{t('logPage.title')}</Typography>}>
       <>
         <TableToolBar filterName={toolBarValue} handleFilterName={handleToolBarValue} userIsAdmin={userIsAdmin} />
-        <Row justify={'end'}>
+        <Row>
           <Form.Item>
             <Space>
-              <Button
-                loading={searching}
-                type={'primary'}
-                onClick={searchLogs}
-                icon={<IconSearch width={'18px'} className={'arco-icon'} />}
-              >
+              <Button loading={searching} type={'primary'} onClick={searchLogs} icon={<IconSearch width={14} />}>
                 搜索
               </Button>
-              <Button loading={searching} onClick={handleRefresh} icon={<IconRefresh width={'18px'} className={'arco-icon'} />}>
+              <Button loading={searching} onClick={handleRefresh} icon={<IconRefresh width={14} />}>
                 重置
               </Button>
             </Space>
           </Form.Item>
         </Row>
-        {searching && <LinearProgress />}
         <Table
           columns={tableRowColumns(t, userIsAdmin)}
           dataSource={logs}
@@ -172,6 +166,7 @@ export default function Log() {
             showTotal: (total) => <span>{total}条</span>
           }}
           scroll={{ x: true }}
+          loading={searching}
         ></Table>
       </>
     </Card>
