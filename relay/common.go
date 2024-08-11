@@ -71,6 +71,7 @@ func GetProvider(c *gin.Context, modeName string) (provider providersBase.Provid
 		return
 	}
 	provider.SetOriginalModel(modeName)
+	c.Set("original_model", modeName)
 
 	newModelName, fail = provider.ModelMappingHandler(modeName)
 	if fail != nil {

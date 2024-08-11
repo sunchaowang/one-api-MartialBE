@@ -14,7 +14,6 @@ import (
 func SetUpLogger(server *gin.Engine) {
 
 	server.Use(GinzapWithConfig())
-
 }
 
 func GinzapWithConfig() gin.HandlerFunc {
@@ -26,6 +25,7 @@ func GinzapWithConfig() gin.HandlerFunc {
 		end := time.Now()
 		latency := end.Sub(start)
 		requestID := c.GetString(logger.RequestIdKey)
+		userID := c.GetInt("id")
 
 		fields := []zapcore.Field{
 			zap.Int("status", c.Writer.Status()),
@@ -36,6 +36,12 @@ func GinzapWithConfig() gin.HandlerFunc {
 			zap.String("ip", utils.GetRequestIP(c)),
 			zap.String("user-agent", c.Request.UserAgent()),
 			zap.Duration("latency", latency),
+			zap.Int("user_id", userID),
+			zap.String("original_model", c.GetString("original_model")),
+			zap.String("new_model", c.GetString("new_model")),
+			zap.Int("token_id", c.GetInt("token_id")),
+			zap.String("token_name", c.GetString("token_name")),
+			zap.Int("channel_id", c.GetInt("channel_id")),
 		}
 
 		if len(c.Errors) > 0 {
@@ -45,7 +51,6 @@ func GinzapWithConfig() gin.HandlerFunc {
 			}
 		} else {
 			logger.Logger.Info("GIN request", fields...)
-
 		}
 	}
 }
