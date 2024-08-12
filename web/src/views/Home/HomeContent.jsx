@@ -85,7 +85,12 @@ const Index = () => {
   const changelog = ['已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为1.5元1刀'];
 
   return (
-    <Card bordered={false} bodyStyle={{ paddingLeft: 24, paddingRight: 24 }}>
+    <Card
+      bordered={false}
+      styles={{
+        body: { paddingLeft: 24, paddingRight: 24 }
+      }}
+    >
       <Space direction={'vertical'} style={{ width: '100%' }}>
         <Typography>
           <Title level={3}>更新日志</Title>

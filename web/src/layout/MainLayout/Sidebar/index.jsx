@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SET_MENU } from '@/store/actions';
 import LogoSection from '@/layout/MainLayout/LogoSection';
 import styled from '../style.module.scss';
+import { isAdmin } from '@/utils/common';
 
 const MenuItem = Menu.Item;
 
@@ -15,6 +16,7 @@ function BaseMenu(props) {
   const { t } = useTranslation();
   const [selectedMenuItemKeys, setSelectedMenuItemKeys] = React.useState([]);
   const location = useLocation();
+  const userIsAdmin = isAdmin();
 
   menuItem.items.forEach((group) => {
     group.children.forEach((item) => {
@@ -36,11 +38,15 @@ function BaseMenu(props) {
 
   return (
     <Menu selectedKeys={selectedMenuItemKeys} {...props}>
-      {panelMenus.children.map((child) => (
-        <Menu.Item key={`${child.id}`} title={child.title} icon={<child.icon className="arco-icon" />}>
-          {child.title}
-        </Menu.Item>
-      ))}
+      {panelMenus.children
+        .filter((child) => {
+          return !child.isAdmin || userIsAdmin;
+        })
+        .map((child) => (
+          <Menu.Item key={`${child.id}`} title={child.title} icon={<child.icon className="arco-icon" />}>
+            {child.title}
+          </Menu.Item>
+        ))}
     </Menu>
   );
 }
