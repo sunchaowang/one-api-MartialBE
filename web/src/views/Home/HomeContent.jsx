@@ -82,7 +82,11 @@ const renderModalTable = (data, provider) => {
 };
 
 const Index = () => {
-  const changelog = ['已接入LINUX DO 授权登录', '恢复计价分组倍率为2.5倍，充值汇率为1.5元1刀'];
+  const changelog = [
+    '已接入LINUX DO 授权登录',
+    '优化计价分组倍率, 默认用户组(default)为2.5倍, OpenAI直连用户组(openai_direct)为3.5倍',
+    '充值汇率为1.5元1刀'
+  ];
 
   return (
     <Card
