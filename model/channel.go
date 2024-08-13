@@ -11,31 +11,31 @@ import (
 )
 
 type Channel struct {
-	Id                 int     `json:"id" form:"id"`
-	Type               int     `json:"type" form:"type" gorm:"default:0"`
-	Key                string  `json:"key" form:"key" gorm:"type:text"`
-	Status             int     `json:"status" form:"status" gorm:"default:1"`
-	Name               string  `json:"name" form:"name" gorm:"index"`
-	Weight             *uint   `json:"weight" gorm:"default:1"`
-	CreatedTime        int64   `json:"created_time" gorm:"bigint"`
-	TestTime           int64   `json:"test_time" gorm:"bigint"`
-	ResponseTime       int     `json:"response_time"` // in milliseconds
-	BaseURL            *string `json:"base_url" gorm:"column:base_url;default:''"`
-	Other              string  `json:"other" form:"other"`
-	Balance            float64 `json:"balance"` // in USD
-	BalanceUpdatedTime int64   `json:"balance_updated_time" gorm:"bigint"`
-	Models             string  `json:"models" form:"models"`
-	Group              string  `json:"group" form:"group" gorm:"type:varchar(32);default:'default'"`
-	Tag                string  `json:"tag" form:"tag" gorm:"type:varchar(32);default:''"`
-	UsedQuota          int64   `json:"used_quota" gorm:"bigint;default:0"`
-	ModelMapping       *string `json:"model_mapping" gorm:"type:varchar(1024);default:''"`
-	Priority           *int64  `json:"priority" gorm:"bigint;default:0"`
-	Proxy              *string `json:"proxy" gorm:"type:varchar(255);default:''"`
-	TestModel          string  `json:"test_model" form:"test_model" gorm:"type:varchar(50);default:''"`
-	OnlyChat           bool    `json:"only_chat" form:"only_chat" gorm:"default:false"`
-	PreCost            int     `json:"pre_cost" form:"pre_cost" gorm:"default:1"`
-
-	Plugin *datatypes.JSONType[PluginType] `json:"plugin" form:"plugin" gorm:"type:json"`
+	Id                 int                             `json:"id" form:"id"`
+	Type               int                             `json:"type" form:"type" gorm:"default:0"`
+	Key                string                          `json:"key" form:"key" gorm:"type:text"`
+	Status             int                             `json:"status" form:"status" gorm:"default:1"`
+	Name               string                          `json:"name" form:"name" gorm:"index"`
+	Weight             *uint                           `json:"weight" gorm:"default:1"`
+	CreatedTime        int64                           `json:"created_time" gorm:"bigint"`
+	TestTime           int64                           `json:"test_time" gorm:"bigint"`
+	ResponseTime       int                             `json:"response_time"` // in milliseconds
+	BaseURL            *string                         `json:"base_url" gorm:"column:base_url;default:''"`
+	Other              string                          `json:"other" form:"other"`
+	Balance            float64                         `json:"balance"` // in USD
+	BalanceUpdatedTime int64                           `json:"balance_updated_time" gorm:"bigint"`
+	Models             string                          `json:"models" form:"models"`
+	Group              string                          `json:"group" form:"group" gorm:"type:varchar(32);default:'default'"`
+	Tag                string                          `json:"tag" form:"tag" gorm:"type:varchar(32);default:''"`
+	UsedQuota          int64                           `json:"used_quota" gorm:"bigint;default:0"`
+	ModelMapping       *string                         `json:"model_mapping" gorm:"type:varchar(1024);default:''"`
+	Priority           *int64                          `json:"priority" gorm:"bigint;default:0"`
+	Proxy              *string                         `json:"proxy" gorm:"type:varchar(255);default:''"`
+	TestModel          string                          `json:"test_model" form:"test_model" gorm:"type:varchar(50);default:''"`
+	OnlyChat           bool                            `json:"only_chat" form:"only_chat" gorm:"default:false"`
+	PreCost            int                             `json:"pre_cost" form:"pre_cost" gorm:"default:1"`
+	DirectGroup        string                          `json:"direct_group" gorm:"type:varchar(32);default:'default'"` //
+	Plugin             *datatypes.JSONType[PluginType] `json:"plugin" form:"plugin" gorm:"type:json"`
 }
 
 type PluginType map[string]map[string]interface{}
@@ -49,6 +49,7 @@ var allowedChannelOrderFields = map[string]bool{
 	"response_time": true,
 	"balance":       true,
 	"priority":      true,
+	"direct_group":  true,
 }
 
 type SearchChannelsParams struct {

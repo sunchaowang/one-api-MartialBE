@@ -132,6 +132,13 @@ func tokenAuth(c *gin.Context, key string) {
 		c.Set("token_channel_limit", "")
 	}
 
+	// 获取令牌的连接类型
+	if token.DirectGroup != "default" {
+		c.Set("token_channel_direct_group", token.DirectGroup)
+	} else {
+		c.Set("token_channel_direct_group", "default")
+	}
+
 	if len(parts) > 1 {
 		if token.ModelLimitsEnabled {
 			abortWithMessage(c, http.StatusForbidden, "模型限制已启用，无法指定渠道")

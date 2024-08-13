@@ -21,9 +21,10 @@ type ChannelChoice struct {
 type ChannelsChooser struct {
 	sync.RWMutex
 	Channels         map[int]*ChannelChoice
-	Rule             map[string]map[string][][]int // group -> model -> priority -> channelIds
+	Rule             map[string]map[string]map[string][][]int // group -> direct group -> model -> priority -> channelIds
 	Match            []string
 	IncludesChannels []string
+	DirectGroup      map[string][]int
 }
 
 type ChannelsFilterFunc func(channelId int, choice *ChannelChoice) bool
@@ -90,7 +91,7 @@ func (cc *ChannelsChooser) ChangeStatus(channelId int, status bool) {
 	}
 }
 
-func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFunc) *Channel {
+func (cc *ChannelsChooser) balancer(channelIds []int, directGroup string, filters []ChannelsFilterFunc) *Channel {
 	nowTime := time.Now().Unix()
 	totalWeight := 0
 
@@ -100,6 +101,9 @@ func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFu
 		if !ok || choice.Disable || choice.CooldownsTime >= nowTime {
 			continue
 		}
+		//if !utils.Contains(channelId, cc.DirectGroup[directGroup]) {
+		//	continue
+		//}
 
 		isSkip := false
 		for _, filter := range filters {
@@ -137,17 +141,20 @@ func (cc *ChannelsChooser) balancer(channelIds []int, filters []ChannelsFilterFu
 	return nil
 }
 
-func (cc *ChannelsChooser) Next(group, modelName string, filters ...ChannelsFilterFunc) (*Channel, error) {
+func (cc *ChannelsChooser) Next(group, modelName string, directGroup string, filters ...ChannelsFilterFunc) (*Channel, error) {
 	cc.RLock()
 	defer cc.RUnlock()
 	if _, ok := cc.Rule[group]; !ok {
 		return nil, errors.New("group not found")
 	}
+	if _, ok := cc.Rule[group][directGroup]; !ok {
+		return nil, errors.New("direct connection group not found")
+	}
 
-	channelsPriority, ok := cc.Rule[group][modelName]
+	channelsPriority, ok := cc.Rule[group][directGroup][modelName]
 	if !ok {
 		matchModel := utils.GetModelsWithMatch(&cc.Match, modelName)
-		channelsPriority, ok = cc.Rule[group][matchModel]
+		channelsPriority, ok = cc.Rule[group][directGroup][matchModel]
 		if !ok {
 			return nil, errors.New("model not found")
 		}
@@ -158,7 +165,7 @@ func (cc *ChannelsChooser) Next(group, modelName string, filters ...ChannelsFilt
 	}
 
 	for _, priority := range channelsPriority {
-		channel := cc.balancer(priority, filters)
+		channel := cc.balancer(priority, directGroup, filters)
 		if channel != nil {
 			if len(cc.IncludesChannels) > 0 {
 				if isChannelIdInLimits(cc.IncludesChannels, channel.Id) {
@@ -212,7 +219,7 @@ func (cc *ChannelsChooser) Load() {
 		return
 	}
 
-	newGroup := make(map[string]map[string][][]int)
+	newGroup := make(map[string]map[string]map[string][][]int)
 	newChannels := make(map[int]*ChannelChoice)
 	newMatch := make(map[string]bool)
 
@@ -229,11 +236,15 @@ func (cc *ChannelsChooser) Load() {
 
 	for _, ability := range abilities {
 		if _, ok := newGroup[ability.Group]; !ok {
-			newGroup[ability.Group] = make(map[string][][]int)
+			newGroup[ability.Group] = make(map[string]map[string][][]int)
 		}
 
-		if _, ok := newGroup[ability.Group][ability.Model]; !ok {
-			newGroup[ability.Group][ability.Model] = make([][]int, 0)
+		if _, ok := newGroup[ability.Group][ability.DirectGroup]; !ok {
+			newGroup[ability.Group][ability.DirectGroup] = make(map[string][][]int)
+		}
+
+		if _, ok := newGroup[ability.Group][ability.DirectGroup][ability.Model]; !ok {
+			newGroup[ability.Group][ability.DirectGroup][ability.Model] = make([][]int, 0)
 		}
 
 		// 如果是以 *结尾的 model名称
@@ -250,7 +261,7 @@ func (cc *ChannelsChooser) Load() {
 			priorityIds = append(priorityIds, utils.String2Int(channelId))
 		}
 
-		newGroup[ability.Group][ability.Model] = append(newGroup[ability.Group][ability.Model], priorityIds)
+		newGroup[ability.Group][ability.DirectGroup][ability.Model] = append(newGroup[ability.Group][ability.DirectGroup][ability.Model], priorityIds)
 	}
 
 	newMatchList := make([]string, 0, len(newMatch))

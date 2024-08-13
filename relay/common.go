@@ -107,6 +107,7 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 	group := c.GetString("group")
 	skipChannelId := c.GetInt("skip_channel_id")
 	skipOnlyChat := c.GetBool("skip_only_chat")
+	tokenChannelDirectGroup := c.GetString("token_channel_direct_group")
 	var filters []model.ChannelsFilterFunc
 	if skipOnlyChat {
 		filters = append(filters, model.FilterOnlyChat())
@@ -120,7 +121,7 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 		model.ChannelGroup.IncludesChannels = includeChannelIds
 	}
 
-	channel, err := model.ChannelGroup.Next(group, modelName, filters...)
+	channel, err := model.ChannelGroup.Next(group, modelName, tokenChannelDirectGroup, filters...)
 	if err != nil {
 		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
 		if channel != nil {
@@ -308,13 +309,13 @@ func shouldRetry(c *gin.Context, apiErr *types.OpenAIErrorWithStatusCode, channe
 			return true
 		}
 
-	if apiErr.StatusCode == http.StatusBadRequest {
-		// 如果是culade 400错误，需要重试
-		if channelType == config.ChannelTypeAnthropic && strings.Contains(apiErr.Message, "This organization has been disabled") {
-			return true
+		if apiErr.StatusCode == http.StatusBadRequest {
+			// 如果是culade 400错误，需要重试
+			if channelType == config.ChannelTypeAnthropic && strings.Contains(apiErr.Message, "This organization has been disabled") {
+				return true
+			}
+			return false
 		}
-		return false
-	}
 
 		if apiErr.StatusCode == 408 {
 			// azure处理超时不重试
