@@ -23,6 +23,7 @@ type Quota struct {
 	promptTokens     int
 	price            model.Price
 	groupRatio       float64
+	directGroupRatio float64
 	inputRatio       float64
 	preConsumedQuota int
 	userId           int
@@ -43,7 +44,8 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *type
 
 	quota.price = *PricingInstance.GetPrice(quota.modelName)
 	quota.groupRatio = common.GetGroupRatio(c.GetString("group"))
-	quota.inputRatio = quota.price.GetInput() * quota.groupRatio
+	quota.directGroupRatio = common.GetDirectGroupRatio(c.GetString("token_channel_direct_group"))
+	quota.inputRatio = quota.price.GetInput() * quota.groupRatio * quota.directGroupRatio
 
 	if quota.price.Type == model.TimesPriceType {
 		quota.preConsumedQuota = int(1000 * quota.inputRatio)
@@ -104,7 +106,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	if q.price.Type == model.TimesPriceType {
 		quota = int(1000 * q.inputRatio)
 	} else {
-		completionRatio := q.price.GetOutput() * q.groupRatio
+		completionRatio := q.price.GetOutput() * q.groupRatio * q.directGroupRatio
 		quota = int(math.Ceil((float64(promptTokens) * q.inputRatio) + (float64(completionTokens) * completionRatio)))
 	}
 
@@ -147,7 +149,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		}
 	}
 
-	logContent := fmt.Sprintf("模型费率 %s，分组倍率 %.2f", modelRatioStr, q.groupRatio)
+	logContent := fmt.Sprintf("模型费率 %s，用户分组倍率 %.2f，令牌分组倍率 %.2f", modelRatioStr, q.groupRatio, q.directGroupRatio)
 	model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime, requestIP, q.originModelName)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 	model.UpdateChannelUsedQuota(q.channelId, quota)

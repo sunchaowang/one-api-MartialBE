@@ -22,6 +22,7 @@ const OperationSetting = () => {
     QuotaRemindThreshold: 0,
     PreConsumedQuota: 0,
     GroupRatio: '',
+    DirectGroupRatio: '',
     TopUpLink: '',
     ChatLink: '',
     ChatLinks: '',
@@ -57,7 +58,7 @@ const OperationSetting = () => {
       if (success) {
         let newInputs = {};
         data.forEach((item) => {
-          if (item.key === 'GroupRatio') {
+          if (item.key === 'GroupRatio' || item.key === 'DirectGroupRatio') {
             item.value = JSON.stringify(JSON.parse(item.value), null, 2);
           }
           if (item.key === 'RechargeDiscount') {
@@ -133,6 +134,13 @@ const OperationSetting = () => {
             return;
           }
           await updateOption('GroupRatio', inputs.GroupRatio);
+        }
+        if (originInputs['DirectGroupRatio'] !== inputs.DirectGroupRatio) {
+          if (!verifyJSON(inputs.DirectGroupRatio)) {
+            showError('令牌分组倍率不是合法的 JSON 字符串');
+            return;
+          }
+          await updateOption('DirectGroupRatio', inputs.DirectGroupRatio);
         }
         break;
       case 'chatlinks':
@@ -682,7 +690,20 @@ const OperationSetting = () => {
               placeholder={t('setting_index.operationSettings.rateSettings.groupRatio.placeholder')}
             />
           </FormControl>
-
+          <FormControl fullWidth>
+            <TextField
+              multiline
+              maxRows={15}
+              id="channel-DirectGroupRatio-label"
+              label={t('setting_index.operationSettings.rateSettings.directGroupRatio.label')}
+              value={inputs.DirectGroupRatio}
+              name="DirectGroupRatio"
+              onChange={handleInputChange}
+              aria-describedby="helper-text-channel-DirectGroupRatio-label"
+              minRows={5}
+              placeholder={t('setting_index.operationSettings.rateSettings.directGroupRatio.placeholder')}
+            />
+          </FormControl>
           <Button
             variant="contained"
             onClick={() => {

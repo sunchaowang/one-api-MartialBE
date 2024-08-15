@@ -501,6 +501,10 @@
           "label": "Group Ratio",
           "placeholder": "It is a JSON text, the key is the group name, and the value is the ratio"
         },
+        "directGroupRatio": {
+          "label": "Direct Group Ratio",
+          "placeholder": "It is a JSON text, the key is the group name, and the value is the ratio"
+        },
         "save": "Save Rate Settings"
       },
       "title": "Operation Settings"
