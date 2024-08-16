@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Box, ButtonBase, useMediaQuery } from '@mui/material';
 
 // project imports
 import LogoSection from '../LogoSection';
@@ -13,8 +12,8 @@ import I18nButton from '@/ui-component/i18nButton';
 import styled from './style.module.scss';
 
 // assets
-import { IconMenu2 } from '@tabler/icons-react';
-import { Grid, Space, Card, Button } from '@arco-design/web-react';
+import { IconMenu2, IconMenu } from '@tabler/icons-react';
+import { Grid, Space, Card, Button } from 'antd';
 import { IconMenuFold, IconMenuUnfold } from '@arco-design/web-react/icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_MENU } from '@/store/actions';
@@ -45,7 +44,7 @@ const Header = ({ handleLeftDrawerToggle, showLogo = true, showMenuCollapse = fa
         {showLogo && <LogoSection />}
         {showMenuCollapse && (
           <Button shape={'circle'} type={'primary'} onClick={() => onCollapseChange(leftDrawerOpened)}>
-            {!leftDrawerOpened ? <IconMenuUnfold></IconMenuUnfold> : <IconMenuFold></IconMenuFold>}
+            <IconMenu2 size={14}></IconMenu2>
           </Button>
         )}
       </div>

@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogContentText, DialogActions, Box } from '@mui/material';
 import { useState } from 'react';
 import QQGroupQCode from '@/assets/images/qq-group.jpg?url';
-import { Button, Modal } from '@arco-design/web-react';
+import { Button, Modal } from 'antd';
 import { copy } from '@/utils/common';
 
 export default function ContactButton() {
@@ -25,7 +25,7 @@ export default function ContactButton() {
         联系方式
       </Button>
       <Modal
-        visible={open}
+        open={open}
         onCancel={handleClose}
         footer={[
           <Button type="text" onClick={handleCopyQQGroupNumber}>

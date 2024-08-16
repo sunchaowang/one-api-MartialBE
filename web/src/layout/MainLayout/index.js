@@ -48,6 +48,11 @@ const MainLayout = () => {
           closeIcon={null}
           placement={'left'}
           onClose={handleLeftDrawerToggle}
+          styles={{
+            body: {
+              padding: 0
+            }
+          }}
         >
           <Sidebar
             isMobile={isMobile}

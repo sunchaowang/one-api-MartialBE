@@ -115,15 +115,15 @@ const Header = () => {
               </Space>
             ) : (
               <Space size={16}>
-                <Button onClick={() => navigate('/')} type={pathname === '/' ? 'primary' : 'text'}>
+                <Button onClick={() => navigate('/')} type={pathname === '/' ? 'primary' : 'text'} ghost>
                   {t('menu.home')}
                 </Button>
                 {account.user && (
-                  <Button onClick={() => navigate('/playground')} type={pathname === '/playground' ? 'primary' : 'text'}>
+                  <Button onClick={() => navigate('/playground')} type={pathname === '/playground' ? 'primary' : 'text'} ghost>
                     Playground
                   </Button>
                 )}
-                <Button onClick={() => navigate('/about')} type={pathname === '/about' ? 'primary' : 'text'}>
+                <Button onClick={() => navigate('/about')} type={pathname === '/about' ? 'primary' : 'text'} ghost>
                   {t('menu.about')}
                 </Button>
                 <ContactButton />
@@ -131,7 +131,7 @@ const Header = () => {
                 <I18nButton />
                 {account.user ? (
                   <>
-                    <Button type={'outline'} onClick={() => navigate('/panel/dashboard')}>
+                    <Button type="primary" onClick={() => navigate('/panel/dashboard')}>
                       {t('menu.console')}
                     </Button>
                     <ProfileSection />
