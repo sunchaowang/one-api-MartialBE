@@ -6,12 +6,12 @@ const renderModalTable = (data, provider) => {
     return record.timesPrice ? (
       <Space direction={'row'} justifyContent={'center'} alignItems={'center'} spacing={1}>
         <Typography>{record.timesPrice}</Typography>
-        <Typography>* 分组倍率</Typography>
+        <Typography>* 用户分组倍率 * 令牌分组倍率</Typography>
       </Space>
     ) : record.characterPrice ? (
       <Space direction={'row'} justifyContent={'center'} alignItems={'center'} spacing={1}>
         <Typography>{record.characterPrice}</Typography>
-        <Typography>* 分组倍率</Typography>
+        <Typography>* 用户分组倍率 * 令牌分组倍率</Typography>
       </Space>
     ) : (
       <Space direction={'row'} justifyContent={'center'} alignItems={'center'} spacing={1}>
@@ -25,7 +25,7 @@ const renderModalTable = (data, provider) => {
             {record.outputTokens + ' / 1k tokens'}
           </div>
         </Space>
-        <Typography>* 分组倍率</Typography>
+        <Typography>* 用户分组倍率 * 令牌分组倍率</Typography>
       </Space>
     );
   }
@@ -84,7 +84,15 @@ const renderModalTable = (data, provider) => {
 const Index = () => {
   const changelog = [
     '已接入LINUX DO 授权登录',
-    '优化计价分组倍率, 默认用户组(default)分组倍率为2.5倍, OpenAI直连用户组(openai_direct)分组倍率为5倍，Claude直连用户组(claude_direct)分组倍率为5倍',
+    <>
+      优化分组倍率计价系统, 分组倍率将细分为用户分组和令牌分组
+      <br />
+      用户分组：默认用户组(default)分组倍率为1倍
+      <br />
+      令牌分组：默认令牌组(default)分组倍率为2.5倍, OpenAI直连分组(openai_direct)分组倍率为5倍，Claude直连分组(claude_direct)分组倍率为5倍
+      <br />
+      如需修改令牌分组请联系站长。
+    </>,
     '充值汇率为1.5元1刀'
   ];
 
