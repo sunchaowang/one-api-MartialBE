@@ -24,8 +24,6 @@ func UserOperationCheckIn(c *gin.Context) {
 		})
 		return
 	}
-	// 打印用户信息
-	fmt.Println(user, "user")
 
 	// 检查是否已经签到
 	checkInTime, lastDayUsed, err := model.IsCheckInToday(user.Id)
@@ -40,6 +38,17 @@ func UserOperationCheckIn(c *gin.Context) {
 		})
 		return
 	}
+
+
+	if lastDayUsed == -2 {
+		// 前一日消耗额度为0, 无法签到
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "前一日消耗额度为0, 无法签到.",
+		})
+		return
+	}
+
 	if lastDayUsed == -1 {
 		// 无法获取统计信息
 		c.JSON(http.StatusOK, gin.H{

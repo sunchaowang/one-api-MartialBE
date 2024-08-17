@@ -102,6 +102,9 @@ func GetUserQuotaUsedByPeriod(userId int, zeroTime time.Time) (used int64, err e
 		used = 0
 	}
 
+	if used == 0 {
+		return -2, nil
+	}
 	// 保底值
 	if float64(used) < (config.QuotaPerUnit * 0.5) {
 		used = int64(config.QuotaPerUnit * 0.45)
