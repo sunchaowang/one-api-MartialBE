@@ -298,7 +298,7 @@ export const tableColumns = ({ t, manageUser, handleSearch }) => {
       render(col, item, index) {
         return (
           <>
-            <Flex gap={'middle'}>
+            <Flex gap={'small'}>
               <Tooltip title={item.wechat_id ? item.wechat_id : t('profilePage.notBound')} placement="top">
                 <IconBrandWechat />
               </Tooltip>
@@ -393,7 +393,7 @@ function TableActionColumn({ col, item, index }) {
         onCancel={() => setEditModalOpen(false)}
       ></Modal>
 
-      <Flex gap={'middle'}>
+      <Flex gap={'small'}>
         <Button type="link" size="small" onClick={() => setEditModalOpen(true)}>
           编辑
         </Button>

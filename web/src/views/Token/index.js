@@ -1,138 +1,122 @@
-import { useState, useEffect } from 'react';
-import { showError, showSuccess, trims } from '@/utils/common';
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableContainer from '@mui/material/TableContainer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import TablePagination from '@mui/material/TablePagination';
-import LinearProgress from '@mui/material/LinearProgress';
-import Alert from '@mui/material/Alert';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Toolbar from '@mui/material/Toolbar';
-
-import { Button, Card, Box, Stack, Container, Typography } from '@mui/material';
-import TokensTableRow from './component/TableRow';
-import KeywordTableHead from '@/ui-component/TableHead';
-import TableToolBar from '@/ui-component/TableToolBar';
-import { API } from '@/utils/api';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
-import EditeModal from './component/EditModal';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { Card, Button, Alert, Typography, Row, Col, Form, Input, Space, Table, message } from 'antd';
+import { PlusOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { showError, showSuccess, trims } from '@/utils/common';
+import { API } from '@/utils/api';
 import { ITEMS_PER_PAGE } from '@/constants';
 import { isAdmin } from '@/utils/common';
-import { useTranslation } from 'react-i18next';
+import EditeModal from './component/EditModal';
+import TokensTableRow, { tableRowColumns } from './component/TableRow';
 
+const { Text } = Typography;
 
 export default function Token() {
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
-  const [order, setOrder] = useState('desc');
-  const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
-  const [listCount, setListCount] = useState(0);
-  const [searching, setSearching] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [form] = Form.useForm();
   const [tokens, setTokens] = useState([]);
-  const [refreshFlag, setRefreshFlag] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editTokenId, setEditTokenId] = useState(0);
   const siteInfo = useSelector((state) => state.siteInfo);
   const userIsAdmin = isAdmin();
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: ITEMS_PER_PAGE,
+    total: 0
+  });
+  const [sortField, setSortField] = useState('id');
+  const [sortOrder, setSortOrder] = useState('descend');
 
-  const handleSort = (event, id) => {
-    const isAsc = orderBy === id && order === 'asc';
-    if (id !== '') {
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
-    }
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const searchTokens = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    setPage(0);
-    setSearchKeyword(formData.get('keyword'));
-  };
-
-  const fetchData = async (page, rowsPerPage, keyword, order, orderBy) => {
-    setSearching(true);
-    keyword = trims(keyword);
+  const fetchData = async (params = {}) => {
+    setLoading(true);
     try {
-      if (orderBy) {
-        orderBy = order === 'desc' ? '-' + orderBy : orderBy;
-      }
-      const res = await API.get(`/api/token/`, {
+      const { current, pageSize, keyword, sortField, sortOrder } = params;
+      const orderBy = sortOrder === 'descend' ? '-' + sortField : sortField;
+      const res = await API.get('/api/token/', {
         params: {
-          page: page + 1,
-          size: rowsPerPage,
-          keyword: keyword,
+          page: current,
+          size: pageSize,
+          keyword: trims(keyword),
           order: orderBy
         }
       });
-      const { success, message, data } = res.data;
+      const { success, message: msg, data } = res.data;
       if (success) {
-        setListCount(data.total_count);
         setTokens(data.data);
+        setPagination({
+          ...params.pagination,
+          total: data.total_count
+        });
       } else {
-        showError(message);
+        message.error(msg);
       }
     } catch (error) {
       console.error(error);
     }
-    setSearching(false);
-  };
-
-  // 处理刷新
-  const handleRefresh = async () => {
-    setOrderBy('id');
-    setOrder('desc');
-    setRefreshFlag(!refreshFlag);
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
-  }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
+    fetchData({
+      current: 1,
+      pageSize: ITEMS_PER_PAGE
+    });
+  }, []);
+
+  const handleTableChange = (newPagination, filters, sorter) => {
+    setPagination({
+      current: newPagination.current,
+      pageSize: newPagination.pageSize
+    });
+    fetchData({
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...newPagination,
+      ...filters
+    });
+  };
+
+  const handleSearch = () => {
+    fetchData({
+      current: 1,
+      pageSize: pagination.pageSize,
+      ...form.getFieldValue()
+    });
+  };
+
+  const handleRefresh = () => {
+    form.resetFields();
+    fetchData({
+      current: 1,
+      pageSize: pagination.pageSize
+    });
+  };
 
   const manageToken = async (id, action, value) => {
-    const url = '/api/token/';
-    let data = { id };
-    let res;
     try {
+      let res;
       switch (action) {
         case 'delete':
-          res = await API.delete(url + id);
+          res = await API.delete(`/api/token/${id}`);
           break;
         case 'status':
-          res = await API.put(url + `?status_only=true`, {
-            ...data,
+          res = await API.put(`/api/token/?status_only=true`, {
+            id,
             status: value
           });
           break;
       }
-      const { success, message } = res.data;
+      const { success, message: msg } = res.data;
       if (success) {
-        showSuccess('操作成功完成！');
-        if (action === 'delete') {
-          await handleRefresh();
-        }
+        message.success('操作成功完成！');
+        handleRefresh();
       } else {
-        showError(message);
+        message.error(msg);
       }
-
-      return res.data;
     } catch (error) {
-      return;
+      console.error(error);
     }
   };
 
@@ -154,94 +138,55 @@ export default function Token() {
   };
 
   return (
-    <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('token_index.token')}</Typography>
-
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            handleOpenModal(0);
-          }}
-          startIcon={<IconPlus />}
-        >
+    <Card
+      title={t('token_index.token')}
+      extra={
+        <Button type="primary" onClick={() => handleOpenModal(0)} icon={<PlusOutlined />}>
           {t('token_index.createToken')}
         </Button>
-      </Stack>
-      <Stack mb={5}>
-        <Alert severity="info">
-          {t('token_index.replaceApiAddress1')}
-          <b>{siteInfo.server_address}</b>
-          {t('token_index.replaceApiAddress2')}
-        </Alert>
-      </Stack>
-      <Card>
-        <Box component="form" onSubmit={searchTokens} noValidate>
-          <TableToolBar placeholder={t('token_index.searchTokenName')} />
-        </Box>
-        <Toolbar
-          sx={{
-            textAlign: 'right',
-            height: 50,
-            display: 'flex',
-            justifyContent: 'space-between',
-            p: (theme) => theme.spacing(0, 1, 0, 3)
-          }}
-        >
-          <Container>
-            <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                {t('token_index.refresh')}
-              </Button>
-            </ButtonGroup>
-          </Container>
-        </Toolbar>
-        {searching && <LinearProgress />}
-        <PerfectScrollbar component="div">
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <KeywordTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'name', label: t('token_index.name'), disableSort: false },
-                  { id: 'status', label: t('token_index.status'), disableSort: false },
-                  { id: 'used_quota', label: t('token_index.usedQuota'), disableSort: false },
-                  { id: 'remain_quota', label: t('token_index.remainingQuota'), disableSort: false },
-                  { id: 'created_time', label: t('token_index.createdTime'), disableSort: false },
-                  { id: 'expired_time', label: t('token_index.expiryTime'), disableSort: false },
-                  { id: 'action', label: t('token_index.actions'), disableSort: true }
-                ]}
-              />
-              <TableBody>
-                {tokens.map((row) => (
-                  <TokensTableRow
-                    item={row}
-                    manageToken={manageToken}
-                    key={row.id}
-                    handleOpenModal={handleOpenModal}
-                    setModalTokenId={setEditTokenId}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </PerfectScrollbar>
-        <TablePagination
-          page={page}
-          component="div"
-          count={listCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          showFirstButton
-          showLastButton
+      }
+    >
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        <Alert
+          message={
+            <>
+              {t('token_index.replaceApiAddress1')}
+              <Text copyable strong>
+                {siteInfo.server_address}
+              </Text>
+              {t('token_index.replaceApiAddress2')}
+            </>
+          }
+          type="info"
         />
-      </Card>
-      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} tokenId={editTokenId} userIsAdmin={userIsAdmin}/>
-    </>
+        <Form form={form}>
+          <Form.Item name="keyword" label={'令牌名称'}>
+            <Input placeholder={t('token_index.searchTokenName')} />
+          </Form.Item>
+          <Space>
+            <Button type="primary" onClick={handleSearch} icon={<SearchOutlined />}>
+              搜索
+            </Button>
+            <Button onClick={handleRefresh} icon={<ReloadOutlined />}>
+              重置
+            </Button>
+          </Space>
+        </Form>
+        <Table
+          columns={tableRowColumns(t, userIsAdmin, manageToken, handleSearch, handleOpenModal)}
+          dataSource={tokens}
+          rowKey="id"
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true
+          }}
+          loading={loading}
+          onChange={handleTableChange}
+          scroll={{ x: true }}
+        />
+      </Space>
+      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} tokenId={editTokenId} userIsAdmin={userIsAdmin} />
+    </Card>
   );
 }

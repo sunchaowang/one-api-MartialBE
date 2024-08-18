@@ -1,84 +1,56 @@
-import { useState, useEffect } from 'react';
-import { showError, showSuccess, trims } from '@/utils/common';
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableContainer from '@mui/material/TableContainer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import TablePagination from '@mui/material/TablePagination';
-import LinearProgress from '@mui/material/LinearProgress';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Toolbar from '@mui/material/Toolbar';
-
-import { Button, Card, Box, Stack, Container, Typography } from '@mui/material';
-import UsersTableRow from './component/TableRow';
-import KeywordTableHead from '@/ui-component/TableHead';
-import TableToolBar from '@/ui-component/TableToolBar';
+import React, { useState, useEffect } from 'react';
+import { Table, Button, Card, Typography, Input, Space, Popconfirm, Switch, Tooltip, Descriptions, Row, Col, Tag, Form, Flex } from 'antd';
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  WechatOutlined,
+  GithubOutlined,
+  MailOutlined,
+  SearchOutlined
+} from '@ant-design/icons';
+import LinuxDoIcon from '@/assets/images/icons/linuxdo.svg?react';
+import { showError, showSuccess, trims, renderQuota, renderNumber, timestamp2string } from '@/utils/common';
 import { API } from '@/utils/api';
 import { ITEMS_PER_PAGE } from '@/constants';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
-import EditeModal from './component/EditModal';
-
 import { useTranslation } from 'react-i18next';
-// ----------------------------------------------------------------------
+import EditeModal from './component/EditModal';
+import { Divider } from 'antd/lib';
+
+const { Title } = Typography;
+const { Search } = Input;
+
 export default function Users() {
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
-  const [order, setOrder] = useState('desc');
-  const [orderBy, setOrderBy] = useState('id');
-  const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
-  const [listCount, setListCount] = useState(0);
-  const [searching, setSearching] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(ITEMS_PER_PAGE);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-  const [refreshFlag, setRefreshFlag] = useState(false);
-
-  const [openModal, setOpenModal] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [sortField, setSortField] = useState('id');
+  const [sortOrder, setSortOrder] = useState('descend');
+  const [modalVisible, setModalVisible] = useState(false);
   const [editUserId, setEditUserId] = useState(0);
   const [editOperation, setEditOperation] = useState('edit');
+  const [form] = Form.useForm();
 
-  const handleSort = (event, id) => {
-    const isAsc = orderBy === id && order === 'asc';
-    if (id !== '') {
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
-    }
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const searchUsers = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    setPage(0);
-    setSearchKeyword(formData.get('keyword'));
-  };
-
-  const fetchData = async (page, rowsPerPage, keyword, order, orderBy) => {
-    setSearching(true);
-    keyword = trims(keyword);
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      if (orderBy) {
-        orderBy = order === 'desc' ? '-' + orderBy : orderBy;
-      }
-      const res = await API.get(`/api/user/`, {
+      const res = await API.get('/api/user/', {
         params: {
-          page: page + 1,
-          size: rowsPerPage,
-          keyword: keyword,
-          order: orderBy
+          page,
+          size: pageSize,
+          keyword: searchKeyword,
+          order: sortOrder === 'ascend' ? sortField : `-${sortField}`
         }
       });
       const { success, message, data } = res.data;
       if (success) {
-        setListCount(data.total_count);
+        setTotal(data.total_count);
         setUsers(data.data);
       } else {
         showError(message);
@@ -86,148 +58,225 @@ export default function Users() {
     } catch (error) {
       console.error(error);
     }
-    setSearching(false);
-  };
-
-  // 处理刷新
-  const handleRefresh = async () => {
-    setOrderBy('id');
-    setOrder('desc');
-    setRefreshFlag(!refreshFlag);
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
-  }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
+    fetchData();
+  }, [page, pageSize, searchKeyword, sortField, sortOrder]);
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    setPage(pagination.current);
+    setPageSize(pagination.pageSize);
+    if (sorter.field) {
+      setSortField(sorter.field);
+      setSortOrder(sorter.order);
+    }
+  };
+
+  const handleSearch = () => {
+    setPage(1);
+    setSearchKeyword(form.getFieldValue('searchKeyword'));
+  };
+
+  const handleRefresh = () => {
+    setSortField('id');
+    setSortOrder('descend');
+    setSearchKeyword('');
+    fetchData();
+  };
 
   const manageUser = async (username, action, value) => {
-    const url = '/api/user/manage';
-    let data = { username: username, action: '' };
-    let res;
-    switch (action) {
-      case 'delete':
-        data.action = 'delete';
-        break;
-      case 'status':
-        data.action = value === 1 ? 'enable' : 'disable';
-        break;
-      case 'role':
-        data.action = value === true ? 'promote' : 'demote';
-        break;
-    }
-
     try {
-      res = await API.post(url, data);
+      const res = await API.post('/api/user/manage', { username, action, value });
       const { success, message } = res.data;
       if (success) {
         showSuccess(t('userPage.operationSuccess'));
-        await handleRefresh();
+        fetchData();
       } else {
         showError(message);
       }
-
-      return res.data;
     } catch (error) {
-      return;
+      console.error(error);
     }
   };
+
+  const columns = [
+    { title: t('userPage.id'), dataIndex: 'id' },
+    { title: t('userPage.username'), dataIndex: 'username' },
+    { title: t('userPage.group'), dataIndex: 'group', render: (text) => <Tag>{text}</Tag> },
+    {
+      title: t('userPage.statistics'),
+      dataIndex: 'stats',
+
+      render: (_, record) => (
+        <Flex gap="small" vertical>
+          {[
+            { label: t('token_index.remainingQuota'), value: renderQuota(record.quota, 6) },
+            { label: t('token_index.usedQuota'), value: renderQuota(record.used_quota, 6) },
+            { label: t('userPage.useQuota'), value: record.request_count },
+            { label: '邀请用户', value: record.inviter_id }
+          ].map((item) => (
+            <Row>
+              <Tag>{item.label}</Tag>
+              <Divider type={'vertical'} />
+              {item.value}
+            </Row>
+          ))}
+        </Flex>
+      )
+    },
+    {
+      title: t('userPage.userRole'),
+      dataIndex: 'role',
+      render: (role) => {
+        switch (role) {
+          case 1:
+            return <Tag>{t('userPage.cUserRole')}</Tag>;
+          case 10:
+            return <Tag>{t('userPage.adminUserRole')}</Tag>;
+          case 100:
+            return <Tag>{t('userPage.superAdminRole')}</Tag>;
+          default:
+            return <Tag>{t('userPage.uUserRole')}</Tag>;
+        }
+      }
+    },
+    {
+      title: t('userPage.bind'),
+      dataIndex: 'bind',
+      onCell: (record) => {
+        return {
+          style: {
+            minWidth: 80
+          }
+        };
+      },
+
+      render: (_, record) => (
+        <Flex vertical gap={'small'}>
+          {[
+            record.wechat_id ? { label: <WechatOutlined />, value: record.wechat_id } : null,
+            record.github_id ? { label: <GithubOutlined />, value: record.github_id } : null,
+            record.email ? { label: <MailOutlined />, value: record.email } : null,
+            record.linuxdo_id ? { label: <LinuxDoIcon />, value: record.linuxdo_id } : null
+          ]
+            .filter((item) => !!item)
+            .map((item) => {
+              return (
+                <Row>
+                  {item.label}
+                  <Divider type={'vertical'} />
+                  {item.value}
+                </Row>
+              );
+            })}
+        </Flex>
+      )
+    },
+    {
+      title: t('userPage.creationTime'),
+      dataIndex: 'created_time',
+      onCell: (record) => {
+        return {
+          style: {
+            minWidth: 120
+          }
+        };
+      },
+      render: (time) => (time === 0 ? t('common.unknown') : timestamp2string(time))
+    },
+    {
+      title: t('userPage.status'),
+      dataIndex: 'status',
+      render: (status, record) => (
+        <Switch size={'small'} checked={status === 1} onChange={(checked) => manageUser(record.username, 'status', checked ? 1 : 2)} />
+      )
+    },
+    {
+      title: t('userPage.action'),
+      key: 'action',
+      fixed: 'right',
+      onCell: (record) => {
+        return {
+          style: {
+            minWidth: 120
+          }
+        };
+      },
+      render: (_, record) => (
+        <Space size="middle">
+          <Button size="small" type={'link'} icon={<EditOutlined />} onClick={() => handleOpenModal(record.id, 'edit')}>
+            编辑
+          </Button>
+          <Popconfirm
+            title={t('userPage.delTip')}
+            onConfirm={() => manageUser(record.username, 'delete', '')}
+            okText={t('common.yes')}
+            cancelText={t('common.no')}
+          >
+            <Button size="small" type="link" icon={<DeleteOutlined />} danger>
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      )
+    }
+  ];
 
   const handleOpenModal = (userId, operationType) => {
     setEditUserId(userId);
-    setOpenModal(true);
+    setModalVisible(true);
     setEditOperation(operationType);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setEditUserId(0);
-  };
-
-  const handleOkModal = (status) => {
-    if (status === true) {
-      handleCloseModal();
-      handleRefresh();
-    }
   };
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('userPage.users')}</Typography>
+      <Card
+        title={t('userPage.users')}
+        extra={
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => handleOpenModal(0, 'add')}>
+            {t('userPage.createUser')}
+          </Button>
+        }
+      >
+        <Row>
+          <Col span={24}>
+            <Form form={form}>
+              <Form.Item label="关键字" name={'searchKeyword'}>
+                <Input placeholder={t('userPage.searchPlaceholder')} />
+              </Form.Item>
 
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0, 'add')}>
-          {t('userPage.createUser')}
-        </Button>
-      </Stack>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 3, sm: 2, md: 4 }} padding={'24px'} paddingBottom={'0px'}></Stack>
-      <Card>
-        <Box component="form" onSubmit={searchUsers} noValidate>
-          <TableToolBar placeholder={t('userPage.searchPlaceholder')} />
-        </Box>
-        <Toolbar
-          sx={{
-            textAlign: 'right',
-            height: 50,
-            display: 'flex',
-            justifyContent: 'space-between',
-            p: (theme) => theme.spacing(0, 1, 0, 3)
+              <Form.Item>
+                <Flex gap={'small'}>
+                  <Button icon={<SearchOutlined />} onClick={handleSearch} type={'primary'}>
+                    搜索
+                  </Button>
+                  <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
+                    重置{' '}
+                  </Button>
+                </Flex>
+              </Form.Item>
+            </Form>
+          </Col>
+        </Row>
+        <Table
+          columns={columns}
+          dataSource={users}
+          rowKey="id"
+          pagination={{
+            current: page,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            showQuickJumper: true
           }}
-        >
-          <Container>
-            <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                {t('userPage.refresh')}
-              </Button>
-            </ButtonGroup>
-          </Container>
-        </Toolbar>
-        {searching && <LinearProgress />}
-        <PerfectScrollbar component="div">
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <KeywordTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'id', label: t('userPage.id'), disableSort: false },
-                  { id: 'username', label: t('userPage.username'), disableSort: false },
-                  { id: 'group', label: t('userPage.group'), disableSort: true },
-                  { id: 'stats', label: t('userPage.statistics'), disableSort: true },
-                  { id: 'role', label: t('userPage.userRole'), disableSort: false },
-                  { id: 'bind', label: t('userPage.bind'), disableSort: true },
-                  { id: 'created_time', label: t('userPage.creationTime'), disableSort: false },
-                  { id: 'status', label: t('userPage.status'), disableSort: false },
-                  { id: 'action', label: t('userPage.action'), disableSort: true }
-                ]}
-              />
-              <TableBody>
-                {users.map((row) => (
-                  <UsersTableRow
-                    item={row}
-                    manageUser={manageUser}
-                    key={row.id}
-                    handleOpenModal={(type) => handleOpenModal(type)}
-                    setModalUserId={setEditUserId}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </PerfectScrollbar>
-        <TablePagination
-          page={page}
-          component="div"
-          count={listCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          showFirstButton
-          showLastButton
+          loading={loading}
+          onChange={handleTableChange}
+          scroll={{ x: 'max-content' }}
         />
       </Card>
-      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} userId={editUserId} />
+      <EditeModal visible={modalVisible} onCancel={() => setModalVisible(false)} onOk={() => setModalVisible(false)} userId={editUserId} />
     </>
   );
 }

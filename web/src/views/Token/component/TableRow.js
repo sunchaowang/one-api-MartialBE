@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
-  Popover,
   TableRow,
   MenuItem,
   TableCell,
@@ -13,17 +12,20 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button,
   Tooltip,
   Stack,
   ButtonGroup
 } from '@mui/material';
 
 import TableSwitch from '@/ui-component/Switch';
-import { renderQuota, timestamp2string, copy, getChatLinks, replaceChatPlaceholders } from '@/utils/common';
+import { renderQuota, timestamp2string, copy, getChatLinks, replaceChatPlaceholders, showSuccess } from '@/utils/common';
 
-import { IconDotsVertical, IconEdit, IconTrash, IconCaretDownFilled } from '@tabler/icons-react';
+import { IconDotsVertical, IconEdit, IconTrash, IconCaretDownFilled, IconCopy, IconMessageChatbot } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+
+import { Switch, Button, Space, Popconfirm, Row, Col } from 'antd';
+import { Tag } from 'antd/lib';
+
 function createMenu(menuItems) {
   return (
     <>
@@ -185,9 +187,9 @@ export default function TokensTableRow({ item, manageToken, handleOpenModal, set
           </Tooltip>
         </TableCell>
 
-        <TableCell>{renderQuota(item.used_quota)}</TableCell>
+        <TableCell>{renderQuota(item.used_quota, 6)}</TableCell>
 
-        <TableCell>{item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 2)}</TableCell>
+        <TableCell>{item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 6)}</TableCell>
 
         <TableCell>{timestamp2string(item.created_time)}</TableCell>
 
@@ -257,3 +259,153 @@ TokensTableRow.propTypes = {
   handleOpenModal: PropTypes.func,
   setModalTokenId: PropTypes.func
 };
+
+export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpenModal) {
+  const handleStatus = async (item) => {
+    const switchValue = item.status === 1 ? 2 : 1;
+    const { success } = await manageToken(item.id, 'status', switchValue);
+    if (success) {
+      searchTokens();
+    }
+  };
+
+  // 创建一个 Button
+  const columns = [
+    { id: 'name', label: t('token_index.name'), disableSort: false },
+    {
+      id: 'direct_group',
+      label: '令牌分组',
+      disableSort: false,
+      render(col, item, index) {
+        return <Tag>{item.direct_group}</Tag>;
+      }
+    },
+
+    {
+      id: 'used_quota',
+      label: t('token_index.usedQuota') + '($)',
+      disableSort: false,
+      render: (col, item, index) => renderQuota(item.used_quota, 6),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 100
+          }
+        };
+      }
+    },
+    {
+      id: 'remain_quota',
+      label: t('token_index.remainingQuota') + '($)',
+      disableSort: false,
+      render: (col, item, index) => (item.unlimited_quota ? t('token_index.unlimited') : renderQuota(item.remain_quota, 6)),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 120
+          }
+        };
+      }
+    },
+    {
+      id: 'created_time',
+      label: t('token_index.createdTime'),
+      disableSort: false,
+      render: (col, item) => timestamp2string(item.created_time),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 120
+          }
+        };
+      }
+    },
+    {
+      id: 'expired_time',
+      label: t('token_index.expiryTime'),
+      disableSort: false,
+      render: (col, item) => (item.expired_time === -1 ? t('token_index.neverExpires') : timestamp2string(item.expired_time)),
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 120
+          }
+        };
+      }
+    },
+    {
+      id: 'status',
+      label: t('token_index.status'),
+      disableSort: false,
+      render: (col, item, index) => {
+        return <Switch size="small" checked={item.status === 1} onChange={() => handleStatus(item)}></Switch>;
+      },
+      onCell: () => {
+        return {
+          style: {
+            minWidth: 50
+          }
+        };
+      }
+    },
+    {
+      id: 'action',
+      label: t('token_index.actions'),
+      disableSort: true,
+      render: (col, item) => {
+        // 删除方法
+
+        const handleDelete = async () => {
+          await manageToken(item.id, 'delete', '');
+          searchTokens();
+        };
+        return (
+          <Space size={8}>
+            <Button
+              type={'link'}
+              onClick={() => {
+                copy(`sk-${item.key}`, t('token_index.token'));
+              }}
+              icon={<IconCopy size={14} />}
+              size={'small'}
+            >
+              {t('token_index.copy')}
+            </Button>
+            {/* <Button type={'link'} icon={<IconMessageChatbot size={14} />} size={'small'}>
+          {t('token_index.chat')}
+        </Button> */}
+            <Button type={'link'} icon={<IconEdit size={14} />} size={'small'} onClick={() => handleOpenModal(item.id)}>
+              {t('common.edit')}
+            </Button>
+
+            <Popconfirm
+              content={
+                <Space direction={'vertical'} size={16}>
+                  <Row>是否确认删除</Row>
+                  <Row>{item.name}</Row>
+                </Space>
+              }
+              title="温馨提示"
+              trigger="click"
+              onConfirm={handleDelete}
+            >
+              <Button type={'link'} danger={true} icon={<IconTrash size={14} />} size={'small'}>
+                {t('common.delete')}
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
+      width: 150
+    }
+  ];
+  return columns
+    .filter((e) => e)
+    .map((e) => {
+      return {
+        ...e,
+        dataIndex: e.id,
+        title: e.label
+      };
+    });
+}

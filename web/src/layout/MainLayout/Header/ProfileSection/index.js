@@ -102,7 +102,7 @@ const ProfileSection = () => {
       <Menu.Item key="menu.signout">
         <Space>
           <IconLogout stroke={1.5} size="1.3rem" className="arco-icon" />
-          {t('menu.signout')}
+          退出
         </Space>
       </Menu.Item>
     </Menu>

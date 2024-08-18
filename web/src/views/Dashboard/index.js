@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Grid, Typography } from '@mui/material';
-import { Button } from '@arco-design/web-react';
+import { Button } from 'antd';
 import { gridSpacing } from '@/store/constant';
 import StatisticalLineChartCard from './component/StatisticalLineChartCard';
 import ApexCharts from '@/ui-component/chart/ApexCharts';

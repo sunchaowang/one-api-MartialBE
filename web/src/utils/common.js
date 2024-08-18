@@ -165,7 +165,7 @@ export function renderQuota(quota, digits = 2) {
   let displayInCurrency = localStorage.getItem('display_in_currency');
   displayInCurrency = displayInCurrency === 'true';
   if (displayInCurrency) {
-    return '$' + calculateQuota(quota, digits);
+    return calculateQuota(quota, digits);
   }
   return renderNumber(quota);
 }
@@ -191,11 +191,11 @@ export function renderNumber(num) {
   }
 }
 
-export function renderQuotaWithPrompt(quota = 0, digits) {
+export function renderQuotaWithPrompt(quota = 0, digits = 6) {
   let displayInCurrency = localStorage.getItem('display_in_currency');
   displayInCurrency = displayInCurrency === 'true';
   if (displayInCurrency) {
-    return `（等价金额：${renderQuota(quota, digits)}）`;
+    return `等价额度($)：${renderQuota(quota, digits)}`;
   }
   return '';
 }

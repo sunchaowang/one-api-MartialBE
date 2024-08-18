@@ -5,6 +5,7 @@
   "private": true,
   "homepage": "",
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "@arco-design/web-react": "^2.63.1",
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.3",

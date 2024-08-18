@@ -187,7 +187,7 @@ export default function Users() {
         </Row>
         <Row>
           <Col span={24}>
-            <Flex gap={'middle'}>
+            <Flex gap={'small'}>
               <Button onClick={handleSearch} icon={<IconSearch width={14} />} type={'primary'}>
                 搜索
               </Button>

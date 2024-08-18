@@ -4,7 +4,7 @@ import SubCard from '@/ui-component/cards/SubCard';
 import { API } from '@/utils/api';
 import { showError, copy } from '@/utils/common';
 import { Typography, Accordion, AccordionSummary, AccordionDetails, Box, Stack } from '@mui/material';
-import { Tag, Card } from '@arco-design/web-react';
+import { Tag, Card } from 'antd';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Label from '@/ui-component/Label';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +50,6 @@ const SupportModels = () => {
                 {models.map((model) => (
                   <Tag
                     type="primary"
-                    color="arcoblue"
                     key={model}
                     onClick={() => {
                       copy(model, t('dashboard_index.model_name'));
