@@ -10,7 +10,7 @@ import (
 func (user User) QuotaForNewLinuxDoUser() {
 	// 赠送对应的金额
 	linuxDoLevel := float64(user.LinuxDoLevel)
-	if linuxDoLevel < 1 {
+	if linuxDoLevel < 2 {
 		linuxDoLevel = 0.5;
 	}else  {
 		linuxDoLevel = float64(user.LinuxDoLevel) - 1;
