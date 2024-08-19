@@ -145,16 +145,22 @@ const Index = () => {
             <Tag type="text" onClick={() => window.open('https://linux.do', 'blank')}>
               LinuxDo 论坛
             </Tag>
-            用户注册时可额外获得
-            <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              论坛等级
-            </Tag>{' '}
-            的使用额度。通过其他渠道注册本站的用户，请在绑定LinuxDo授权后在论坛私信（Username为）
+            用户注册时可再额外获得赠金， 。通过其他渠道注册本站的用户，请在绑定LinuxDo授权后在论坛私信（Username为）
             <Tag color={'red'} defaultChecked>
               {' '}
               @sunnysun
             </Tag>
-            补发对应的奖励额度
+            补发对应的奖励额度。
+            <br />
+            （论坛等级2级及以上，获得
+            <Tag color={'red'} defaultChecked size="small" variant="outlined">
+              论坛等级 - 1
+            </Tag>{' '}
+            的额度 ； 低于2级的获得
+            <Tag color={'red'} defaultChecked size="small" variant="outlined">
+              $0.5
+            </Tag>{' '}
+            的额度）
           </Paragraph>
           <Paragraph>
             8. 当前仅支持{' '}
