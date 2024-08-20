@@ -159,16 +159,31 @@ export default function Users() {
             record.wechat_id ? { label: <WechatOutlined />, value: record.wechat_id } : null,
             record.github_id ? { label: <GithubOutlined />, value: record.github_id } : null,
             record.email ? { label: <MailOutlined />, value: record.email } : null,
-            record.linuxdo_id ? { label: <LinuxDoIcon />, value: record.linuxdo_id } : null
+            record.linuxdo_id
+              ? {
+                  label: <LinuxDoIcon />,
+                  value: (
+                    <>
+                      {record.linuxdo_id}
+                      <Divider type={'vertical'} />
+                      {record.linuxdo_name}
+                      <Divider type={'vertical'} />
+                      {record.linuxdo_username}
+                      <Divider type={'vertical'} />
+                      {record.linuxdo_level}级
+                    </>
+                  )
+                }
+              : null
           ]
             .filter((item) => !!item)
             .map((item) => {
               return (
-                <Row>
+                <Flex justify={'center'} align={'center'}>
                   {item.label}
                   <Divider type={'vertical'} />
                   {item.value}
-                </Row>
+                </Flex>
               );
             })}
         </Flex>
