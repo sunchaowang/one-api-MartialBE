@@ -32,7 +32,6 @@ const OperationSetting = () => {
     ChannelDisableThreshold: 0,
     LogConsumeEnabled: '',
     DisplayInCurrencyEnabled: '',
-    DisplayTokenStatEnabled: '',
     ApproximateTokenEnabled: '',
     RetryTimes: 0,
     RetryCooldownSeconds: 0,
@@ -322,13 +321,6 @@ const OperationSetting = () => {
                   onChange={handleInputChange}
                   name="DisplayInCurrencyEnabled"
                 />
-              }
-            />
-
-            <FormControlLabel
-              label={t('setting_index.operationSettings.generalSettings.displayTokenStat')}
-              control={
-                <Checkbox checked={inputs.DisplayTokenStatEnabled === 'true'} onChange={handleInputChange} name="DisplayTokenStatEnabled" />
               }
             />
 
