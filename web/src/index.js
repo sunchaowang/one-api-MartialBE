@@ -32,13 +32,7 @@ function getLocale() {
 }
 
 root.render(
-  <ConfigProvider
-    locale={getLocale()}
-    prefixCls={'chirou'}
-    theme={{
-      algorithm: theme.compactAlgorithm
-    }}
-  >
+  <ConfigProvider locale={getLocale()} prefixCls={'chirou'} theme={{}}>
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />

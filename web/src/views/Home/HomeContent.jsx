@@ -116,7 +116,7 @@ const Index = () => {
         <Typography>
           <Title level={3}>介绍说明</Title>
           <Paragraph>1.AI API接口转发站</Paragraph>
-          <Paragraph>2.本站渠道来源：OpenAI、Azure、AWS、GCP、逆向、上游代理</Paragraph>
+          <Paragraph>2.本站渠道来源：OpenAI、Azure、AWS、GCP、逆向、其它渠道</Paragraph>
           <Paragraph>3.默认分组用户接口服务在官网直连以及其他渠道自动调优，如需官网直连，请联系站长修改分组。</Paragraph>
           <Paragraph>4.支持模型请查看下方模型介绍</Paragraph>
           <Paragraph>
@@ -145,7 +145,7 @@ const Index = () => {
             <Tag type="text" onClick={() => window.open('https://linux.do', 'blank')}>
               LinuxDo 论坛
             </Tag>
-            用户注册时可再额外获得赠金， 。通过其他渠道注册本站的用户，请在绑定LinuxDo授权后在论坛私信（Username为）
+            用户注册时可再额外获得赠金。通过其他渠道注册本站的用户，请在绑定LinuxDo授权后在论坛私信（Username为）
             <Tag color={'red'} defaultChecked>
               {' '}
               @sunnysun
