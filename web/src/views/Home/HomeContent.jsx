@@ -212,7 +212,7 @@ const Index = () => {
           <Row bordered={false}>
             <Paragraph span={24}>
               本页面更新可能存在延迟，实际可用模型及计费请以设置页以及日志页为准{' '}
-              <Button type="text" onClick={() => window.open('https://wochirou.com/panel/model_price')}>
+              <Button type="primary" dashed onClick={() => window.open('https://wochirou.com/panel/model_price')}>
                 点击查看最新可用模型及计费列表
               </Button>
             </Paragraph>
