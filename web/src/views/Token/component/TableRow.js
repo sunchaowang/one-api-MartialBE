@@ -260,7 +260,7 @@ TokensTableRow.propTypes = {
   setModalTokenId: PropTypes.func
 };
 
-export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpenModal) {
+export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpenModal, { directGroupRatio }) {
   const handleStatus = async (item) => {
     const switchValue = item.status === 1 ? 2 : 1;
     const { success } = await manageToken(item.id, 'status', switchValue);
@@ -277,7 +277,16 @@ export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpe
       label: '令牌分组',
       disableSort: false,
       render(col, item, index) {
-        return <Tag>{item.direct_group}</Tag>;
+        const colorMap = new Map();
+        colorMap.set('default', 'blue');
+        colorMap.set('openai_direct', 'orange');
+        colorMap.set('claude_direct', 'orange');
+        return (
+          <>
+            <Tag color={colorMap.get(item.direct_group)}>{item.direct_group}</Tag>
+            <Tag>倍率 {directGroupRatio[item.direct_group]}</Tag>
+          </>
+        );
       }
     },
 

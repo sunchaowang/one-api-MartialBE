@@ -30,6 +30,7 @@ export default function Users() {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [userId, setUserId] = useState('');
   const [sortField, setSortField] = useState('id');
   const [sortOrder, setSortOrder] = useState('descend');
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,6 +46,7 @@ export default function Users() {
           page,
           size: pageSize,
           keyword: searchKeyword,
+          user_id: userId,
           order: sortOrder === 'ascend' ? sortField : `-${sortField}`
         }
       });
@@ -63,7 +65,7 @@ export default function Users() {
 
   useEffect(() => {
     fetchData();
-  }, [page, pageSize, searchKeyword, sortField, sortOrder]);
+  }, [page, pageSize, searchKeyword, sortField, sortOrder, userId]);
 
   const handleTableChange = (pagination, filters, sorter) => {
     setPage(pagination.current);
@@ -77,12 +79,15 @@ export default function Users() {
   const handleSearch = () => {
     setPage(1);
     setSearchKeyword(form.getFieldValue('searchKeyword'));
+    setUserId(form.getFieldValue('userId'));
   };
 
   const handleRefresh = () => {
     setSortField('id');
     setSortOrder('descend');
     setSearchKeyword('');
+    setUserId('');
+    form.resetFields();
     fetchData();
   };
 
@@ -211,7 +216,6 @@ export default function Users() {
     {
       title: t('userPage.action'),
       key: 'action',
-      fixed: 'right',
       onCell: (record) => {
         return {
           style: {
@@ -255,9 +259,16 @@ export default function Users() {
           </Button>
         }
       >
-        <Row>
+        <Row
+          style={{
+            marginBottom: 16
+          }}
+        >
           <Col span={24}>
-            <Form form={form}>
+            <Form form={form} layout={'inline'}>
+              <Form.Item label="用户ID" name={'userId'}>
+                <Input placeholder="请输入" />
+              </Form.Item>
               <Form.Item label="关键字" name={'searchKeyword'}>
                 <Input placeholder={t('userPage.searchPlaceholder')} />
               </Form.Item>

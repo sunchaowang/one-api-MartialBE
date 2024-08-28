@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import dayjs from 'dayjs';
-import { Modal, Form, Input, InputNumber, Switch, DatePicker, Button, Alert, Divider, Space } from 'antd';
+import { Modal, Form, Input, InputNumber, Switch, DatePicker, Button, Alert, Divider, Space, Select, Tag, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { renderQuotaWithPrompt, showSuccess, showError } from '@/utils/common';
@@ -30,13 +30,15 @@ const originInputs = {
   model_limits_enabled: false,
   model_limits: '',
   channel_limits_enabled: false,
-  channel_limits: ''
+  channel_limits: '',
+  direct_group: ''
 };
 
-const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
+const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRatio }) => {
   const { t } = useTranslation();
   const [inputs, setInputs] = useState(originInputs);
   const siteInfo = useSelector((state) => state.siteInfo);
+  const [directGroupRatio, setDirectGroupRatio] = useState([]);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -92,6 +94,21 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
     }
   }, [tokenId]);
 
+  useEffect(() => {
+    if (_directGroupRatio) {
+      console.log('directGroupRatio', _directGroupRatio);
+      setDirectGroupRatio(() =>
+        Object.keys(_directGroupRatio).map((key) => {
+          return {
+            label: key,
+            value: key,
+            ratio: _directGroupRatio[key]
+          };
+        })
+      );
+    }
+  }, [_directGroupRatio]);
+
   return (
     <Modal
       open={open}
@@ -102,7 +119,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
       destroyOnClose={true}
     >
       <Divider />
-      <Alert message={t('token_index.quotaNote')} type="info" showIcon style={{ marginBottom: 16 }} />
+      <Alert message={t('token_index.quotaNote')} type="info" style={{ marginBottom: 16 }} />
       <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
         {({ errors, touched, values, handleChange, handleBlur, handleSubmit, setFieldValue, isSubmitting }) => (
           <Form layout="vertical" onFinish={handleSubmit}>
@@ -114,6 +131,24 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
               <Input name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} />
             </Form.Item>
 
+            <Form.Item label={'令牌分组'} name={'direct_group'}>
+              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(directGroupRatio)}</Typography.Text>
+              <Select
+                name={'direct_group'}
+                value={values.direct_group}
+                options={directGroupRatio.map((item) => item)}
+                onChange={(value) => setFieldValue('direct_group', value)}
+                optionRender={(option) => (
+                  <Space>
+                    <span role="img" aria-label={option.data.label}>
+                      {option.data.value}
+                    </span>
+                    <Tag>倍率 {option.data.ratio}</Tag>
+                  </Space>
+                )}
+              ></Select>
+            </Form.Item>
+
             <Form.Item label={t('token_index.expiryTime')}>
               <DatePicker
                 showTime
@@ -122,6 +157,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
                 onChange={(date) => setFieldValue('expired_time', date ? date.unix() : -1)}
               />
               <Switch
+                size={'small'}
                 checked={values.expired_time === -1}
                 onChange={(checked) => setFieldValue('expired_time', checked ? -1 : dayjs().unix())}
                 style={{ marginLeft: 8 }}
@@ -147,7 +183,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
 
             <Form.Item>
               <Space>
-                <Switch checked={values.unlimited_quota} onChange={(checked) => setFieldValue('unlimited_quota', checked)} />
+                <Switch size={'small'} checked={values.unlimited_quota} onChange={(checked) => setFieldValue('unlimited_quota', checked)} />
                 <span>{t('token_index.unlimitedQuota')}</span>
               </Space>
             </Form.Item>
@@ -155,7 +191,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
             {siteInfo.chat_cache_enabled && (
               <Form.Item>
                 <Space>
-                  <Switch checked={values.chat_cache} onChange={(checked) => setFieldValue('chat_cache', checked)} />
+                  <Switch size={'small'} checked={values.chat_cache} onChange={(checked) => setFieldValue('chat_cache', checked)} />
                   <span>{t('token_index.enableCache')}</span>
                 </Space>
               </Form.Item>
@@ -174,7 +210,11 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
 
             <Form.Item>
               <Space>
-                <Switch checked={values.model_limits_enabled} onChange={(checked) => setFieldValue('model_limits_enabled', checked)} />
+                <Switch
+                  size={'small'}
+                  checked={values.model_limits_enabled}
+                  onChange={(checked) => setFieldValue('model_limits_enabled', checked)}
+                />
                 <span>模型限制</span>
               </Space>
             </Form.Item>
@@ -188,13 +228,14 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin }) => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     disabled={!values.channel_limits_enabled}
-                    placeholder='用逗号分隔渠道名称'
+                    placeholder="用逗号分隔渠道名称"
                   />
                 </Form.Item>
 
                 <Form.Item>
                   <Space>
                     <Switch
+                      size={'small'}
                       checked={values.channel_limits_enabled}
                       onChange={(checked) => setFieldValue('channel_limits_enabled', checked)}
                     />
@@ -224,7 +265,8 @@ EditModal.propTypes = {
   tokenId: PropTypes.number,
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
-  userIsAdmin: PropTypes.bool
+  userIsAdmin: PropTypes.bool,
+  _directGroupRatio: PropTypes.object
 };
 
 export default EditModal;

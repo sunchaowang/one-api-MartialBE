@@ -29,6 +29,9 @@ export default function Token() {
   const [sortField, setSortField] = useState('id');
   const [sortOrder, setSortOrder] = useState('descend');
 
+  // 配置项
+  const [directGroupRatio, setDirectGroupRatio] = useState({});
+
   const fetchData = async (params = {}) => {
     setLoading(true);
     try {
@@ -58,11 +61,27 @@ export default function Token() {
     setLoading(false);
   };
 
+  async function fetchSettingOptions() {
+    const res = await API.get('/api/option', {
+      params: {
+        keys: 'DirectGroupRatio'
+      }
+    });
+    const { success, message: msg, data } = res.data;
+    if (success) {
+      const _directGroupRatio = data.find((item) => item.key === 'DirectGroupRatio');
+      setDirectGroupRatio(JSON.parse(_directGroupRatio.value));
+    }
+  }
+
   useEffect(() => {
     fetchData({
       current: 1,
       pageSize: ITEMS_PER_PAGE
     });
+
+    // 获取配置项
+    fetchSettingOptions();
   }, []);
 
   const handleTableChange = (newPagination, filters, sorter) => {
@@ -159,7 +178,7 @@ export default function Token() {
           }
           type="info"
         />
-        <Form form={form}>
+        <Form form={form} layout={'inline'}>
           <Form.Item name="keyword" label={'令牌名称'}>
             <Input placeholder={t('token_index.searchTokenName')} />
           </Form.Item>
@@ -173,7 +192,9 @@ export default function Token() {
           </Space>
         </Form>
         <Table
-          columns={tableRowColumns(t, userIsAdmin, manageToken, handleSearch, handleOpenModal)}
+          columns={tableRowColumns(t, userIsAdmin, manageToken, handleSearch, handleOpenModal, {
+            directGroupRatio
+          })}
           dataSource={tokens}
           rowKey="id"
           pagination={{
@@ -186,7 +207,14 @@ export default function Token() {
           scroll={{ x: true }}
         />
       </Space>
-      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} tokenId={editTokenId} userIsAdmin={userIsAdmin} />
+      <EditeModal
+        open={openModal}
+        onCancel={handleCloseModal}
+        onOk={handleOkModal}
+        tokenId={editTokenId}
+        userIsAdmin={userIsAdmin}
+        _directGroupRatio={directGroupRatio}
+      />
     </Card>
   );
 }

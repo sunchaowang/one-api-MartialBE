@@ -5,7 +5,7 @@ import { TableRow, TableCell, Stack } from '@mui/material';
 import { timestamp2string, renderQuota } from '@/utils/common';
 import Label from '@/ui-component/Label';
 import LogType from '../type/LogType';
-import { Space, Tag } from 'antd';
+import { Space, Tag, Typography } from 'antd';
 
 function renderType(type) {
   const typeOption = LogType[type];
@@ -278,7 +278,12 @@ export function tableRowColumns(t, userIsAdmin) {
       id: 'detail',
       label: t('logPage.detailLabel'),
       disableSort: true,
-      render: (col, item, index) => item.content,
+      render: (col, item, index) => (
+        <Space direction={'vertical'} size={8}>
+          <Typography.Text>{item.content}</Typography.Text>
+          <Typography.Text>{item.request_ip}</Typography.Text>
+        </Space>
+      ),
       onCell: () => {
         return {
           style: {

@@ -21,6 +21,7 @@ import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 
 import { ConfigProvider, theme } from 'antd';
+import { isMobile } from '@/utils/common';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
 
@@ -32,7 +33,17 @@ function getLocale() {
 }
 
 root.render(
-  <ConfigProvider locale={getLocale()} prefixCls={'chirou'} theme={{}}>
+  <ConfigProvider
+    locale={getLocale()}
+    prefixCls={'chirou'}
+    theme={
+      isMobile()
+        ? {
+            algorithm: theme.compactAlgorithm
+          }
+        : {}
+    }
+  >
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />
