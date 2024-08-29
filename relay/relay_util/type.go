@@ -36,7 +36,13 @@ func init() {
 		config.ChannelTypeSuno:         "Suno",
 		config.ChannelTypeDoubao:       "Doubao",
 		config.ChannelTypeVertexAI:     "VertexAI",
-		config.ChannelTogetherAI:       "TogetherAI",
+		config.ChannelTypeTogetherAI:   "TogetherAI",
 		config.ChannelTypeFireworksAI:  "FireworksAI",
+		config.ChannelTypeLLAMA:        "LLAMA",
+		config.ChannelTypeFlux:         "Flux",
+		config.ChannelTypeIdeogram:     "Ideogram",
+		config.ChannelTypeSiliconflow:  "Siliconflow",
+		config.ChannelTypeJina:         "Jina",
+		config.ChannelTypeRerank:       "Rerank",
 	}
 }

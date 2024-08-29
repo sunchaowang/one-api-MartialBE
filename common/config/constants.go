@@ -198,6 +198,12 @@ const (
 	ChannelTypeVertexAI       = 44
 	ChannelTypeTogetherAI     = 45
 	ChannelTypeFireworksAI    = 46
+	ChannelTypeLLAMA          = 47
+	ChannelTypeIdeogram       = 48
+	ChannelTypeSiliconflow    = 49
+	ChannelTypeFlux           = 50
+	ChannelTypeJina           = 51
+	ChannelTypeRerank         = 52
 )
 
 var ChannelBaseURLs = []string{
@@ -246,8 +252,14 @@ var ChannelBaseURLs = []string{
 	"https://api.together.xyz",              //42
 	"https://ark.cn-beijing.volces.com",     //43
 	"",                                      //44
-	"",                                      //45
+	"https://api.together.xyz",              //45
 	"https://api.fireworks.ai/inference/v1", //46
+	"",                                      //47
+	"https://api.ideogram.ai",               //48
+	"https://api.siliconflow.cn",            //49
+	"",                                      //50
+	"https://api.jina.ai",                   //51
+	"",                                      //52
 }
 
 const (
@@ -264,6 +276,7 @@ const (
 	RelayModeAudioTranscription
 	RelayModeAudioTranslation
 	RelayModeSuno
+	RelayModeRerank
 )
 
 type ContextKey string

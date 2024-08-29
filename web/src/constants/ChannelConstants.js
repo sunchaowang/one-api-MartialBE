@@ -187,6 +187,13 @@ export const CHANNEL_OPTIONS = {
     value: 41,
     color: 'default'
   },
+  42: {
+    key: 42,
+    text: 'VertexAI',
+    value: 42,
+    color: 'orange',
+    url: 'https://console.cloud.google.com/'
+  },
   24: {
     key: 24,
     text: 'Azure Speech',
@@ -228,5 +235,19 @@ export const CHANNEL_OPTIONS = {
     value: 46,
     color: 'orange',
     url: 'https://fireworks.ai'
+  },
+  49: {
+    key: 49,
+    text: 'Siliconflow',
+    value: 49,
+    color: 'orange',
+    url: 'https://siliconflow.cn/'
+  },
+  51: {
+    key: 51,
+    text: 'Jina',
+    value: 51,
+    color: 'orange',
+    url: 'https://jina.ai/'
   }
 };
