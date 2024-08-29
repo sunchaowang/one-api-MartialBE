@@ -89,7 +89,7 @@ const Index = () => {
       <br />
       用户分组：默认用户组(default)分组倍率为1倍
       <br />
-      令牌分组：默认令牌组(default)分组倍率为2.5倍, OpenAI直连分组(openai_direct)分组倍率为5倍，Claude直连分组(claude_direct)分组倍率为5倍
+      令牌分组：默认令牌组(default)分组倍率为2倍, OpenAI直连分组(openai_direct)分组倍率为5倍，Claude直连分组(claude_direct)分组倍率为5倍
       <br />
       如需修改令牌分组请联系站长。
     </>,
@@ -177,11 +177,7 @@ const Index = () => {
           </Paragraph>
           <Paragraph>9.为了维持转发服务正常使用，将不定期清除非法用户（包括重复注册等任何形式的小号）；请使用真实邮箱注册</Paragraph>
           <Paragraph>
-            10.受供应商和OpenAI政策影响，价格会随时调整，本站计价分组倍率
-            <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              2.5倍
-            </Tag>
-            ，充值汇率为
+            10.受供应商和OpenAI政策影响，价格会随时调整，充值汇率为
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
               1.5元=1刀
             </Tag>
