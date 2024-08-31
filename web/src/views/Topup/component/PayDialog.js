@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Dialog, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton, Stack } from '@mui/material';
+import { Typography, Button } from 'antd';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import { QRCode } from 'react-qrcode-logo';
 import successSvg from '@/assets/images/success.svg';
 import { API } from '@/utils/api';
-import { showError } from '@/utils/common';
+import { isMobile, showError } from '@/utils/common';
 import { useSelector } from 'react-redux';
+import { Modal } from 'antd';
 
 const PayDialog = ({ open, onClose, amount, uuid }) => {
   const theme = useTheme();
@@ -109,53 +111,28 @@ const PayDialog = ({ open, onClose, amount, uuid }) => {
     }
   };
   return (
-    <Dialog open={open} fullWidth maxWidth={'sm'} disableEscapeKeyDown>
-      <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>支付</DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={() => {
-          if (intervalId) {
-            clearInterval(intervalId);
-            setIntervalId(null);
-          }
-          clearValue();
-          onClose();
-        }}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500]
-        }}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent>
-        <DialogContent>
-          <Stack direction="column" justifyContent="center" alignItems="center" spacing={2}>
-            {loading && <img src={useLogo} alt="loading" height="100" />}
-            {qrCodeUrl && (
-              <QRCode
-                value={qrCodeUrl}
-                size={256}
-                qrStyle="dots"
-                eyeRadius={20}
-                fgColor={theme.palette.primary.main}
-                bgColor={theme.palette.background.paper}
-              />
-            )}
-            {success && <img src={successSvg} alt="success" height="100" />}
-            <Typography variant="h3">{message}</Typography>
-            {subMessage && <Typography variant="body">{subMessage}</Typography>}
-            {qrCodeUrl && qrCodeUrl.startsWith('https://qr.alipay.com') && !success && (
-              <Button variant="contained" color="primary" onClick={() => handleOpenAlipay(qrCodeUrl)}>
+    <Modal open={open} fullWidth maxWidth={'90vw'} destroyOnClose title={'支付'} footer={null}>
+      <Stack direction="column" justifyContent="center" alignItems="center" spacing={2}>
+        {loading && <img src={useLogo} alt="loading" height="100" />}
+        {qrCodeUrl && (
+          <QRCode value={qrCodeUrl} size={256} qrStyle="dots" eyeRadius={20} fgColor={'#1677ff'} bgColor={theme.palette.background.paper} />
+        )}
+        {success && <img src={successSvg} alt="success" height="100" />}
+        <Typography variant="h3">{message}</Typography>
+        {subMessage && <Typography variant="body">{subMessage}</Typography>}
+        {qrCodeUrl && qrCodeUrl.startsWith('https://qr.alipay.com') && !success && (
+          <>
+            <Typography.Text>充值未到账请联系管理员</Typography.Text>
+
+            {isMobile() && (
+              <Button type={'primary'} block={true} onClick={() => handleOpenAlipay(qrCodeUrl)}>
                 打开支付宝
               </Button>
             )}
-          </Stack>
-        </DialogContent>
-      </DialogContent>
-    </Dialog>
+          </>
+        )}
+      </Stack>
+    </Modal>
   );
 };
 

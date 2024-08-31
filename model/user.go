@@ -23,6 +23,9 @@ type User struct {
 	Status           int            `json:"status" gorm:"type:int;default:1"` // enabled, disabled
 	Email            string         `json:"email" gorm:"index" validate:"max=50"`
 	GitHubId         string         `json:"github_id" gorm:"column:github_id;index"`
+	GitHubUserName   string         `json:"github_username" gorm:"column:github_username;type:string"`
+	GitHubEmail      string         `json:"github_email" gorm:"column:github_email;type:string"`
+	GitHubCreatedAt  string         `json:"github_created_at" gorm:"column:github_created_at;type:string"`
 	LinuxDoId        string         `json:"linuxdo_id" gorm:"column:linuxdo_id;index"`
 	LinuxDoLevel     int            `json:"linuxdo_level" gorm:"column:linuxdo_level;type:int;default:0"`
 	WeChatId         string         `json:"wechat_id" gorm:"column:wechat_id;index"`

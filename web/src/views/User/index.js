@@ -91,9 +91,9 @@ export default function Users() {
     fetchData();
   };
 
-  const manageUser = async (username, action, value) => {
+  const manageUser = async (id, action, value) => {
     try {
-      const res = await API.post('/api/user/manage', { username, action, value });
+      const res = await API.post('/api/user/manage', { id, action, value });
       const { success, message } = res.data;
       if (success) {
         showSuccess(t('userPage.operationSuccess'));
@@ -210,7 +210,11 @@ export default function Users() {
       title: t('userPage.status'),
       dataIndex: 'status',
       render: (status, record) => (
-        <Switch size={'small'} checked={status === 1} onChange={(checked) => manageUser(record.username, 'status', checked ? 1 : 2)} />
+        <Switch
+          size={'small'}
+          checked={status === 1}
+          onChange={(checked) => manageUser(record.id, status === 1 ? 'disable' : 'enable', checked ? 1 : 2)}
+        />
       )
     },
     {
@@ -230,7 +234,7 @@ export default function Users() {
           </Button>
           <Popconfirm
             title={t('userPage.delTip')}
-            onConfirm={() => manageUser(record.username, 'delete', '')}
+            onConfirm={() => manageUser(record.id, 'delete', '')}
             okText={t('common.yes')}
             cancelText={t('common.no')}
           >

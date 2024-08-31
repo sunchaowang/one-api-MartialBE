@@ -41,7 +41,9 @@ root.render(
         ? {
             algorithm: theme.compactAlgorithm
           }
-        : {}
+        : {
+            algorithm: theme.compactAlgorithm
+          }
     }
   >
     <Provider store={store}>

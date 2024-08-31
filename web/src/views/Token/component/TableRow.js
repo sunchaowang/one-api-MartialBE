@@ -398,9 +398,7 @@ export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpe
               trigger="click"
               onConfirm={handleDelete}
             >
-              <Button type={'link'} danger={true} icon={<IconTrash size={14} />} size={'small'}>
-                {t('common.delete')}
-              </Button>
+              <Button type={'link'} danger={true} icon={<IconTrash size={14} />} size={'small'}></Button>
             </Popconfirm>
           </Space>
         );

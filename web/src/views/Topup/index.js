@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { showError } from '@/utils/common';
-import { Stack, Alert } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Row, Col, Alert, Card } from 'antd';
 import TopupCard from './component/TopupCard';
 import InviteCard from './component/InviteCard';
 import { API } from '@/utils/api';
@@ -30,19 +29,21 @@ const Topup = () => {
   }, []);
 
   return (
-    <Grid container spacing={2}>
-      <Grid xs={12}>
-        <Alert severity="warning">{t('topupPage.alertMessage')}</Alert>
-      </Grid>
-      <Grid xs={12} md={6} lg={6}>
-        <Stack spacing={2}>
+    <Card title={'充值'}>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Alert message={t('topupPage.alertMessage')} />
+        </Col>
+        <Col xs={24}>
           <TopupCard user={user} />
-        </Stack>
-      </Grid>
-      <Grid xs={12} md={6} lg={6}>
-        <InviteCard user={user} />
-      </Grid>
-    </Grid>
+        </Col>
+        {/* <Col xs={24} md={12} lg={12}>
+          <Card>
+            <InviteCard user={user} />
+          </Card>
+        </Col> */}
+      </Row>
+    </Card>
   );
 };
 

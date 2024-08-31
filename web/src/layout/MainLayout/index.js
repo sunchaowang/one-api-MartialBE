@@ -30,7 +30,7 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Layout className={styled.layout} style={!isMobile ? { minWidth: 1400, overflow: 'scroll' } : {}}>
+    <Layout className={styled.layout} style={!isMobile ? { minWidth: 1080, overflow: 'scroll' } : {}}>
       {!isMobile ? (
         <Layout.Sider theme={'light'} collapsedWidth={80} className={styled.layoutSider} width={260} collapsed={!leftDrawerOpened}>
           <Sidebar

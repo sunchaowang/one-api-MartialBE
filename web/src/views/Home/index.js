@@ -25,7 +25,7 @@ const Home = () => {
           const htmlNotice = marked(data);
 
           modal.success({
-            title: null,
+            title: '通知',
             icon: null,
             content: <div dangerouslySetInnerHTML={{ __html: htmlNotice }} />,
             style: {

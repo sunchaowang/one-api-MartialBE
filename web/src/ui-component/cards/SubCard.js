@@ -3,7 +3,8 @@ import { forwardRef } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
+import { CardContent, CardHeader, Divider, Typography } from '@mui/material';
+import { Card } from 'antd';
 
 // ==============================|| CUSTOM SUB CARD ||============================== //
 
@@ -12,34 +13,23 @@ const SubCard = forwardRef(
     const theme = useTheme();
 
     return (
-      <Card
-        ref={ref}
-        sx={{
-          border: theme.typography.SubCard.border,
-          ':hover': {
-            boxShadow: '0 2px 14px 0 rgb(32 40 45 / 8%)'
-          },
-          ...sx
-        }}
-        {...others}
-      >
+      <Card ref={ref} title={title} {...others}>
         {/* card header and action */}
-        {!darkTitle && title && (
+        {/* {!darkTitle && title && (
           <CardHeader sx={{ p: 2.5 }} title={<Typography variant="h5">{title}</Typography>} action={secondary} subheader={subTitle} />
         )}
         {darkTitle && title && (
           <CardHeader sx={{ p: 2.5 }} title={<Typography variant="h4">{title}</Typography>} action={secondary} subheader={subTitle} />
-        )}
+        )} */}
 
         {/* content & header divider */}
-        {title && (
+        {/* {title && (
           <Divider
             sx={{
               opacity: 1
-              // borderColor: theme.palette.primary.light
             }}
           />
-        )}
+        )} */}
 
         {/* card content */}
         {content && (

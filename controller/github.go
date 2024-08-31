@@ -24,9 +24,13 @@ type GitHubOAuthResponse struct {
 }
 
 type GitHubUser struct {
-	Login string `json:"login"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Login     string `json:"login"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Location  string `json:"location"`
+	Type      string `json:"type"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
@@ -77,6 +81,17 @@ func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 	if githubUser.Login == "" {
 		return nil, errors.New("返回值非法，用户字段为空，请稍后重试！")
 	}
+	// 校验注册时间 七天内注册的不允许注册
+	// if githubUser.CreatedAt != "" {
+	// 	createdAt, err := time.Parse(time.RFC3339, githubUser.CreatedAt)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	if time.Since(createdAt) < 7*24*time.Hour {
+	// 		return nil, errors.New("GitHub 账户注册时间少于七天，不允许注册")
+	// 	}
+	// }
+
 	return &githubUser, nil
 }
 
@@ -113,7 +128,10 @@ func GitHubOAuth(c *gin.Context) {
 		return
 	}
 	user := model.User{
-		GitHubId: githubUser.Login,
+		GitHubId:        githubUser.Login,
+		GitHubUserName:  githubUser.Name,
+		GitHubEmail:     githubUser.Email,
+		GitHubCreatedAt: githubUser.CreatedAt,
 	}
 	if model.IsGitHubIdAlreadyTaken(user.GitHubId) {
 		err := user.FillUserByGitHubId()

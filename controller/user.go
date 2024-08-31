@@ -577,6 +577,7 @@ func CreateUser(c *gin.Context) {
 type ManageRequest struct {
 	Username string `json:"username"`
 	Action   string `json:"action"`
+	Id       int    `json:"id"`
 }
 
 // ManageUser Only admin user can do this
@@ -592,7 +593,7 @@ func ManageUser(c *gin.Context) {
 		return
 	}
 	user := model.User{
-		Username: req.Username,
+		Id: req.Id,
 	}
 	// Fill attributes
 	model.DB.Where(&user).First(&user)
