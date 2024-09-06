@@ -26,27 +26,27 @@ import (
 func Path2Relay(c *gin.Context, path string) RelayBaseInterface {
 	allowCache := false
 	var relay RelayBaseInterface
-	if strings.HasPrefix(path, "/v1/chat/completions") {
+	if strings.Contains(path, "/v1/chat/completions") {
 		allowCache = true
 		relay = NewRelayChat(c)
-	} else if strings.HasPrefix(path, "/v1/completions") {
+	} else if strings.Contains(path, "/v1/completions") {
 		allowCache = true
 		relay = NewRelayCompletions(c)
-	} else if strings.HasPrefix(path, "/v1/embeddings") {
+	} else if strings.Contains(path, "/v1/embeddings") {
 		relay = NewRelayEmbeddings(c)
-	} else if strings.HasPrefix(path, "/v1/moderations") {
+	} else if strings.Contains(path, "/v1/moderations") {
 		relay = NewRelayModerations(c)
-	} else if strings.HasPrefix(path, "/v1/images/generations") {
+	} else if strings.Contains(path, "/v1/images/generations") {
 		relay = NewRelayImageGenerations(c)
-	} else if strings.HasPrefix(path, "/v1/images/edits") {
+	} else if strings.Contains(path, "/v1/images/edits") {
 		relay = NewRelayImageEdits(c)
-	} else if strings.HasPrefix(path, "/v1/images/variations") {
+	} else if strings.Contains(path, "/v1/images/variations") {
 		relay = NewRelayImageVariations(c)
-	} else if strings.HasPrefix(path, "/v1/audio/speech") {
+	} else if strings.Contains(path, "/v1/audio/speech") {
 		relay = NewRelaySpeech(c)
-	} else if strings.HasPrefix(path, "/v1/audio/transcriptions") {
+	} else if strings.Contains(path, "/v1/audio/transcriptions") {
 		relay = NewRelayTranscriptions(c)
-	} else if strings.HasPrefix(path, "/v1/audio/translations") {
+	} else if strings.Contains(path, "/v1/audio/translations") {
 		relay = NewRelayTranslations(c)
 	}
 

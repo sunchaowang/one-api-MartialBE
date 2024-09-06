@@ -13,14 +13,15 @@ import (
 func SetRelayRouter(router *gin.Engine) {
 	router.Use(middleware.CORS())
 	// https://platform.openai.com/docs/api-reference/introduction
-	setOpenAIRouter(router)
+	setOpenAIV1Router(router)
+	setOpenAIAPIRouter(router)
 	setMJRouter(router)
 	setSunoRouter(router)
 	setClaudeRouter(router)
 	setGeminiRouter(router)
 }
 
-func setOpenAIRouter(router *gin.Engine) {
+func setOpenAIRouter(router *gin.RouterGroup) {
 	modelsRouter := router.Group("/v1/models")
 	modelsRouter.Use(middleware.OpenaiAuth(), middleware.Distribute())
 	{
@@ -38,7 +39,6 @@ func setOpenAIRouter(router *gin.Engine) {
 		relayV1Router.POST("/images/variations", relay.Relay)
 		relayV1Router.POST("/embeddings", relay.Relay)
 		// relayV1Router.POST("/engines/:model/embeddings", controller.RelayEmbeddings)
-
 		relayV1Router.POST("/audio/transcriptions", relay.Relay)
 		relayV1Router.POST("/audio/translations", relay.Relay)
 		relayV1Router.POST("/audio/speech", relay.Relay)
@@ -57,9 +57,18 @@ func setOpenAIRouter(router *gin.Engine) {
 			relayV1Router.Any("/batches/*any", relay.RelayOnly)
 			relayV1Router.Any("/vector_stores/*any", relay.RelayOnly)
 			relayV1Router.DELETE("/models/:model", relay.RelayOnly)
-
 		}
 	}
+}
+
+func setOpenAIAPIRouter(router gin.IRouter) {
+	relayV1Router := router.Group("/api")
+	setOpenAIRouter(relayV1Router)
+}
+
+func setOpenAIV1Router(router gin.IRouter) {
+	relayV1Router := router.Group("")
+	setOpenAIRouter(relayV1Router)
 }
 
 func setMJRouter(router *gin.Engine) {
@@ -101,7 +110,6 @@ func setSunoRouter(router *gin.Engine) {
 		relaySunoRouter.POST("/submit/:action", task.RelayTaskSubmit)
 		relaySunoRouter.POST("/fetch", suno.GetFetch)
 		relaySunoRouter.GET("/fetch/:id", suno.GetFetchByID)
-
 	}
 }
 
