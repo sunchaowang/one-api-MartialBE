@@ -151,7 +151,7 @@ const Index = () => {
               @sunnysun
             </Tag>
             补发对应的奖励额度。
-            <br />
+            {/* <br />
             （论坛等级2级及以上，获得
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
               论坛等级 - 1
@@ -160,7 +160,7 @@ const Index = () => {
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
               $0.5
             </Tag>{' '}
-            的额度）
+            的额度） */}
           </Paragraph>
           <Paragraph>
             8. 当前仅支持{' '}
