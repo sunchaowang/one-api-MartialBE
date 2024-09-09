@@ -89,7 +89,7 @@ const Index = () => {
       <br />
       用户分组：默认用户组(default)分组倍率为1倍
       <br />
-      令牌分组：默认令牌组(default)分组倍率为2倍, OpenAI直连分组(openai_direct)分组倍率为5倍，Claude直连分组(claude_direct)分组倍率为5倍
+      令牌分组：默认令牌组(default)分组倍率为1.5倍，OpenAI直连分组(openai_direct)分组倍率为2.5倍，Claude直连分组(claude_direct)分组倍率为2.5倍
       <br />
       如需修改令牌分组请联系站长。
     </>,
