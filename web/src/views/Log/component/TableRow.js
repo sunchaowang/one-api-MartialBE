@@ -6,7 +6,7 @@ import { timestamp2string, renderQuota } from '@/utils/common';
 import Label from '@/ui-component/Label';
 import LogType from '../type/LogType';
 import { Space, Tag, Typography } from 'antd';
-
+import { stringToTagColor } from '@/utils/common';
 function renderType(type) {
   const typeOption = LogType[type];
   if (typeOption) {
@@ -196,10 +196,10 @@ export function tableRowColumns(t, userIsAdmin) {
       width: 120
     },
     {
-      id: 'type',
-      label: t('logPage.typeLabel'),
+      id: 'directGroup',
+      label: '令牌分组',
       disableSort: false,
-      render: (col, item, index) => item.type && renderType(item.type)
+      render: (col, item, index) => item.type && <Tag color={stringToTagColor(item.direct_group)}>{item.direct_group}</Tag>
     },
     {
       id: 'model_name',
@@ -280,6 +280,7 @@ export function tableRowColumns(t, userIsAdmin) {
       disableSort: true,
       render: (col, item, index) => (
         <Space direction={'vertical'} size={8}>
+          {renderType(item.type)}
           <Typography.Text>{item.content}</Typography.Text>
           <Typography.Text>{item.request_ip}</Typography.Text>
         </Space>

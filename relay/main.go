@@ -131,6 +131,7 @@ func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isSt
 
 	// 写入日志
 	tokenName := c.GetString("token_name")
+	directGroup := c.GetString("token_channel_direct_group")
 
 	requestTime := 0
 	requestStartTimeValue := c.Request.Context().Value("requestStartTime")
@@ -141,5 +142,5 @@ func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isSt
 		}
 	}
 
-	model.RecordConsumeLog(c.Request.Context(), cacheProps.UserId, cacheProps.ChannelID, cacheProps.PromptTokens, cacheProps.CompletionTokens, cacheProps.ModelName, tokenName, 0, "缓存", requestTime, utils.GetRequestIP(c), cacheProps.ModelName)
+	model.RecordConsumeLog(c.Request.Context(), cacheProps.UserId, cacheProps.ChannelID, cacheProps.PromptTokens, cacheProps.CompletionTokens, cacheProps.ModelName, tokenName, 0, "缓存", requestTime, utils.GetRequestIP(c), cacheProps.ModelName, directGroup)
 }

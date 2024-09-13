@@ -87,7 +87,7 @@ func setupLogin(user *model.User, c *gin.Context) {
 		Status:      user.Status,
 	}
 
-	model.RecordLogWithRequestIP(user.Id, model.LogLogin, "登录", utils.GetRequestIP(c))
+	model.RecordLogWithRequestIP(user.Id, model.LogLogin, "登录", utils.GetRequestIP(c), "")
 	c.JSON(http.StatusOK, gin.H{
 		"message": "",
 		"success": true,
@@ -417,7 +417,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	if originUser.Quota != updatedUser.Quota {
-		model.RecordLog(originUser.Id, model.LogTypeManage, fmt.Sprintf("管理员将用户额度从 %s修改为 %s", common.LogQuota(originUser.Quota), common.LogQuota(updatedUser.Quota)))
+		model.RecordLog(originUser.Id, model.LogTypeManage, fmt.Sprintf("管理员将用户额度从 %s修改为 %s", common.LogQuota(originUser.Quota), common.LogQuota(updatedUser.Quota)), "")
 	}
 
 	if updatedUser.UpdateQuota != 0 {
@@ -426,7 +426,7 @@ func UpdateUser(c *gin.Context) {
 			//	打印
 			err := model.IncreaseUserQuota(updatedUser.Id, updatedUser.UpdateQuota)
 			if err == nil {
-				model.RecordLog(originUser.Id, model.LogTypeManage, fmt.Sprintf("管理员补发用户 %s, 原因 %s", common.LogQuota(updatedUser.UpdateQuota), updatedUser.UpdateQuotaRemark))
+				model.RecordLog(originUser.Id, model.LogTypeManage, fmt.Sprintf("管理员补发用户 %s, 原因 %s", common.LogQuota(updatedUser.UpdateQuota), updatedUser.UpdateQuotaRemark), "")
 
 			}
 		}
@@ -434,7 +434,7 @@ func UpdateUser(c *gin.Context) {
 			// 减少
 			err := model.DecreaseUserQuota(updatedUser.Id, int(math.Abs(float64(updatedUser.UpdateQuota))))
 			if err == nil {
-				model.RecordLog(originUser.Id, model.LogTypeManage, fmt.Sprintf("管理员扣除用户 %s, 原因 %s", common.LogQuota(int(math.Abs(float64(updatedUser.UpdateQuota)))), updatedUser.UpdateQuotaRemark))
+				model.RecordLog(originUser.Id, model.LogTypeManage, fmt.Sprintf("管理员扣除用户 %s, 原因 %s", common.LogQuota(int(math.Abs(float64(updatedUser.UpdateQuota)))), updatedUser.UpdateQuotaRemark), "")
 			}
 		}
 

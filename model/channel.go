@@ -34,7 +34,7 @@ type Channel struct {
 	TestModel          string                          `json:"test_model" form:"test_model" gorm:"type:varchar(50);default:''"`
 	OnlyChat           bool                            `json:"only_chat" form:"only_chat" gorm:"default:false"`
 	PreCost            int                             `json:"pre_cost" form:"pre_cost" gorm:"default:1"`
-	DirectGroup        string                          `json:"direct_group" gorm:"type:varchar(32);default:'default'"` //
+	DirectGroup        string                          `json:"direct_group" gorm:"type:varchar(32);default:'default'"` // 渠道分组
 	Plugin             *datatypes.JSONType[PluginType] `json:"plugin" form:"plugin" gorm:"type:json"`
 }
 
@@ -49,7 +49,7 @@ var allowedChannelOrderFields = map[string]bool{
 	"response_time": true,
 	"balance":       true,
 	"priority":      true,
-	"direct_group":  true,
+	"direct_group":  true, 
 }
 
 type SearchChannelsParams struct {
@@ -106,7 +106,7 @@ func GetChannelsList(params *SearchChannelsParams) (*DataResult[Channel], error)
 	if params.Id != 0 {
 		db = db.Where("id = ?", params.Id)
 	}
-
+ 
 	return PaginateAndOrder(db, &params.PaginationParams, &channels, allowedChannelOrderFields)
 }
 

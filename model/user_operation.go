@@ -48,7 +48,7 @@ func InsertOperationCheckIn(userId int, lastDayUsed int64, requestIP string) (qu
 		return 0, err
 	}
 
-	RecordLogWithRequestIP(userId, LogTypeUserQuotoIncrease, strings.Join(operationRemark, ""), requestIP)
+	RecordLogWithRequestIP(userId, LogTypeUserQuotoIncrease, strings.Join(operationRemark, ""), requestIP, "")
 	err = insertOperation(UserOperation{
 		UserId:      userId,
 		Type:        1,

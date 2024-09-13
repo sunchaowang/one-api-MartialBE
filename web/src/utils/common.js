@@ -326,3 +326,34 @@ export function useStateWithCallback(initialState) {
 
   return [state, setStateCallback];
 }
+
+
+
+export function stringToRGB(str, opacity = 1) {
+  let hash = 0;
+  // Create a hash from the string
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  // Calculate RGB values
+  const r = (hash >> 16) & 0xff;
+  const g = (hash >> 8) & 0xff;
+  const b = hash & 0xff;
+
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+export function stringToTagColor(str) {
+  const colors = ['pink', 'red', 'orange', 'green', 'cyan', 'purple'];
+  let hash = 0;
+
+  // Create a hash from the string
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  // Map the hash to a color index
+  const colorIndex = Math.abs(hash) % colors.length;
+
+  return colors[colorIndex];
+}

@@ -11,24 +11,24 @@ import (
 )
 
 type Log struct {
-	Id               int    `json:"id"`
-	UserId           int    `json:"user_id" gorm:"index"`
-	CreatedAt        int64  `json:"created_at" gorm:"bigint;index:idx_created_at_type"`
-	Type             int    `json:"type" gorm:"index:idx_created_at_type"`
-	Content          string `json:"content"`
-	Username         string `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`
-	TokenName        string `json:"token_name" gorm:"index;default:''"`
-	ModelName        string `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`
-	OriginModelName  string `json:"origin_model_name,omitempty" gorm:"index;index:index_username_origin_model_name,priority:1;default:''"`
-	Quota            int    `json:"quota" gorm:"default:0"`
-	PromptTokens     int    `json:"prompt_tokens" gorm:"default:0"`
-	CompletionTokens int    `json:"completion_tokens" gorm:"default:0"`
-	ChannelId        int    `json:"channel_id" gorm:"index"`
-	RequestTime      int    `json:"request_time" gorm:"default:0"`
-	RequestIp        string `json:"request_ip,omitempty" gorm:"default:''"`
-	RequestId        string `json:"request_id,omitempty"`
-
-	Channel *Channel `json:"channel" gorm:"foreignKey:Id;references:ChannelId"`
+	Id               int      `json:"id"`
+	UserId           int      `json:"user_id" gorm:"index"`
+	CreatedAt        int64    `json:"created_at" gorm:"bigint;index:idx_created_at_type"`
+	Type             int      `json:"type" gorm:"index:idx_created_at_type"`
+	Content          string   `json:"content"`
+	Username         string   `json:"username" gorm:"index:index_username_model_name,priority:2;default:''"`
+	TokenName        string   `json:"token_name" gorm:"index;default:''"`
+	ModelName        string   `json:"model_name" gorm:"index;index:index_username_model_name,priority:1;default:''"`
+	OriginModelName  string   `json:"origin_model_name,omitempty" gorm:"index;index:index_username_origin_model_name,priority:1;default:''"`
+	Quota            int      `json:"quota" gorm:"default:0"`
+	PromptTokens     int      `json:"prompt_tokens" gorm:"default:0"`
+	CompletionTokens int      `json:"completion_tokens" gorm:"default:0"`
+	ChannelId        int      `json:"channel_id" gorm:"index"`
+	RequestTime      int      `json:"request_time" gorm:"default:0"`
+	RequestIp        string   `json:"request_ip,omitempty" gorm:"default:''"`
+	RequestId        string   `json:"request_id,omitempty"`
+	DirectGroup      string   `json:"direct_group,omitempty" gorm:"default:'default'"`
+	Channel          *Channel `json:"channel" gorm:"foreignKey:Id;references:ChannelId"`
 }
 
 const (
@@ -41,16 +41,17 @@ const (
 	LogLogin
 )
 
-func RecordLog(userId int, logType int, content string) {
+func RecordLog(userId int, logType int, content string, directGroup string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return
 	}
 	log := &Log{
-		UserId:    userId,
-		Username:  GetUsernameById(userId),
-		CreatedAt: utils.GetTimestamp(),
-		Type:      logType,
-		Content:   content,
+		UserId:      userId,
+		Username:    GetUsernameById(userId),
+		CreatedAt:   utils.GetTimestamp(),
+		Type:        logType,
+		Content:     content,
+		DirectGroup: directGroup,
 	}
 	err := DB.Create(log).Error
 	if err != nil {
@@ -58,17 +59,18 @@ func RecordLog(userId int, logType int, content string) {
 	}
 }
 
-func RecordLogWithRequestIP(userId int, logType int, content string, requestIP string) {
+func RecordLogWithRequestIP(userId int, logType int, content string, requestIP string, directGroup string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return
 	}
 	log := &Log{
-		UserId:    userId,
-		Username:  GetUsernameById(userId),
-		CreatedAt: utils.GetTimestamp(),
-		Type:      logType,
-		Content:   content,
-		RequestIp: requestIP,
+		UserId:      userId,
+		Username:    GetUsernameById(userId),
+		CreatedAt:   utils.GetTimestamp(),
+		Type:        logType,
+		Content:     content,
+		RequestIp:   requestIP,
+		DirectGroup: directGroup,
 	}
 	err := DB.Create(log).Error
 	if err != nil {
@@ -76,8 +78,8 @@ func RecordLogWithRequestIP(userId int, logType int, content string, requestIP s
 	}
 }
 
-func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int, content string, requestTime int, requestIP string, originModelName string) {
-	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, originModelName=%s, tokenName=%s, quota=%d, content=%s", userId, channelId, promptTokens, completionTokens, modelName, originModelName, tokenName, quota, content))
+func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int, content string, requestTime int, requestIP string, originModelName string, directGroup string) {
+	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, originModelName=%s, tokenName=%s, quota=%d, content=%s, directGroup=%s", userId, channelId, promptTokens, completionTokens, modelName, originModelName, tokenName, quota, content, directGroup))
 	if !config.LogConsumeEnabled {
 		return
 	}
@@ -97,6 +99,7 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 		RequestTime:      requestTime,
 		RequestIp:        requestIP,
 		RequestId:        ctx.Value(logger.RequestIdKey).(string),
+		DirectGroup:      directGroup,
 	}
 	err := DB.Create(log).Error
 	if err != nil {
@@ -114,15 +117,17 @@ type LogsListParams struct {
 	TokenName      string `form:"token_name"`
 	ChannelId      int    `form:"channel_id"`
 	UserId         int    `form:"user_id"`
+	DirectGroup    string `form:"direct_group"`
 }
 
 var allowedLogsOrderFields = map[string]bool{
-	"created_at": true,
-	"channel_id": true,
-	"user_id":    true,
-	"token_name": true,
-	"model_name": true,
-	"type":       true,
+	"created_at":   true,
+	"channel_id":   true,
+	"user_id":      true,
+	"token_name":   true,
+	"model_name":   true,
+	"type":         true,
+	"direct_group": true,
 }
 
 func GetLogsList(params *LogsListParams) (*DataResult[Log], error) {
@@ -157,6 +162,9 @@ func GetLogsList(params *LogsListParams) (*DataResult[Log], error) {
 	if params.UserId != 0 {
 		tx = tx.Where("user_id = ?", params.UserId)
 	}
+	if params.DirectGroup != "" {
+		tx = tx.Where("direct_group = ?", params.DirectGroup)
+	}
 
 	return PaginateAndOrder[Log](tx, &params.PaginationParams, &logs, allowedLogsOrderFields)
 }
@@ -180,6 +188,9 @@ func GetUserLogsList(userId int, params *LogsListParams) (*DataResult[Log], erro
 	}
 	if params.EndTimestamp != 0 {
 		tx = tx.Where("created_at <= ?", params.EndTimestamp)
+	}
+	if params.DirectGroup != "" {
+		tx = tx.Where("direct_group = ?", params.DirectGroup)
 	}
 
 	return PaginateAndOrder[Log](tx, &params.PaginationParams, &logs, allowedLogsOrderFields)

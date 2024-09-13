@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Switch, Button, Space, Popconfirm, Row, Col } from 'antd';
 import { Tag } from 'antd/lib';
+import { stringToTagColor } from '@/utils/common';
 
 function createMenu(menuItems) {
   return (
@@ -279,8 +280,8 @@ export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpe
       render(col, item, index) {
         const colorMap = new Map();
         colorMap.set('default', 'blue');
-        colorMap.set('openai_direct', 'orange');
-        colorMap.set('claude_direct', 'orange');
+        colorMap.set('openai_direct', stringToTagColor('openai_direct'));
+        colorMap.set('claude_direct', stringToTagColor('claude_direct'));
         return (
           <>
             <Tag color={colorMap.get(item.direct_group)}>{item.direct_group}</Tag>

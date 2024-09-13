@@ -30,5 +30,5 @@ func (user User) QuotaForNewLinuxDoUser() {
 		return
 	}
 
-	RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("linux do %v级用户注册, 赠送 %s", user.LinuxDoLevel, common.LogQuota(quota)))
+	RecordLog(user.Id, LogTypeSystem, fmt.Sprintf("linux do %v级用户注册, 赠送 %s", user.LinuxDoLevel, common.LogQuota(quota)), "")
 }
