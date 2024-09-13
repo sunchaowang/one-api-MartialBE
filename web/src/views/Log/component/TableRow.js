@@ -200,9 +200,12 @@ export function tableRowColumns(t, userIsAdmin) {
       label: '令牌分组',
       disableSort: false,
       render: (col, item, index) =>
-        item.type && (
+        item.type &&
+        (String(item.type) === LogType['2'].value ? (
           <Tag color={item.direct_group === 'default' ? 'default' : stringToTagColor(item.direct_group)}>{item.direct_group}</Tag>
-        )
+        ) : (
+          ''
+        ))
     },
     {
       id: 'model_name',
@@ -223,20 +226,23 @@ export function tableRowColumns(t, userIsAdmin) {
       label: t('logPage.durationLabel'),
       tooltip: t('logPage.durationTooltip'),
       disableSort: true,
-      render: (col, item, index) => (
-        <Space direction={'vertical'} size={5}>
-          <Tag color={requestTimeLabelOptions(item.request_time)}>
-            {' '}
-            {item.request_time == 0 ? '无' : requestTsText(item).request_time_str}{' '}
-          </Tag>
-          {requestTsText(item).request_ts_str && (
-            <Tag size={'small'} color={requestTSLabelOptions(requestTsText(item).request_ts)}>
+      render: (col, item, index) =>
+        String(item.type) === LogType['2'].value ? (
+          <Space direction={'vertical'} size={5}>
+            <Tag color={requestTimeLabelOptions(item.request_time)}>
               {' '}
-              {requestTsText(item).request_ts_str}{' '}
+              {item.request_time == 0 ? '无' : requestTsText(item).request_time_str}{' '}
             </Tag>
-          )}
-        </Space>
-      )
+            {requestTsText(item).request_ts_str && (
+              <Tag size={'small'} color={requestTSLabelOptions(requestTsText(item).request_ts)}>
+                {' '}
+                {requestTsText(item).request_ts_str}{' '}
+              </Tag>
+            )}
+          </Space>
+        ) : (
+          ''
+        )
     },
     {
       id: 'message',
