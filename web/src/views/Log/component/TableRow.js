@@ -199,7 +199,10 @@ export function tableRowColumns(t, userIsAdmin) {
       id: 'directGroup',
       label: '令牌分组',
       disableSort: false,
-      render: (col, item, index) => item.type && <Tag color={stringToTagColor(item.direct_group)}>{item.direct_group}</Tag>
+      render: (col, item, index) =>
+        item.type && (
+          <Tag color={item.direct_group === 'default' ? 'default' : stringToTagColor(item.direct_group)}>{item.direct_group}</Tag>
+        )
     },
     {
       id: 'model_name',
