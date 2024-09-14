@@ -20,8 +20,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 
-import { ConfigProvider, LocaleProvider } from '@douyinfe/semi-ui';
-import zh_CN from '@douyinfe/semi-ui/lib/es/locale/source/zh_CN';
+import { ConfigProvider, theme } from 'antd';
 
 import { isMobile } from '@/utils/common';
 
@@ -35,14 +34,12 @@ function getLocale() {
 }
 
 root.render(
-  <ConfigProvider>
-    <LocaleProvider locale={zh_CN}>
-      <Provider store={store}>
-        <BrowserRouter basename={config.basename}>
-          <App />
-        </BrowserRouter>
-      </Provider>
-    </LocaleProvider>
+  <ConfigProvider theme={{ algorithm: [isMobile() ? theme.compactAlgorithm : theme.defaultAlgorithm] }} locale={getLocale()}>
+    <Provider store={store}>
+      <BrowserRouter basename={config.basename}>
+        <App />
+      </BrowserRouter>
+    </Provider>
   </ConfigProvider>
 );
 

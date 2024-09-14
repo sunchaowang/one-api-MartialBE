@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import dayjs from 'dayjs';
-import { Modal, Form, Input, InputNumber, Switch, DatePicker, Button, Alert, Divider, Space, Select, Tag, Typography } from 'antd';
+import { Drawer, Modal, Form, Input, InputNumber, Switch, DatePicker, Button, Alert, Divider, Space, Select, Tag, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { renderQuotaWithPrompt, showSuccess, showError } from '@/utils/common';
@@ -31,7 +31,7 @@ const originInputs = {
   model_limits: '',
   channel_limits_enabled: false,
   channel_limits: '',
-  direct_group: ''
+  direct_group: 'default'
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRatio }) => {
@@ -39,6 +39,7 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
   const [inputs, setInputs] = useState(originInputs);
   const siteInfo = useSelector((state) => state.siteInfo);
   const [directGroupRatio, setDirectGroupRatio] = useState([]);
+  const [form] = Form.useForm();
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -76,8 +77,9 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
       let res = await API.get(`/api/token/${tokenId}`);
       const { success, message, data } = res.data;
       if (success) {
-        data.is_edit = true;
         setInputs(data);
+
+        data.is_edit = true;
       } else {
         showError(message);
       }
@@ -110,153 +112,96 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
   }, [_directGroupRatio]);
 
   return (
-    <Modal
+    <Drawer
       open={open}
-      onCancel={onCancel}
+      onClose={onCancel}
       title={tokenId ? t('token_index.editToken') : t('token_index.createToken')}
-      footer={null}
       width={800}
       destroyOnClose={true}
+      footer={
+        <Space>
+          <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
+          <Button type="primary" onClick={() => form.submit()}>
+            {t('token_index.submit')}
+          </Button>
+        </Space>
+      }
     >
-      <Divider />
       <Alert message={t('token_index.quotaNote')} type="info" style={{ marginBottom: 16 }} />
-      <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
-        {({ errors, touched, values, handleChange, handleBlur, handleSubmit, setFieldValue, isSubmitting }) => (
-          <Form layout="vertical" onFinish={handleSubmit}>
-            <Form.Item
-              label={t('token_index.name')}
-              validateStatus={touched.name && errors.name ? 'error' : ''}
-              help={touched.name && errors.name}
-            >
-              <Input name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} />
-            </Form.Item>
+      <Form form={form} layout="vertical" initialValues={inputs}>
+        <Form.Item name="name" label={t('token_index.name')} rules={[{ required: true, message: '名称不能为空' }]}>
+          <Input />
+        </Form.Item>
 
-            <Form.Item label={'令牌分组'} name={'direct_group'}>
-              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(directGroupRatio)}</Typography.Text>
-              <Select
-                name={'direct_group'}
-                value={values.direct_group}
-                options={directGroupRatio.map((item) => item)}
-                onChange={(value) => setFieldValue('direct_group', value)}
-                optionRender={(option) => (
-                  <Space>
-                    <span role="img" aria-label={option.data.label}>
-                      {option.data.value}
-                    </span>
-                    <Tag>倍率 {option.data.ratio}</Tag>
-                  </Space>
-                )}
-              ></Select>
-            </Form.Item>
-
-            <Form.Item label={t('token_index.expiryTime')}>
-              <DatePicker
-                showTime
-                disabled={values.expired_time === -1}
-                value={values.expired_time !== -1 ? dayjs.unix(values.expired_time) : null}
-                onChange={(date) => setFieldValue('expired_time', date ? date.unix() : -1)}
-              />
-              <Switch
-                size={'small'}
-                checked={values.expired_time === -1}
-                onChange={(checked) => setFieldValue('expired_time', checked ? -1 : dayjs().unix())}
-                style={{ marginLeft: 8 }}
-              />
-              <span style={{ marginLeft: 8 }}>{t('token_index.neverExpires')}</span>
-            </Form.Item>
-
-            <Form.Item
-              label={t('token_index.quota')}
-              validateStatus={touched.remain_quota && errors.remain_quota ? 'error' : ''}
-              help={touched.remain_quota && errors.remain_quota}
-            >
-              <InputNumber
-                name="remain_quota"
-                value={values.remain_quota}
-                onChange={(value) => setFieldValue('remain_quota', value)}
-                onBlur={handleBlur}
-                disabled={values.unlimited_quota}
-                addonAfter={renderQuotaWithPrompt(values.remain_quota, 6)}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-
-            <Form.Item>
+        <Form.Item label={'令牌分组'} name={'direct_group'}>
+          <Select
+            options={directGroupRatio.map((item) => item)}
+            optionRender={(option) => (
               <Space>
-                <Switch size={'small'} checked={values.unlimited_quota} onChange={(checked) => setFieldValue('unlimited_quota', checked)} />
-                <span>{t('token_index.unlimitedQuota')}</span>
+                <span role="img" aria-label={option.data.label}>
+                  {option.data.value}
+                </span>
+                <Tag>倍率 {option.data.ratio}</Tag>
               </Space>
-            </Form.Item>
-
-            {siteInfo.chat_cache_enabled && (
-              <Form.Item>
-                <Space>
-                  <Switch size={'small'} checked={values.chat_cache} onChange={(checked) => setFieldValue('chat_cache', checked)} />
-                  <span>{t('token_index.enableCache')}</span>
-                </Space>
-              </Form.Item>
             )}
+          />
+        </Form.Item>
 
-            <Form.Item label="模型限制">
-              <Input.TextArea
-                name="model_limits"
-                value={values.model_limits}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={!values.model_limits_enabled}
-                placeholder="用逗号分隔模型名称，如：gpt-3.5-turbo,text-davinci-003"
-              />
+        <Form.Item label={t('token_index.expiryTime')} name="expired_time">
+          <Space>
+            <DatePicker showTime disabled={form.getFieldValue('expired_time') === -1} />
+            <Form.Item name="never_expires" valuePropName="checked" noStyle>
+              <Switch onChange={(checked) => form.setFieldsValue({ expired_time: checked ? -1 : null })} />
+            </Form.Item>
+            <span>{t('token_index.neverExpires')}</span>
+          </Space>
+        </Form.Item>
+
+        <Form.Item name="remain_quota" label={t('token_index.quota')} rules={[{ type: 'number', min: 0, message: '必须大于等于0' }]}>
+          <InputNumber
+            disabled={form.getFieldValue('unlimited_quota')}
+            addonAfter={renderQuotaWithPrompt(form.getFieldValue('remain_quota'), 6)}
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
+
+        <Form.Item name="unlimited_quota" valuePropName="checked">
+          <Space>
+            <Switch />
+            <span>{t('token_index.unlimitedQuota')}</span>
+          </Space>
+        </Form.Item>
+
+        <Form.Item label="模型限制" name="model_limits">
+          <Input.TextArea
+            disabled={!form.getFieldValue('model_limits_enabled')}
+            placeholder="用逗号分隔模型名称，如：gpt-3.5-turbo,text-davinci-003"
+          />
+        </Form.Item>
+
+        <Form.Item name="model_limits_enabled" valuePropName="checked">
+          <Space>
+            <Switch />
+            <span>模型限制</span>
+          </Space>
+        </Form.Item>
+
+        {userIsAdmin && (
+          <>
+            <Form.Item label="渠道限制" name="channel_limits">
+              <Input.TextArea disabled={!form.getFieldValue('channel_limits_enabled')} placeholder="用逗号分隔渠道名称" />
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item name="channel_limits_enabled" valuePropName="checked">
               <Space>
-                <Switch
-                  size={'small'}
-                  checked={values.model_limits_enabled}
-                  onChange={(checked) => setFieldValue('model_limits_enabled', checked)}
-                />
-                <span>模型限制</span>
+                <Switch />
+                <span>渠道限制</span>
               </Space>
             </Form.Item>
-
-            {userIsAdmin && (
-              <>
-                <Form.Item label="渠道限制">
-                  <Input.TextArea
-                    name="channel_limits"
-                    value={values.channel_limits}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    disabled={!values.channel_limits_enabled}
-                    placeholder="用逗号分隔渠道名称"
-                  />
-                </Form.Item>
-
-                <Form.Item>
-                  <Space>
-                    <Switch
-                      size={'small'}
-                      checked={values.channel_limits_enabled}
-                      onChange={(checked) => setFieldValue('channel_limits_enabled', checked)}
-                    />
-                    <span>渠道限制</span>
-                  </Space>
-                </Form.Item>
-              </>
-            )}
-
-            <Form.Item>
-              <Space>
-                <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
-                <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                  {t('token_index.submit')}
-                </Button>
-              </Space>
-            </Form.Item>
-          </Form>
+          </>
         )}
-      </Formik>
-    </Modal>
+      </Form>
+    </Drawer>
   );
 };
 
