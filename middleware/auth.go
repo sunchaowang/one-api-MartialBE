@@ -88,10 +88,10 @@ func tokenAuth(c *gin.Context, key string) {
 	key = strings.TrimPrefix(key, "Bearer ")
 	key = strings.TrimPrefix(key, "sk-")
 
-	if len(key) < 48 {
-		abortWithMessage(c, http.StatusUnauthorized, "无效的令牌")
-		return
-	}
+	// if len(key) < 48 {
+	// 	abortWithMessage(c, http.StatusUnauthorized, "无效的令牌")
+	// 	return
+	// }
 
 	parts := strings.Split(key, "-")
 	key = parts[0]

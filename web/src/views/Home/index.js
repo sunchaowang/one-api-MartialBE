@@ -28,9 +28,9 @@ const Home = () => {
             title: '通知',
             icon: null,
             content: <div dangerouslySetInnerHTML={{ __html: htmlNotice }} />,
-            style: {
-              maxWidth: '90vw',
-              padding: 20
+            width: '75vw',
+            bodyStyle: {
+              width: '100%'
             }
           });
         }

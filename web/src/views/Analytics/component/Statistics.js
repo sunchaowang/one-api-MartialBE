@@ -5,6 +5,7 @@ import { gridSpacing } from '@/store/constant';
 import { showError, renderQuota } from '@/utils/common';
 import { API } from '@/utils/api';
 import { useTranslation } from 'react-i18next';
+import { Statistic, Card } from 'antd';
 
 export default function Overview() {
   const { t } = useTranslation();
@@ -121,51 +122,34 @@ export default function Overview() {
 
   return (
     <Grid container spacing={gridSpacing}>
-      <Grid item lg={3} xs={12}>
-        <DataCard
-          isLoading={userLoading}
-          title={t('analytics_index.totalUserSpending')}
-          content={userStatistics?.total_used_quota || '0'}
-          subContent={t('analytics_index.totalUserBalance') + '：' + (userStatistics?.total_quota || '0')}
-        />
+      <Grid item lg={6} xs={12}>
+        <Card isLoading={userLoading}>
+          <Statistic title={t('analytics_index.totalUserSpending')} value={userStatistics?.total_used_quota || '0'} />
+          {t('analytics_index.totalUserBalance') + '：' + (userStatistics?.total_quota || '0')}
+        </Card>
       </Grid>
-      <Grid item lg={3} xs={12}>
-        <DataCard
-          isLoading={userLoading}
-          title={t('analytics_index.totalUsers')}
-          content={userStatistics?.total_user || '0'}
-          subContent={
-            <>
-              {t('analytics_index.directRegistration')}：{userStatistics?.total_direct_user || '0'} <br />
-              {t('analytics_index.invitationRegistration')}：{userStatistics?.total_inviter_user || '0'}
-            </>
-          }
-        />
+      <Grid item lg={6} xs={12}>
+        <Card isLoading={userLoading}>
+          <Statistic title={t('analytics_index.totalUsers')} value={userStatistics?.total_direct_user || '0'} />
+          {t('analytics_index.invitationRegistration') + '：' + (userStatistics?.total_inviter_user || '0')}
+        </Card>
       </Grid>
-      <Grid item lg={3} xs={12}>
-        <DataCard
-          isLoading={channelLoading}
-          title={t('analytics_index.channelCount')}
-          content={channelStatistics.total}
-          subContent={
-            <>
-              {t('analytics_index.active')}：{channelStatistics.active} / {t('analytics_index.disabled')}：{'·'}
-              {channelStatistics.disabled} / {t('analytics_index.testDisabled')}：{channelStatistics.test_disabled}
-            </>
-          }
-        />
+      <Grid item lg={6} xs={12}>
+        <Card isLoading={userLoading}>
+          <Statistic title={t('analytics_index.channelCount')} value={channelStatistics.active} />
+          <>
+            {t('analytics_index.disabled')}：{channelStatistics.disabled} / {t('analytics_index.testDisabled')}：
+            {channelStatistics.test_disabled}
+          </>
+        </Card>
       </Grid>
-      <Grid item lg={3} xs={12}>
-        <DataCard
-          isLoading={rechargeLoading}
-          title={'充值统计'}
-          content={rechargeStatistics.total}
-          subContent={
-            <>
-              兑换码: {rechargeStatistics.Redemption} <br /> 订单: {rechargeStatistics.Oder} / {rechargeStatistics.OderContent}
-            </>
-          }
-        />
+      <Grid item lg={6} xs={12}>
+        <Card isLoading={userLoading}>
+          <Statistic title={t('充值统计')} value={rechargeStatistics.total || '0'} suffix={'$'} />
+          <>
+            兑换码: {rechargeStatistics.Redemption} / 订单: {rechargeStatistics.Oder} $ / {rechargeStatistics.OderContent}
+          </>
+        </Card>
       </Grid>
     </Grid>
   );

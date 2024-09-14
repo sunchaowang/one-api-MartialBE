@@ -20,7 +20,9 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, LocaleProvider } from '@douyinfe/semi-ui';
+import zh_CN from '@douyinfe/semi-ui/lib/es/locale/source/zh_CN';
+
 import { isMobile } from '@/utils/common';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
@@ -33,24 +35,14 @@ function getLocale() {
 }
 
 root.render(
-  <ConfigProvider
-    locale={getLocale()}
-    prefixCls={'chirou'}
-    theme={
-      isMobile()
-        ? {
-            algorithm: theme.compactAlgorithm
-          }
-        : {
-            algorithm: theme.compactAlgorithm
-          }
-    }
-  >
-    <Provider store={store}>
-      <BrowserRouter basename={config.basename}>
-        <App />
-      </BrowserRouter>
-    </Provider>
+  <ConfigProvider>
+    <LocaleProvider locale={zh_CN}>
+      <Provider store={store}>
+        <BrowserRouter basename={config.basename}>
+          <App />
+        </BrowserRouter>
+      </Provider>
+    </LocaleProvider>
   </ConfigProvider>
 );
 

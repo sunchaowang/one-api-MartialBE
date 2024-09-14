@@ -190,8 +190,8 @@ func IncreaseTokenQuota(id int, quota int) (err error) {
 func increaseTokenQuota(id int, quota int) (err error) {
 	err = DB.Model(&Token{}).Where("id = ?", id).Updates(
 		map[string]interface{}{
-			"remain_quota":  gorm.Expr("remain_quota + ?", quota),
-			"used_quota":    gorm.Expr("used_quota - ?", quota),
+			"remain_quota": gorm.Expr("remain_quota + ?", quota),
+			// "used_quota":    gorm.Expr("used_quota - ?", quota),
 			"accessed_time": utils.GetTimestamp(),
 		},
 	).Error
@@ -212,7 +212,24 @@ func DecreaseTokenQuota(id int, quota int) (err error) {
 func decreaseTokenQuota(id int, quota int) (err error) {
 	err = DB.Model(&Token{}).Where("id = ?", id).Updates(
 		map[string]interface{}{
-			"remain_quota":  gorm.Expr("remain_quota - ?", quota),
+			"remain_quota": gorm.Expr("remain_quota - ?", quota),
+			// "used_quota":    gorm.Expr("used_quota + ?", quota),
+			"accessed_time": utils.GetTimestamp(),
+		},
+	).Error
+	return err
+}
+
+func IncreaseTokenUsedQuota(id int, quota int) (err error) {
+	if quota < 0 {
+		return errors.New("quota 不能为负数！")
+	}
+	return increaseTokenUsedQuota(id, quota)
+}
+
+func increaseTokenUsedQuota(id int, quota int) (err error) {
+	err = DB.Model(&Token{}).Where("id = ?", id).Updates(
+		map[string]interface{}{
 			"used_quota":    gorm.Expr("used_quota + ?", quota),
 			"accessed_time": utils.GetTimestamp(),
 		},
@@ -248,7 +265,13 @@ func PreConsumeTokenQuota(tokenId int, quota int) (err error) {
 		if err != nil {
 			return err
 		}
+
 	}
+	err = IncreaseTokenUsedQuota(tokenId, quota)
+	if err != nil {
+		return err
+	}
+
 	err = DecreaseUserQuota(token.UserId, quota)
 	return err
 }
@@ -297,9 +320,15 @@ func PostConsumeTokenQuota(tokenId int, quota int) (err error) {
 		} else {
 			err = IncreaseTokenQuota(tokenId, -quota)
 		}
+
 		if err != nil {
 			return err
 		}
+	}
+	if quota > 0 {
+		err = increaseTokenUsedQuota(tokenId, quota)
+	} else {
+		err = increaseTokenUsedQuota(tokenId, -quota)
 	}
 	return nil
 }
