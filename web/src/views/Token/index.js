@@ -62,7 +62,7 @@ export default function Token() {
   };
 
   async function fetchSettingOptions() {
-    const res = await API.get('/api/option', {
+    const res = await API.get('/api/site/option', {
       params: {
         keys: 'DirectGroupRatio'
       }

@@ -43,6 +43,7 @@ type OpenAIModels struct {
 	Root       *string                  `json:"root"`
 	Parent     *string                  `json:"parent"`
 	Price      *ModelPrice              `json:"price"`
+	DirectGroup string                  `json:"direct_group"`
 }
 
 func ListModels(c *gin.Context) {
@@ -70,7 +71,7 @@ func ListModels(c *gin.Context) {
 
 	var groupOpenAIModels []*OpenAIModels
 	for _, modelName := range models {
-		groupOpenAIModels = append(groupOpenAIModels, getOpenAIModelWithName(modelName))
+		groupOpenAIModels = append(groupOpenAIModels, getOpenAIModelWithName(modelName, channelDirectGroup))
 	}
 
 	// 根据 OwnedBy 排序
@@ -114,7 +115,7 @@ func ListModelsForUser(c *gin.Context) {
 
 	var groupOpenAIModels []*OpenAIModels
 	for _, modelName := range models {
-		groupOpenAIModels = append(groupOpenAIModels, getOpenAIModelWithName(modelName))
+		groupOpenAIModels = append(groupOpenAIModels, getOpenAIModelWithName(modelName, "default"))
 	}
 
 	// 根据 OwnedBy 排序
@@ -137,16 +138,19 @@ func ListModelsForUser(c *gin.Context) {
 func ListModelsForAdmin(c *gin.Context) {
 	prices := relay_util.PricingInstance.GetAllPrices()
 	var openAIModels []OpenAIModels
-	for modelId, price := range prices {
-		openAIModels = append(openAIModels, OpenAIModels{
-			Id:         modelId,
-			Object:     "model",
-			Created:    1677649963,
-			OwnedBy:    getModelOwnedBy(price.ChannelType),
-			Permission: nil,
-			Root:       nil,
-			Parent:     nil,
-		})
+	for groupId, group := range prices {
+		for modelId, price := range group {
+			openAIModels = append(openAIModels, OpenAIModels{
+				Id:         groupId + ":" + modelId,
+				Object:     "model",
+				Created:    1677649963,
+				OwnedBy:    getModelOwnedBy(price.ChannelType),
+				Permission: nil,
+				Root:       nil,
+				Parent:     nil,
+			})
+		}
+		
 	}
 	// 根据 OwnedBy 排序
 	sort.Slice(openAIModels, func(i, j int) bool {
@@ -167,7 +171,8 @@ func ListModelsForAdmin(c *gin.Context) {
 
 func RetrieveModel(c *gin.Context) {
 	modelName := c.Param("model")
-	openaiModel := getOpenAIModelWithName(modelName)
+	directGroup := c.GetString("token_channel_direct_group")
+	openaiModel := getOpenAIModelWithName(modelName, directGroup)
 	if *openaiModel.OwnedBy != relay_util.UnknownOwnedBy {
 		c.JSON(200, openaiModel)
 	} else {
@@ -191,8 +196,8 @@ func getModelOwnedBy(channelType int) (ownedBy *string) {
 	return &relay_util.UnknownOwnedBy
 }
 
-func getOpenAIModelWithName(modelName string) *OpenAIModels {
-	price := relay_util.PricingInstance.GetPrice(modelName)
+func getOpenAIModelWithName(modelName string, directGroup string) *OpenAIModels {
+	price := relay_util.PricingInstance.GetPrice(modelName, directGroup)
 
 	return &OpenAIModels{
 		Id:         modelName,

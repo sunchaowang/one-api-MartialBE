@@ -30,6 +30,7 @@ type Quota struct {
 	channelId        int
 	tokenId          int
 	HandelStatus     bool
+	directGroup      string
 }
 
 func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *types.OpenAIErrorWithStatusCode) {
@@ -40,9 +41,12 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *type
 		channelId:    c.GetInt("channel_id"),
 		tokenId:      c.GetInt("token_id"),
 		HandelStatus: false,
+		directGroup:  c.GetString("token_channel_direct_group"),
 	}
 
-	quota.price = *PricingInstance.GetPrice(quota.modelName)
+	quota.price = *PricingInstance.GetPrice(quota.modelName, quota.directGroup)
+	// 日志
+	fmt.Println("quota.price", quota.price)
 	quota.groupRatio = common.GetGroupRatio(c.GetString("group"))
 	quota.directGroupRatio = common.GetDirectGroupRatio(c.GetString("token_channel_direct_group"))
 	quota.inputRatio = quota.price.GetInput() * quota.groupRatio * quota.directGroupRatio

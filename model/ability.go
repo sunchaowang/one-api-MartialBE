@@ -15,7 +15,7 @@ type Ability struct {
 	Enabled     bool   `json:"enabled"`
 	Priority    *int64 `json:"priority" gorm:"bigint;default:0;index"`
 	Weight      *uint  `json:"weight" gorm:"default:1"`
-	DirectGroup string `json:"direct_group" gorm:"type:varchar(32);default:'default'"` //
+	DirectGroup string `json:"direct_group" gorm:"type:varchar(32);primaryKey;autoIncrement:false;default:'default'"` //
 }
 
 func (channel *Channel) AddAbilities() error {

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"one-api/common"
@@ -36,28 +37,35 @@ func GetAllModelList(c *gin.Context) {
 	prices := relay_util.PricingInstance.GetAllPrices()
 	channelModel := model.ChannelGroup.Rule
 
-	modelsMap := make(map[string]bool)
-	for modelName := range prices {
-		modelsMap[modelName] = true
+	groupsMap := make(map[string]bool)
+	for groupName := range prices {
+		groupsMap[groupName] = true
 	}
 
 	for _, modelMap := range channelModel {
 		for modelName := range modelMap {
 			if _, ok := prices[modelName]; !ok {
-				modelsMap[modelName] = true
+				groupsMap[modelName] = true
 			}
 		}
 	}
+	fmt.Printf("groupsMap: %v\n", groupsMap)
+	var groups map[string][]string
+	groups = make(map[string][]string)
 
-	var models []string
-	for modelName := range modelsMap {
-		models = append(models, modelName)
+	for group := range groupsMap {
+		var models []string
+		for model := range prices[group] {
+			models = append(models, model)
+		}
+		groups[group] = models
+
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    models,
+		"data": groups,
 	})
 }
 
@@ -107,6 +115,7 @@ func UpdatePrice(c *gin.Context) {
 
 func DeletePrice(c *gin.Context) {
 	modelName := c.Param("model")
+	directGroup := c.Param("directGroup")
 	if modelName == "" || len(modelName) < 2 {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("model name is required"))
 		return
@@ -114,7 +123,7 @@ func DeletePrice(c *gin.Context) {
 	modelName = modelName[1:]
 	modelName, _ = url.PathUnescape(modelName)
 
-	if err := relay_util.PricingInstance.DeletePrice(modelName); err != nil {
+	if err := relay_util.PricingInstance.DeletePrice(modelName, directGroup); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
