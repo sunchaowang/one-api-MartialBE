@@ -26,16 +26,16 @@ func RelaycClaudeOnly(c *gin.Context) {
 		return
 	}
 
-	cacheProps := relay_util.NewChatCacheProps(c, true)
-	cacheProps.SetHash(request)
+	// cacheProps := relay_util.NewChatCacheProps(c, true)
+	// cacheProps.SetHash(request)
 
-	cache := cacheProps.GetCache()
+	// cache := cacheProps.GetCache()
 
-	if cache != nil {
-		// 说明有缓存， 直接返回缓存内容
-		cacheProcessing(c, cache, request.Stream)
-		return
-	}
+	// if cache != nil {
+	// 	// 说明有缓存， 直接返回缓存内容
+	// 	cacheProcessing(c, cache, request.Stream)
+	// 	return
+	// }
 
 	chatProvider, modelName, fail := GetClaudeChatInterface(c, request.Model)
 	if fail != nil {
@@ -55,7 +55,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 		return
 	}
 
-	errWithCode, done := RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
+	errWithCode, done := RelayClaudeHandler(c, promptTokens, chatProvider, nil, request, originalModel)
 
 	if errWithCode == nil {
 		return
@@ -91,7 +91,7 @@ func RelaycClaudeOnly(c *gin.Context) {
 			}
 		}
 
-		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, cacheProps, request, originalModel)
+		errWithCode, done = RelayClaudeHandler(c, promptTokens, chatProvider, nil, request, originalModel)
 		if errWithCode == nil {
 			return
 		}

@@ -27,17 +27,17 @@ func Relay(c *gin.Context) {
 		return
 	}
 
-	cacheProps := relay.GetChatCache()
-	cacheProps.SetHash(relay.getRequest())
+	// cacheProps := relay.GetChatCache()
+	// cacheProps.SetHash(relay.getRequest())
 
-	// 获取缓存
-	cache := cacheProps.GetCache()
+	// // 获取缓存
+	// cache := cacheProps.GetCache()
 
-	if cache != nil {
-		// 说明有缓存， 直接返回缓存内容
-		cacheProcessing(c, cache, relay.IsStream())
-		return
-	}
+	// if cache != nil {
+	// 	// 说明有缓存， 直接返回缓存内容
+	// 	cacheProcessing(c, cache, relay.IsStream())
+	// 	return
+	// }
 
 	if err := relay.setProvider(relay.getOriginalModel()); err != nil {
 		common.AbortWithMessage(c, http.StatusServiceUnavailable, err.Error())

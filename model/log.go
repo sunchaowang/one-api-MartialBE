@@ -79,7 +79,7 @@ func RecordLogWithRequestIP(userId int, logType int, content string, requestIP s
 }
 
 func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int, content string, requestTime int, requestIP string, originModelName string, directGroup string) {
-	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, originModelName=%s, tokenName=%s, quota=%d, content=%s, directGroup=%s", userId, channelId, promptTokens, completionTokens, modelName, originModelName, tokenName, quota, content, directGroup))
+	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, originModelName=%s, tokenName=%s, quota=%d, content=%s, direct_group=%s", userId, channelId, promptTokens, completionTokens, modelName, originModelName, tokenName, quota, content, directGroup))
 	if !config.LogConsumeEnabled {
 		return
 	}

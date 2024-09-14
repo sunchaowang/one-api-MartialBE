@@ -255,10 +255,10 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 }
 
 // BatchDeletePrices deletes the prices of multiple models
-func (p *Pricing) BatchDeletePrices(models []string) error {
+func (p *Pricing) BatchDeletePrices(models []string, directGroup string) error {
 	tx := model.DB.Begin()
 
-	err := model.DeletePrices(tx, models)
+	err := model.DeletePrices(tx, models, directGroup)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -276,7 +276,7 @@ func (p *Pricing) BatchDeletePrices(models []string) error {
 	return nil
 }
 
-func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []string) error {
+func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []string, directGroup string) error {
 	// 查找需要删除的model
 	var deletePrices []string
 	var addPrices []*model.Price
@@ -316,7 +316,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	}
 
 	if len(deletePrices) > 0 {
-		err := model.DeletePrices(tx, deletePrices)
+		err := model.DeletePrices(tx, deletePrices, directGroup)
 		if err != nil {
 			tx.Rollback()
 			return err

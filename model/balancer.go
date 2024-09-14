@@ -180,7 +180,7 @@ func (cc *ChannelsChooser) Next(group, modelName string, directGroup string, fil
 	return nil, errors.New("channel not found")
 }
 
-func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
+func (cc *ChannelsChooser) GetGroupModels(group string, channelDirectGroup string) ([]string, error) {
 	cc.RLock()
 	defer cc.RUnlock()
 
@@ -188,23 +188,18 @@ func (cc *ChannelsChooser) GetGroupModels(group string) ([]string, error) {
 		return nil, errors.New("group not found")
 	}
 
-	// models 数组长度
-	// 1. 遍历 cc.Rule[group]，获取 directGroup
-	var modelLens = 0
-	// 2. 遍历 cc.Rule[group][directGroup]，获取 model
-	// 3. 将 models 数组长度设置为 models 数组长度
-	for directGroup := range cc.Rule[group] {
-		modelLens += len(cc.Rule[group][directGroup])
-	}
-
-	models := make([]string, 0, modelLens)
+	modelsMap := make(map[string][]string)
 	for directGroup := range cc.Rule[group] {
 		for model := range cc.Rule[group][directGroup] {
-			models = append(models, model)
+			modelsMap[directGroup] = append(modelsMap[directGroup], model)
 		}
 	}
 
-	return models, nil
+	if models, ok := modelsMap[channelDirectGroup]; ok {
+		return models, nil
+	}
+
+	return nil, errors.New("direct group not found")
 }
 
 func (cc *ChannelsChooser) GetChannel(channelId int) *Channel {

@@ -47,6 +47,7 @@ type OpenAIModels struct {
 
 func ListModels(c *gin.Context) {
 	groupName := c.GetString("group")
+	channelDirectGroup := c.GetString("token_channel_direct_group")
 	if groupName == "" {
 		id := c.GetInt("id")
 		user, err := model.GetUserById(id, false)
@@ -57,7 +58,51 @@ func ListModels(c *gin.Context) {
 		groupName = user.Group
 	}
 
-	models, err := model.ChannelGroup.GetGroupModels(groupName)
+	models, err := model.ChannelGroup.GetGroupModels(groupName, channelDirectGroup)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"object": "list",
+			"data":   []string{},
+		})
+		return
+	}
+	sort.Strings(models)
+
+	var groupOpenAIModels []*OpenAIModels
+	for _, modelName := range models {
+		groupOpenAIModels = append(groupOpenAIModels, getOpenAIModelWithName(modelName))
+	}
+
+	// 根据 OwnedBy 排序
+	sort.Slice(groupOpenAIModels, func(i, j int) bool {
+		if groupOpenAIModels[i].OwnedBy == nil {
+			return true // 假设 nil 值小于任何非 nil 值
+		}
+		if groupOpenAIModels[j].OwnedBy == nil {
+			return false // 假设任何非 nil 值大于 nil 值
+		}
+		return *groupOpenAIModels[i].OwnedBy < *groupOpenAIModels[j].OwnedBy
+	})
+
+	c.JSON(200, gin.H{
+		"object": "list",
+		"data":   groupOpenAIModels,
+	})
+}
+
+func ListModelsForUser(c *gin.Context) {
+	groupName := c.GetString("group")
+	if groupName == "" {
+		id := c.GetInt("id")
+		user, err := model.GetUserById(id, false)
+		if err != nil {
+			common.AbortWithMessage(c, http.StatusServiceUnavailable, err.Error())
+			return
+		}
+		groupName = user.Group
+	}
+
+	models, err := model.ChannelGroup.GetGroupModels(groupName, "default")
 	if err != nil {
 		c.JSON(200, gin.H{
 			"object": "list",

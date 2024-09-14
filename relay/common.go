@@ -352,8 +352,8 @@ func relayRerankResponseWithErr(c *gin.Context, err *types.OpenAIErrorWithStatus
 		err.OpenAIError.Message = utils.MessageWithRequestId(err.OpenAIError.Message, requestId)
 	}
 
-	if err.OpenAIError.Type == "new_api_error" || err.OpenAIError.Type == "one_api_error" {
-		err.OpenAIError.Type = "system_error"
+	if err.OpenAIError.Type == "new_api_error" || err.OpenAIError.Type == "one_api_error" || err.OpenAIError.Type == "rix_api_error" {
+		err.OpenAIError.Type = "chirou_api_error"
 	}
 
 	c.JSON(err.StatusCode, gin.H{

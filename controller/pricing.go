@@ -128,6 +128,7 @@ func DeletePrice(c *gin.Context) {
 type PriceBatchRequest struct {
 	OriginalModels []string `json:"original_models"`
 	relay_util.BatchPrices
+	DirectGroup string `json:"direct_group"`
 }
 
 func BatchSetPrices(c *gin.Context) {
@@ -137,7 +138,7 @@ func BatchSetPrices(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchSetPrices(&pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil {
+	if err := relay_util.PricingInstance.BatchSetPrices(&pricesBatch.BatchPrices, pricesBatch.OriginalModels, pricesBatch.DirectGroup); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -149,7 +150,8 @@ func BatchSetPrices(c *gin.Context) {
 }
 
 type PriceBatchDeleteRequest struct {
-	Models []string `json:"models" binding:"required"`
+	Models      []string `json:"models" binding:"required"`
+	DirectGroup string   `json:"direct_group"`
 }
 
 func BatchDeletePrices(c *gin.Context) {
@@ -159,7 +161,7 @@ func BatchDeletePrices(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchDeletePrices(pricesBatch.Models); err != nil {
+	if err := relay_util.PricingInstance.BatchDeletePrices(pricesBatch.Models, pricesBatch.DirectGroup); err != nil {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
