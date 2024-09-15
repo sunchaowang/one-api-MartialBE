@@ -89,11 +89,11 @@ const Index = () => {
       <br />
       用户分组：默认用户组(default)分组倍率为1倍
       <br />
-      令牌分组：默认令牌组(default)分组倍率为1.5倍，OpenAI直连分组(openai_direct)分组倍率为2.5倍，Claude直连分组(claude_direct)分组倍率为2.5倍
+      令牌分组：默认令牌组(default)分组倍率为1倍，OpenAI直连分组(openai_direct)分组倍率为8倍，Claude直连分组(claude_direct)分组倍率为8倍
       <br />
       如需修改令牌分组请联系站长。
     </>,
-    '充值汇率为1.5元1刀'
+    '充值汇率为1元 = 1刀'
   ];
 
   return (
@@ -132,11 +132,11 @@ const Index = () => {
           <Paragraph>
             6.每位注册用户都将获得{' '}
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              $0.5
+              $0.3
             </Tag>{' '}
             的初始使用额度, 邀请新用户奖励
             <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              $0.5
+              $0.2
             </Tag>
             的额度, 可使用全模型
           </Paragraph>
@@ -176,13 +176,7 @@ const Index = () => {
             的账号注册 ，谢谢🙏
           </Paragraph>
           <Paragraph>9.为了维持转发服务正常使用，将不定期清除非法用户（包括重复注册等任何形式的小号）；请使用真实邮箱注册</Paragraph>
-          <Paragraph>
-            10.受供应商和OpenAI政策影响，价格会随时调整，充值汇率为
-            <Tag color={'red'} defaultChecked size="small" variant="outlined">
-              1.5元=1刀
-            </Tag>
-            （模型计费详情请查看下方表格）
-          </Paragraph>
+          <Paragraph>10.受供应商和OpenAI政策影响，价格会随时调整， （模型计费详情请查看下方表格）</Paragraph>
         </Typography>
 
         <Typography>
