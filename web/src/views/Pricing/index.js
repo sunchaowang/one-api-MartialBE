@@ -155,7 +155,7 @@ const Pricing = () => {
       const res = await API.get('/api/prices/model_list');
       const { success, message, data } = res.data;
       if (success) {
-        setModelList(data);
+        setModelList(data.default);
       } else {
         showError(message);
       }
