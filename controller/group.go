@@ -19,10 +19,10 @@ func GetGroups(c *gin.Context) {
 	})
 }
 
-// DirectGroup
-func GetDirectGroups(c *gin.Context) {
+// TokenGroup
+func GetTokenGroups(c *gin.Context) {
 	groupNames := make([]string, 0)
-	for groupName := range common.DirectGroupRatio {
+	for groupName := range common.TokenGroupRatio {
 		groupNames = append(groupNames, groupName)
 	}
 	c.JSON(http.StatusOK, gin.H{

@@ -133,10 +133,10 @@ func tokenAuth(c *gin.Context, key string) {
 	}
 
 	// 获取令牌的连接类型
-	if token.DirectGroup != "default" {
-		c.Set("token_channel_direct_group", token.DirectGroup)
+	if token.TokenGroup != "default" {
+		c.Set("token_group", token.TokenGroup)
 	} else {
-		c.Set("token_channel_direct_group", "default")
+		c.Set("token_group", "default")
 	}
 
 	if len(parts) > 1 {

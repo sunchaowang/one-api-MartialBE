@@ -77,7 +77,8 @@ const getValidationSchema = (t) =>
         return false;
       }
       return false;
-    })
+    }),
+    token_groups: Yup.array().min(1, '不能为空')
   });
 
 const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => {

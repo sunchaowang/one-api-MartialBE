@@ -3,7 +3,6 @@ package relay_util
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
@@ -21,7 +20,7 @@ var PricingInstance *Pricing
 // Pricing is a struct that contains the pricing data
 type Pricing struct {
 	sync.RWMutex
-	Prices map[string]map[string]*model.Price `json:"models"`
+	Prices map[string]*model.Price `json:"models"`
 	Match  []string                `json:"-"`
 }
 
@@ -35,7 +34,7 @@ func NewPricing() {
 	logger.SysLog("Initializing Pricing")
 
 	PricingInstance = &Pricing{
-		Prices: make(map[string]map[string]*model.Price),
+		Prices: make(map[string]*model.Price),
 		Match:  make([]string, 0),
 	}
 
@@ -66,14 +65,11 @@ func (p *Pricing) Init() error {
 		return nil
 	}
 
-	newPrices := make(map[string]map[string]*model.Price)
+	newPrices := make(map[string]*model.Price)
 	newMatch := make(map[string]bool)
 
 	for _, price := range prices {
-		if _, ok := newPrices[price.DirectGroup]; !ok {
-			newPrices[price.DirectGroup] = make(map[string]*model.Price)
-		}
-		newPrices[price.DirectGroup][price.Model] = price
+		newPrices[price.Model] = price
 		if strings.HasSuffix(price.Model, "*") {
 			if _, ok := newMatch[price.Model]; !ok {
 				newMatch[price.Model] = true
@@ -96,17 +92,16 @@ func (p *Pricing) Init() error {
 }
 
 // GetPrice returns the price of a model
-func (p *Pricing) GetPrice(modelName string, directGroup string) *model.Price {
+func (p *Pricing) GetPrice(modelName string) *model.Price {
 	p.RLock()
 	defer p.RUnlock()
 
-	fmt.Println("GetPrice p.Prices", modelName, directGroup)
-	if price, ok := p.Prices[directGroup][modelName]; ok {
+	if price, ok := p.Prices[modelName]; ok {
 		return price
 	}
 
 	matchModel := utils.GetModelsWithMatch(&p.Match, modelName)
-	if price, ok := p.Prices[directGroup][matchModel]; ok {
+	if price, ok := p.Prices[matchModel]; ok {
 		return price
 	}
 
@@ -115,20 +110,17 @@ func (p *Pricing) GetPrice(modelName string, directGroup string) *model.Price {
 		ChannelType: config.ChannelTypeUnknown,
 		Input:       model.DefaultPrice,
 		Output:      model.DefaultPrice,
-		DirectGroup: "default",
 	}
 }
 
-func (p *Pricing) GetAllPrices() map[string]map[string]*model.Price {
+func (p *Pricing) GetAllPrices() map[string]*model.Price {
 	return p.Prices
 }
 
 func (p *Pricing) GetAllPricesList() []*model.Price {
 	var prices []*model.Price
-	for _, group := range p.Prices {
-		for _, price := range group {
-			prices = append(prices, price)
-		}
+	for _, price := range p.Prices {
+		prices = append(prices, price)
 	}
 
 	return prices
@@ -143,7 +135,7 @@ func (p *Pricing) updateRawPrice(modelName string, price *model.Price) error {
 		return errors.New("model names cannot be duplicated")
 	}
 
-	if err := p.deleteRawPrice(modelName, price.DirectGroup); err != nil {
+	if err := p.deleteRawPrice(modelName); err != nil {
 		return err
 	}
 
@@ -181,8 +173,8 @@ func (p *Pricing) AddPrice(price *model.Price) error {
 	return err
 }
 
-func (p *Pricing) deleteRawPrice(modelName string, directGroup string) error {
-	item, ok := p.Prices[directGroup][modelName]
+func (p *Pricing) deleteRawPrice(modelName string) error {
+	item, ok := p.Prices[modelName]
 	if !ok {
 		return errors.New("model not found")
 	}
@@ -191,8 +183,8 @@ func (p *Pricing) deleteRawPrice(modelName string, directGroup string) error {
 }
 
 // DeletePrice deletes a price from the Pricing instance
-func (p *Pricing) DeletePrice(modelName string, directGroup string) error {
-	if err := p.deleteRawPrice(modelName, directGroup); err != nil {
+func (p *Pricing) DeletePrice(modelName string) error {
+	if err := p.deleteRawPrice(modelName); err != nil {
 		return err
 	}
 
@@ -263,10 +255,10 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 }
 
 // BatchDeletePrices deletes the prices of multiple models
-func (p *Pricing) BatchDeletePrices(models []string, directGroup string) error {
+func (p *Pricing) BatchDeletePrices(models []string) error {
 	tx := model.DB.Begin()
 
-	err := model.DeletePrices(tx, models, directGroup)
+	err := model.DeletePrices(tx, models)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -284,7 +276,7 @@ func (p *Pricing) BatchDeletePrices(models []string, directGroup string) error {
 	return nil
 }
 
-func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []string, directGroup string) error {
+func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []string) error {
 	// 查找需要删除的model
 	var deletePrices []string
 	var addPrices []*model.Price
@@ -324,7 +316,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	}
 
 	if len(deletePrices) > 0 {
-		err := model.DeletePrices(tx, deletePrices, directGroup)
+		err := model.DeletePrices(tx, deletePrices)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -375,7 +367,7 @@ func GetOldPricesList() []*model.Price {
 
 	var prices []*model.Price
 	for modelName, oldPrice := range oldData {
-		price := PricingInstance.GetPrice(modelName, "default")
+		price := PricingInstance.GetPrice(modelName)
 		prices = append(prices, &model.Price{
 			Model:       modelName,
 			Type:        model.TokensPriceType,

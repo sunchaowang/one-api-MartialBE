@@ -9,31 +9,31 @@ import (
 )
 
 type Ability struct {
-	Group       string `json:"group" gorm:"type:varchar(32);primaryKey;autoIncrement:false"`
-	Model       string `json:"model" gorm:"primaryKey;autoIncrement:false"`
-	ChannelId   int    `json:"channel_id" gorm:"primaryKey;autoIncrement:false;index"`
-	Enabled     bool   `json:"enabled"`
-	Priority    *int64 `json:"priority" gorm:"bigint;default:0;index"`
-	Weight      *uint  `json:"weight" gorm:"default:1"`
-	DirectGroup string `json:"direct_group" gorm:"type:varchar(32);primaryKey;autoIncrement:false;default:'default'"` //
+	Group      string `json:"group" gorm:"type:varchar(32);primaryKey;autoIncrement:false"`
+	Model      string `json:"model" gorm:"primaryKey;autoIncrement:false"`
+	ChannelId  int    `json:"channel_id" gorm:"primaryKey;autoIncrement:false;index"`
+	Enabled    bool   `json:"enabled"`
+	Priority   *int64 `json:"priority" gorm:"bigint;default:0;index"`
+	Weight     *uint  `json:"weight" gorm:"default:1"`
+	TokenGroup string `json:"token_group" gorm:"type:varchar(32);primaryKey;autoIncrement:false;default:'default'"` //
 }
 
 func (channel *Channel) AddAbilities() error {
 	models_ := strings.Split(channel.Models, ",")
 	groups_ := strings.Split(channel.Group, ",")
-	directGroups_ := strings.Split(channel.DirectGroup, ",")
+	tokenGroups := strings.Split(channel.TokenGroup, ",")
 	abilities := make([]Ability, 0, len(models_))
 	for _, model := range models_ {
 		for _, group := range groups_ {
-			for _, directGroups := range directGroups_ {
+			for _, tokenGroup := range tokenGroups {
 				ability := Ability{
-					Group:       group,
-					Model:       model,
-					ChannelId:   channel.Id,
-					Enabled:     channel.Status == config.ChannelStatusEnabled,
-					Priority:    channel.Priority,
-					Weight:      channel.Weight,
-					DirectGroup: directGroups,
+					Group:      group,
+					Model:      model,
+					ChannelId:  channel.Id,
+					Enabled:    channel.Status == config.ChannelStatusEnabled,
+					Priority:   channel.Priority,
+					Weight:     channel.Weight,
+					TokenGroup: tokenGroup,
 				}
 				abilities = append(abilities, ability)
 			}
@@ -68,11 +68,11 @@ func UpdateAbilityStatus(tx *gorm.DB, channelId int, status bool) error {
 }
 
 type AbilityChannelGroup struct {
-	Group       string `json:"group"`
-	Model       string `json:"model"`
-	Priority    int    `json:"priority"`
-	ChannelIds  string `json:"channel_ids"`
-	DirectGroup string `json:"direct_group" gorm:"type:varchar(32);default:'default'"` //
+	Group      string `json:"group"`
+	Model      string `json:"model"`
+	Priority   int    `json:"priority"`
+	ChannelIds string `json:"channel_ids"`
+	TokenGroup string `json:"token_group" gorm:"type:varchar(32);default:'default'"` //
 }
 
 func GetAbilityChannelGroup() ([]*AbilityChannelGroup, error) {
@@ -93,10 +93,10 @@ func GetAbilityChannelGroup() ([]*AbilityChannelGroup, error) {
 	}
 
 	err := DB.Raw(`
-	SELECT `+quotePostgresField("group")+`, model, priority, direct_group, `+channelSql+` as channel_ids
+	SELECT `+quotePostgresField("group")+`, model, priority, token_group, `+channelSql+` as channel_ids
 	FROM abilities
 	WHERE enabled = ?
-	GROUP BY `+quotePostgresField("group")+`, model, priority, direct_group
+	GROUP BY `+quotePostgresField("group")+`, model, priority, token_group
 	ORDER BY priority DESC
 	`, trueVal).Scan(&abilities).Error
 

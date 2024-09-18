@@ -23,14 +23,14 @@ type Quota struct {
 	promptTokens     int
 	price            model.Price
 	groupRatio       float64
-	directGroupRatio float64
+	tokenGroupRatio  float64
 	inputRatio       float64
 	preConsumedQuota int
 	userId           int
 	channelId        int
 	tokenId          int
 	HandelStatus     bool
-	directGroup      string
+	tokenGroup       string
 }
 
 func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *types.OpenAIErrorWithStatusCode) {
@@ -41,15 +41,15 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *type
 		channelId:    c.GetInt("channel_id"),
 		tokenId:      c.GetInt("token_id"),
 		HandelStatus: false,
-		directGroup:  c.GetString("token_channel_direct_group"),
+		tokenGroup:   c.GetString("token_group"),
 	}
 
-	quota.price = *PricingInstance.GetPrice(quota.modelName, quota.directGroup)
+	quota.price = *PricingInstance.GetPrice(quota.modelName)
 	// 日志
 	fmt.Println("quota.price", quota.price)
 	quota.groupRatio = common.GetGroupRatio(c.GetString("group"))
-	quota.directGroupRatio = common.GetDirectGroupRatio(c.GetString("token_channel_direct_group"))
-	quota.inputRatio = quota.price.GetInput() * quota.groupRatio * quota.directGroupRatio
+	quota.tokenGroupRatio = common.GetTokenGroupRatio(c.GetString("token_group"))
+	quota.inputRatio = quota.price.GetInput() * quota.groupRatio * quota.tokenGroupRatio
 
 	if quota.price.Type == model.TimesPriceType {
 		quota.preConsumedQuota = int(1000 * quota.inputRatio)
@@ -110,7 +110,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 	if q.price.Type == model.TimesPriceType {
 		quota = int(1000 * q.inputRatio)
 	} else {
-		completionRatio := q.price.GetOutput() * q.groupRatio * q.directGroupRatio
+		completionRatio := q.price.GetOutput() * q.groupRatio * q.tokenGroupRatio
 		quota = int(math.Ceil((float64(promptTokens) * q.inputRatio) + (float64(completionTokens) * completionRatio)))
 	}
 
@@ -153,7 +153,7 @@ func (q *Quota) completedQuotaConsumption(usage *types.Usage, tokenName string, 
 		}
 	}
 
-	logContent := fmt.Sprintf("模型费率 %s，用户分组倍率 %.2f，令牌分组倍率 %.2f", modelRatioStr, q.groupRatio, q.directGroupRatio)
+	logContent := fmt.Sprintf("模型费率 %s，用户分组倍率 %.2f，令牌分组倍率 %.2f", modelRatioStr, q.groupRatio, q.tokenGroupRatio)
 	model.RecordConsumeLog(ctx, q.userId, q.channelId, promptTokens, completionTokens, q.modelName, tokenName, quota, logContent, requestTime, requestIP, q.originModelName, directGroup)
 	model.UpdateUserUsedQuotaAndRequestCount(q.userId, quota)
 	model.UpdateChannelUsedQuota(q.channelId, quota)
@@ -177,7 +177,7 @@ func (q *Quota) Undo(c *gin.Context) {
 func (q *Quota) Consume(c *gin.Context, usage *types.Usage) {
 	tokenName := c.GetString("token_name")
 	originModelName := c.GetString("origin_channel_model")
-	directGroup := c.GetString("token_channel_direct_group")
+	directGroup := c.GetString("token_group")
 	q.originModelName = originModelName
 	requestIP := utils.GetRequestIP(c)
 	// 如果没有报错，则消费配额

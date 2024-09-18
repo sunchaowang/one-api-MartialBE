@@ -27,7 +27,7 @@ type Log struct {
 	RequestTime      int      `json:"request_time" gorm:"default:0"`
 	RequestIp        string   `json:"request_ip,omitempty" gorm:"default:''"`
 	RequestId        string   `json:"request_id,omitempty"`
-	DirectGroup      string   `json:"direct_group,omitempty" gorm:"default:'default'"`
+	TokenGroup       string   `json:"token_group,omitempty" gorm:"default:'default'"`
 	Channel          *Channel `json:"channel" gorm:"foreignKey:Id;references:ChannelId"`
 }
 
@@ -41,17 +41,17 @@ const (
 	LogLogin
 )
 
-func RecordLog(userId int, logType int, content string, directGroup string) {
+func RecordLog(userId int, logType int, content string, tokenGroup string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return
 	}
 	log := &Log{
-		UserId:      userId,
-		Username:    GetUsernameById(userId),
-		CreatedAt:   utils.GetTimestamp(),
-		Type:        logType,
-		Content:     content,
-		DirectGroup: directGroup,
+		UserId:     userId,
+		Username:   GetUsernameById(userId),
+		CreatedAt:  utils.GetTimestamp(),
+		Type:       logType,
+		Content:    content,
+		TokenGroup: tokenGroup,
 	}
 	err := DB.Create(log).Error
 	if err != nil {
@@ -59,18 +59,18 @@ func RecordLog(userId int, logType int, content string, directGroup string) {
 	}
 }
 
-func RecordLogWithRequestIP(userId int, logType int, content string, requestIP string, directGroup string) {
+func RecordLogWithRequestIP(userId int, logType int, content string, requestIP string, tokenGroup string) {
 	if logType == LogTypeConsume && !config.LogConsumeEnabled {
 		return
 	}
 	log := &Log{
-		UserId:      userId,
-		Username:    GetUsernameById(userId),
-		CreatedAt:   utils.GetTimestamp(),
-		Type:        logType,
-		Content:     content,
-		RequestIp:   requestIP,
-		DirectGroup: directGroup,
+		UserId:     userId,
+		Username:   GetUsernameById(userId),
+		CreatedAt:  utils.GetTimestamp(),
+		Type:       logType,
+		Content:    content,
+		RequestIp:  requestIP,
+		TokenGroup: tokenGroup,
 	}
 	err := DB.Create(log).Error
 	if err != nil {
@@ -78,8 +78,8 @@ func RecordLogWithRequestIP(userId int, logType int, content string, requestIP s
 	}
 }
 
-func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int, content string, requestTime int, requestIP string, originModelName string, directGroup string) {
-	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, originModelName=%s, tokenName=%s, quota=%d, content=%s, direct_group=%s", userId, channelId, promptTokens, completionTokens, modelName, originModelName, tokenName, quota, content, directGroup))
+func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptTokens int, completionTokens int, modelName string, tokenName string, quota int, content string, requestTime int, requestIP string, originModelName string, tokenGroup string) {
+	logger.LogInfo(ctx, fmt.Sprintf("record consume log: userId=%d, channelId=%d, promptTokens=%d, completionTokens=%d, modelName=%s, originModelName=%s, tokenName=%s, quota=%d, content=%s, token_group=%s", userId, channelId, promptTokens, completionTokens, modelName, originModelName, tokenName, quota, content, tokenGroup))
 	if !config.LogConsumeEnabled {
 		return
 	}
@@ -99,7 +99,7 @@ func RecordConsumeLog(ctx context.Context, userId int, channelId int, promptToke
 		RequestTime:      requestTime,
 		RequestIp:        requestIP,
 		RequestId:        ctx.Value(logger.RequestIdKey).(string),
-		DirectGroup:      directGroup,
+		TokenGroup:       tokenGroup,
 	}
 	err := DB.Create(log).Error
 	if err != nil {
@@ -117,7 +117,7 @@ type LogsListParams struct {
 	TokenName      string `form:"token_name"`
 	ChannelId      int    `form:"channel_id"`
 	UserId         int    `form:"user_id"`
-	DirectGroup    string `form:"direct_group"`
+	TokenGroup     string `form:"token_group"`
 }
 
 var allowedLogsOrderFields = map[string]bool{
@@ -127,7 +127,7 @@ var allowedLogsOrderFields = map[string]bool{
 	"token_name":   true,
 	"model_name":   true,
 	"type":         true,
-	"direct_group": true,
+	"token_group": true,
 }
 
 func GetLogsList(params *LogsListParams) (*DataResult[Log], error) {
@@ -162,8 +162,8 @@ func GetLogsList(params *LogsListParams) (*DataResult[Log], error) {
 	if params.UserId != 0 {
 		tx = tx.Where("user_id = ?", params.UserId)
 	}
-	if params.DirectGroup != "" {
-		tx = tx.Where("direct_group = ?", params.DirectGroup)
+	if params.TokenGroup != "" {
+		tx = tx.Where("token_group = ?", params.TokenGroup)
 	}
 
 	return PaginateAndOrder[Log](tx, &params.PaginationParams, &logs, allowedLogsOrderFields)
@@ -189,8 +189,8 @@ func GetUserLogsList(userId int, params *LogsListParams) (*DataResult[Log], erro
 	if params.EndTimestamp != 0 {
 		tx = tx.Where("created_at <= ?", params.EndTimestamp)
 	}
-	if params.DirectGroup != "" {
-		tx = tx.Where("direct_group = ?", params.DirectGroup)
+	if params.TokenGroup != "" {
+		tx = tx.Where("token_group = ?", params.TokenGroup)
 	}
 
 	return PaginateAndOrder[Log](tx, &params.PaginationParams, &logs, allowedLogsOrderFields)

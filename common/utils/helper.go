@@ -282,6 +282,7 @@ func Filter[T any](arr []T, f func(T) bool) []T {
 }
 
 func GetModelsWithMatch(modelList *[]string, modelName string) string {
+	fmt.Println("modelList: ", *modelList)
 	for _, model := range *modelList {
 		if strings.HasPrefix(modelName, strings.TrimRight(model, "*")) {
 			return model

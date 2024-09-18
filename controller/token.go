@@ -71,7 +71,7 @@ func GetPlaygroundToken(c *gin.Context) {
 			RemainQuota:    0,
 			UnlimitedQuota: true,
 			ChatCache:      false,
-			DirectGroup:    "default",
+			TokenGroup:     "default",
 		}
 		err = cleanToken.Insert()
 		if err != nil {
@@ -122,7 +122,7 @@ func AddToken(c *gin.Context) {
 		ModelLimits:          token.ModelLimits,
 		ChannelLimitsEnabled: token.ChannelLimitsEnabled,
 		ChannelLimits:        token.ChannelLimits,
-		DirectGroup:          token.DirectGroup,
+		TokenGroup:           token.TokenGroup,
 	}
 	err = cleanToken.Insert()
 	if err != nil {
@@ -211,7 +211,7 @@ func UpdateToken(c *gin.Context) {
 		cleanToken.ModelLimits = token.ModelLimits
 		cleanToken.ChannelLimits = token.ChannelLimits
 		cleanToken.ChannelLimitsEnabled = token.ChannelLimitsEnabled
-		cleanToken.DirectGroup = token.DirectGroup
+		cleanToken.TokenGroup = token.TokenGroup
 	}
 	err = cleanToken.Update()
 	if err != nil {

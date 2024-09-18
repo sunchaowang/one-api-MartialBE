@@ -41,7 +41,8 @@ const getValidationSchema = (t) =>
     channel_type: Yup.number().min(1, t('pricing_edit.channelTypeErr')).required(t('pricing_edit.requiredChannelType')),
     input: Yup.number().required(t('pricing_edit.requiredInput')),
     output: Yup.number().required(t('pricing_edit.requiredOutput')),
-    models: Yup.array().min(1, t('pricing_edit.requiredModels'))
+    models: Yup.array().min(1, t('pricing_edit.requiredModels')),
+    token_groups: Yup.array().min(1, t('模型分组不能为空'))
   });
 
 const originInputs = {
@@ -50,14 +51,16 @@ const originInputs = {
   channel_type: 1,
   input: 0,
   output: 0,
-  models: []
+  models: [],
+  token_groups: []
 };
 
-const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) => {
+const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, _directGroupRatio }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
   const [selectModel, setSelectModel] = useState([]);
+  const [directGroupRatio, setDirectGroupRatio] = useState([]);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -112,6 +115,20 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pricesItem]);
+
+  useEffect(() => {
+    if (_directGroupRatio) {
+      setDirectGroupRatio(() =>
+        Object.keys(_directGroupRatio).map((key) => {
+          return {
+            label: key,
+            value: key,
+            ratio: _directGroupRatio[key]
+          };
+        })
+      );
+    }
+  }, [_directGroupRatio]);
 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
@@ -183,6 +200,40 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                 {touched.channel_type && errors.channel_type && (
                   <FormHelperText error id="helper-tex-channel_type-label">
                     {errors.channel_type}
+                  </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.token_groups && errors.token_groups)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="token_groups-label">{t('模型渠道分组')}</InputLabel>
+                <Select
+                  id="token_groups-label"
+                  label={t('模型渠道分组')}
+                  value={values.token_groups}
+                  name="token_groups"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200
+                      }
+                    }
+                  }}
+                  multiple
+                  renderValue={(selected) => selected.join(', ')}
+                >
+                  {directGroupRatio.map((option) => {
+                    return (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+                {touched.token_groups && errors.token_groups && (
+                  <FormHelperText error id="helper-tex-token_groups-label">
+                    {errors.token_groups}
                   </FormHelperText>
                 )}
               </FormControl>

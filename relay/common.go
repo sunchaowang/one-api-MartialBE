@@ -107,7 +107,7 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 	group := c.GetString("group")
 	skipChannelId := c.GetInt("skip_channel_id")
 	skipOnlyChat := c.GetBool("skip_only_chat")
-	tokenChannelDirectGroup := c.GetString("token_channel_direct_group")
+	tokenGroup := c.GetString("token_group")
 	var filters []model.ChannelsFilterFunc
 	if skipOnlyChat {
 		filters = append(filters, model.FilterOnlyChat())
@@ -121,13 +121,20 @@ func fetchChannelByModel(c *gin.Context, modelName string) (*model.Channel, erro
 		model.ChannelGroup.IncludesChannels = includeChannelIds
 	}
 
-	channel, err := model.ChannelGroup.Next(group, modelName, tokenChannelDirectGroup, filters...)
+	channel, err := model.ChannelGroup.Next(group, modelName, tokenGroup, filters...)
 	if err != nil {
-		message := fmt.Sprintf("当前分组 %s 下对于模型 %s 无可用渠道", group, modelName)
-		if channel != nil {
-			logger.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
-			message = "数据库一致性已被破坏，请联系管理员"
+		message := ""
+		if err.Error() == "group not found" {
+			message = fmt.Sprintf("当前用户分组 %s 下对于模型 %s 无可用渠道", group, modelName)
+		} else if err.Error() == "token group not found" {
+			message = fmt.Sprintf("当前令牌分组 %s 下对于模型 %s 无可用渠道", tokenGroup, modelName)
+		} else {
+			if channel != nil {
+				logger.SysError(fmt.Sprintf("渠道不存在：%d", channel.Id))
+				message = "数据库一致性已被破坏，请联系管理员"
+			}
 		}
+		
 		return nil, errors.New(message)
 	}
 

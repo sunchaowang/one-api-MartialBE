@@ -131,7 +131,7 @@ func cacheProcessing(c *gin.Context, cacheProps *relay_util.ChatCacheProps, isSt
 
 	// 写入日志
 	tokenName := c.GetString("token_name")
-	directGroup := c.GetString("token_channel_direct_group")
+	directGroup := c.GetString("token_group")
 
 	requestTime := 0
 	requestStartTimeValue := c.Request.Context().Value("requestStartTime")

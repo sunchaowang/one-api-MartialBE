@@ -95,7 +95,6 @@ export default function ModelPrice() {
         output: price?.output !== undefined && price?.output !== null ? price.output : 30
       });
     });
-    console.log(newRows);
     setRows(newRows);
   }, [userModelList, ownedby, prices]);
 
@@ -138,6 +137,16 @@ export default function ModelPrice() {
         minWidth: 100,
         type: 'singleSelect',
         valueOptions: ownedby,
+        needIsAdmin: true
+      },
+      {
+        field: 'token_groups',
+        sortable: true,
+        headerName: t('modelpricePage.directGroups'),
+        flex: 0.5,
+        minWidth: 100,
+        type: 'singleSelect',
+        valueOptions: directGroupRatio,
         needIsAdmin: true
       },
       {

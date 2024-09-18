@@ -31,7 +31,7 @@ const originInputs = {
   model_limits: '',
   channel_limits_enabled: false,
   channel_limits: '',
-  direct_group: ''
+  token_group: ''
 };
 
 const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRatio }) => {
@@ -96,7 +96,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
 
   useEffect(() => {
     if (_directGroupRatio) {
-      console.log('directGroupRatio', _directGroupRatio);
       setDirectGroupRatio(() =>
         Object.keys(_directGroupRatio).map((key) => {
           return {
@@ -131,13 +130,13 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
               <Input name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} />
             </Form.Item>
 
-            <Form.Item label={'令牌分组'} name={'direct_group'}>
+            <Form.Item label={'令牌分组'} name={'token_group'}>
               <Typography.Text style={{ display: 'none' }}>{JSON.stringify(directGroupRatio)}</Typography.Text>
               <Select
-                name={'direct_group'}
-                value={values.direct_group}
+                name={'token_group'}
+                value={values.token_group}
                 options={directGroupRatio.map((item) => item)}
-                onChange={(value) => setFieldValue('direct_group', value)}
+                onChange={(value) => setFieldValue('token_group', value)}
                 optionRender={(option) => (
                   <Space>
                     <span role="img" aria-label={option.data.label}>

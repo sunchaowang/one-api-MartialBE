@@ -69,7 +69,7 @@ func InitOptionMap() {
 	config.OptionMap["QuotaRemindThreshold"] = strconv.Itoa(config.QuotaRemindThreshold)
 	config.OptionMap["PreConsumedQuota"] = strconv.Itoa(config.PreConsumedQuota)
 	config.OptionMap["GroupRatio"] = common.GroupRatio2JSONString()
-	config.OptionMap["DirectGroupRatio"] = common.DirectGroupRatio2JSONString()
+	config.OptionMap["TokenGroupRatio"] = common.TokenGroupRatio2JSONString()
 	config.OptionMap["TopUpLink"] = config.TopUpLink
 	config.OptionMap["ChatLink"] = config.ChatLink
 	config.OptionMap["ChatLinks"] = config.ChatLinks
@@ -219,8 +219,8 @@ func updateOptionMap(key string, value string) (err error) {
 		config.EmailDomainWhitelist = strings.Split(value, ",")
 	case "GroupRatio":
 		err = common.UpdateGroupRatioByJSONString(value)
-	case "DirectGroupRatio":
-		err = common.UpdateDirectGroupRatioByJSONString(value)
+	case "TokenGroupRatio":
+		err = common.UpdateTokenGroupRatioByJSONString(value)
 	case "ChannelDisableThreshold":
 		config.ChannelDisableThreshold, _ = strconv.ParseFloat(value, 64)
 	case "QuotaPerUnit":

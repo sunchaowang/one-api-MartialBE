@@ -22,7 +22,7 @@ const OperationSetting = () => {
     QuotaRemindThreshold: 0,
     PreConsumedQuota: 0,
     GroupRatio: '',
-    DirectGroupRatio: '',
+    TokenGroupRatio: '',
     TopUpLink: '',
     ChatLink: '',
     ChatLinks: '',
@@ -57,7 +57,7 @@ const OperationSetting = () => {
       if (success) {
         let newInputs = {};
         data.forEach((item) => {
-          if (item.key === 'GroupRatio' || item.key === 'DirectGroupRatio') {
+          if (item.key === 'GroupRatio' || item.key === 'TokenGroupRatio') {
             item.value = JSON.stringify(JSON.parse(item.value), null, 2);
           }
           if (item.key === 'RechargeDiscount') {
@@ -134,12 +134,12 @@ const OperationSetting = () => {
           }
           await updateOption('GroupRatio', inputs.GroupRatio);
         }
-        if (originInputs['DirectGroupRatio'] !== inputs.DirectGroupRatio) {
-          if (!verifyJSON(inputs.DirectGroupRatio)) {
+        if (originInputs['TokenGroupRatio'] !== inputs.TokenGroupRatio) {
+          if (!verifyJSON(inputs.TokenGroupRatio)) {
             showError('令牌分组倍率不是合法的 JSON 字符串');
             return;
           }
-          await updateOption('DirectGroupRatio', inputs.DirectGroupRatio);
+          await updateOption('TokenGroupRatio', inputs.TokenGroupRatio);
         }
         break;
       case 'chatlinks':
@@ -686,12 +686,12 @@ const OperationSetting = () => {
             <TextField
               multiline
               maxRows={15}
-              id="channel-DirectGroupRatio-label"
+              id="channel-TokenGroupRatio-label"
               label={t('setting_index.operationSettings.rateSettings.directGroupRatio.label')}
-              value={inputs.DirectGroupRatio}
-              name="DirectGroupRatio"
+              value={inputs.TokenGroupRatio}
+              name="TokenGroupRatio"
               onChange={handleInputChange}
-              aria-describedby="helper-text-channel-DirectGroupRatio-label"
+              aria-describedby="helper-text-channel-TokenGroupRatio-label"
               minRows={5}
               placeholder={t('setting_index.operationSettings.rateSettings.directGroupRatio.placeholder')}
             />

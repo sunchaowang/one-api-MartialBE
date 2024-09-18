@@ -202,7 +202,7 @@ export function tableRowColumns(t, userIsAdmin) {
       render: (col, item, index) =>
         item.type &&
         (String(item.type) === LogType['2'].value ? (
-          <Tag color={item.direct_group === 'default' ? 'default' : stringToTagColor(item.direct_group)}>{item.direct_group}</Tag>
+          <Tag color={item.token_group === 'default' ? 'default' : stringToTagColor(item.token_group)}>{item.token_group}</Tag>
         ) : (
           ''
         ))

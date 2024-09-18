@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"one-api/common/config"
 	"one-api/common/logger"
@@ -21,10 +22,10 @@ type ChannelChoice struct {
 type ChannelsChooser struct {
 	sync.RWMutex
 	Channels         map[int]*ChannelChoice
-	Rule             map[string]map[string]map[string][][]int // group -> direct group -> model -> priority -> channelIds
+	Rule             map[string]map[string]map[string][][]int // group -> token group -> model -> priority -> channelIds
 	Match            []string
 	IncludesChannels []string
-	DirectGroup      map[string][]int
+	TokenGroup       map[string][]int
 }
 
 type ChannelsFilterFunc func(channelId int, choice *ChannelChoice) bool
@@ -91,7 +92,7 @@ func (cc *ChannelsChooser) ChangeStatus(channelId int, status bool) {
 	}
 }
 
-func (cc *ChannelsChooser) balancer(channelIds []int, directGroup string, filters []ChannelsFilterFunc) *Channel {
+func (cc *ChannelsChooser) balancer(channelIds []int, tokenGroup string, filters []ChannelsFilterFunc) *Channel {
 	nowTime := time.Now().Unix()
 	totalWeight := 0
 
@@ -101,9 +102,6 @@ func (cc *ChannelsChooser) balancer(channelIds []int, directGroup string, filter
 		if !ok || choice.Disable || choice.CooldownsTime >= nowTime {
 			continue
 		}
-		//if !utils.Contains(channelId, cc.DirectGroup[directGroup]) {
-		//	continue
-		//}
 
 		isSkip := false
 		for _, filter := range filters {
@@ -141,20 +139,21 @@ func (cc *ChannelsChooser) balancer(channelIds []int, directGroup string, filter
 	return nil
 }
 
-func (cc *ChannelsChooser) Next(group, modelName string, directGroup string, filters ...ChannelsFilterFunc) (*Channel, error) {
+func (cc *ChannelsChooser) Next(group, modelName string, tokenGroup string, filters ...ChannelsFilterFunc) (*Channel, error) {
 	cc.RLock()
 	defer cc.RUnlock()
 	if _, ok := cc.Rule[group]; !ok {
 		return nil, errors.New("group not found")
 	}
-	if _, ok := cc.Rule[group][directGroup]; !ok {
-		return nil, errors.New("direct connection group not found")
+	fmt.Println("cc.Rule[group]", cc.Rule[group])
+	if _, ok := cc.Rule[group][tokenGroup]; !ok {
+		return nil, errors.New("token group not found")
 	}
 
-	channelsPriority, ok := cc.Rule[group][directGroup][modelName]
+	channelsPriority, ok := cc.Rule[group][tokenGroup][modelName]
 	if !ok {
 		matchModel := utils.GetModelsWithMatch(&cc.Match, modelName)
-		channelsPriority, ok = cc.Rule[group][directGroup][matchModel]
+		channelsPriority, ok = cc.Rule[group][tokenGroup][matchModel]
 		if !ok {
 			return nil, errors.New("model not found")
 		}
@@ -165,7 +164,7 @@ func (cc *ChannelsChooser) Next(group, modelName string, directGroup string, fil
 	}
 
 	for _, priority := range channelsPriority {
-		channel := cc.balancer(priority, directGroup, filters)
+		channel := cc.balancer(priority, tokenGroup, filters)
 		if channel != nil {
 			if len(cc.IncludesChannels) > 0 {
 				if isChannelIdInLimits(cc.IncludesChannels, channel.Id) {
@@ -180,7 +179,7 @@ func (cc *ChannelsChooser) Next(group, modelName string, directGroup string, fil
 	return nil, errors.New("channel not found")
 }
 
-func (cc *ChannelsChooser) GetGroupModels(group string, channelDirectGroup string) ([]string, error) {
+func (cc *ChannelsChooser) GetGroupModels(group string, tokenGroup string) ([]string, error) {
 	cc.RLock()
 	defer cc.RUnlock()
 
@@ -189,13 +188,13 @@ func (cc *ChannelsChooser) GetGroupModels(group string, channelDirectGroup strin
 	}
 
 	modelsMap := make(map[string][]string)
-	for directGroup := range cc.Rule[group] {
-		for model := range cc.Rule[group][directGroup] {
-			modelsMap[directGroup] = append(modelsMap[directGroup], model)
+	for tokenGroup := range cc.Rule[group] {
+		for model := range cc.Rule[group][tokenGroup] {
+			modelsMap[tokenGroup] = append(modelsMap[tokenGroup], model)
 		}
 	}
 
-	if models, ok := modelsMap[channelDirectGroup]; ok {
+	if models, ok := modelsMap[tokenGroup]; ok {
 		return models, nil
 	}
 
@@ -245,12 +244,12 @@ func (cc *ChannelsChooser) Load() {
 			newGroup[ability.Group] = make(map[string]map[string][][]int)
 		}
 
-		if _, ok := newGroup[ability.Group][ability.DirectGroup]; !ok {
-			newGroup[ability.Group][ability.DirectGroup] = make(map[string][][]int)
+		if _, ok := newGroup[ability.Group][ability.TokenGroup]; !ok {
+			newGroup[ability.Group][ability.TokenGroup] = make(map[string][][]int)
 		}
 
-		if _, ok := newGroup[ability.Group][ability.DirectGroup][ability.Model]; !ok {
-			newGroup[ability.Group][ability.DirectGroup][ability.Model] = make([][]int, 0)
+		if _, ok := newGroup[ability.Group][ability.TokenGroup][ability.Model]; !ok {
+			newGroup[ability.Group][ability.TokenGroup][ability.Model] = make([][]int, 0)
 		}
 
 		// 如果是以 *结尾的 model名称
@@ -267,7 +266,7 @@ func (cc *ChannelsChooser) Load() {
 			priorityIds = append(priorityIds, utils.String2Int(channelId))
 		}
 
-		newGroup[ability.Group][ability.DirectGroup][ability.Model] = append(newGroup[ability.Group][ability.DirectGroup][ability.Model], priorityIds)
+		newGroup[ability.Group][ability.TokenGroup][ability.Model] = append(newGroup[ability.Group][ability.TokenGroup][ability.Model], priorityIds)
 	}
 
 	newMatchList := make([]string, 0, len(newMatch))

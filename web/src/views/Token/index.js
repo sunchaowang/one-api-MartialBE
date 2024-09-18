@@ -64,12 +64,12 @@ export default function Token() {
   async function fetchSettingOptions() {
     const res = await API.get('/api/site/option', {
       params: {
-        keys: 'DirectGroupRatio'
+        keys: 'TokenGroupRatio'
       }
     });
     const { success, message: msg, data } = res.data;
     if (success) {
-      const _directGroupRatio = data.find((item) => item.key === 'DirectGroupRatio');
+      const _directGroupRatio = data.find((item) => item.key === 'TokenGroupRatio');
       setDirectGroupRatio(JSON.parse(_directGroupRatio.value));
     }
   }

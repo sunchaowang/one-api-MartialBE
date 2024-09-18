@@ -67,7 +67,7 @@ EditToolbar.propTypes = {
   setRowModesModel: PropTypes.func.isRequired
 };
 
-const Single = ({ ownedby, prices, reloadData }) => {
+const Single = ({ ownedby, prices, reloadData, directGroupRatio }) => {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
@@ -196,6 +196,16 @@ const Single = ({ ownedby, prices, reloadData }) => {
         minWidth: 100,
         type: 'singleSelect',
         valueOptions: priceType,
+        editable: true
+      },
+      {
+        field: 'token_group',
+        sortable: true,
+        headerName: t('模型分组'),
+        flex: 0.5,
+        minWidth: 100,
+        type: 'singleSelect',
+        valueOptions: directGroupRatio,
         editable: true
       },
       {
@@ -373,5 +383,6 @@ export default Single;
 Single.propTypes = {
   prices: PropTypes.array,
   ownedby: PropTypes.array,
-  reloadData: PropTypes.func
+  reloadData: PropTypes.func,
+  directGroupRatio: PropTypes.array
 };

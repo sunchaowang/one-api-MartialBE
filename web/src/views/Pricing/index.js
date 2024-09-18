@@ -45,6 +45,7 @@ const Pricing = () => {
   const [errPrices, setErrPrices] = useState('');
   const [prices, setPrices] = useState([]);
   const [noPriceModel, setNoPriceModel] = useState([]);
+  const [directGroupRatio, setDirectGroupRatio] = useState([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -99,6 +100,19 @@ const Pricing = () => {
     }
   };
 
+  async function fetchSettingOptions() {
+    const res = await API.get('/api/site/option', {
+      params: {
+        keys: 'TokenGroupRatio'
+      }
+    });
+    const { success, message: msg, data } = res.data;
+    if (success) {
+      const _directGroupRatio = data.find((item) => item.key === 'TokenGroupRatio');
+      setDirectGroupRatio(JSON.parse(_directGroupRatio.value));
+    }
+  }
+
   useEffect(() => {
     const missingModels = modelList.filter((model) => !prices.some((price) => price.model === model));
     setNoPriceModel(missingModels);
@@ -130,6 +144,9 @@ const Pricing = () => {
     } catch (error) {
       console.error(error);
     }
+
+    // 获取配置项
+    fetchSettingOptions();
   }, []);
 
   const fetchModelList = useCallback(async () => {
@@ -237,6 +254,7 @@ const Pricing = () => {
         pricesItem={editPricesItem}
         ownedby={ownedby}
         noPriceModel={noPriceModel}
+        directGroupRatio={directGroupRatio}
       />
       <Card>
         <AdminContainer>
@@ -248,10 +266,16 @@ const Pricing = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <Single ownedby={ownedby} reloadData={reloadData} prices={prices} />
+              <Single ownedby={ownedby} reloadData={reloadData} prices={prices} directGroupRatio={directGroupRatio} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} handleOpenModal={handleOpenaddModal} />
+              <Multiple
+                ownedby={ownedby}
+                reloadData={reloadData}
+                prices={prices}
+                handleOpenModal={handleOpenaddModal}
+                directGroupRatio={directGroupRatio}
+              />
             </CustomTabPanel>
           </Box>
         </AdminContainer>
