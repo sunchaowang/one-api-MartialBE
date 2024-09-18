@@ -49,7 +49,7 @@ var allowedChannelOrderFields = map[string]bool{
 	"response_time": true,
 	"balance":       true,
 	"priority":      true,
-	"token_group":  true,
+	"token_group":   true,
 }
 
 type SearchChannelsParams struct {

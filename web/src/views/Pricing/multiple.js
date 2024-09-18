@@ -15,7 +15,7 @@ import EditeModal from './component/EditModal';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
-export default function Multiple({ prices, reloadData, handleOpenModal, ownedby, directGroupRatio }) {
+export default function Multiple({ prices, reloadData, handleOpenModal, ownedby, tokenGroupRatio }) {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
 
@@ -105,5 +105,5 @@ Multiple.propTypes = {
   ownedby: PropTypes.array,
   handleOpenModal: PropTypes.func,
   reloadData: PropTypes.func,
-  directGroupRatio: PropTypes.array
+  tokenGroupRatio: PropTypes.array
 };

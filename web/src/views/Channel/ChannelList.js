@@ -35,7 +35,8 @@ const originalKeyword = {
   other: '',
   filter_tag: false,
   tag: '',
-  id: ''
+  id: '',
+  token_group: ''
 };
 
 export async function fetchChannelData(page, rowsPerPage, keyword, order, orderBy) {
@@ -87,6 +88,7 @@ export default function ChannelList() {
   const [openModal, setOpenModal] = useState(false);
   const [editChannelId, setEditChannelId] = useState(0);
   const [openBatchModal, setOpenBatchModal] = useState(false);
+  const [tokenGroupOptions, setTokenGroupOptions] = useState([]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -298,6 +300,19 @@ export default function ChannelList() {
     }
   };
 
+  async function fetchSettingOptions() {
+    const res = await API.get('/api/site/option', {
+      params: {
+        keys: 'TokenGroupRatio'
+      }
+    });
+    const { success, message: msg, data } = res.data;
+    if (success) {
+      const _tokenGroup = data.find((item) => item.key === 'TokenGroupRatio');
+      setTokenGroupOptions(Object.keys(JSON.parse(_tokenGroup.value)).map((key) => ({ key, value: JSON.parse(_tokenGroup.value)[key] })));
+    }
+  }
+
   useEffect(() => {
     fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
   }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
@@ -305,6 +320,7 @@ export default function ChannelList() {
   useEffect(() => {
     fetchGroups().then();
     fetchTags().then();
+    fetchSettingOptions().then();
   }, []);
 
   return (
@@ -426,6 +442,7 @@ export default function ChannelList() {
                     key={row.id}
                     handleOpenModal={handleOpenModal}
                     setModalChannelId={setEditChannelId}
+                    tokenGroupOptions={tokenGroupOptions}
                   />
                 ))}
               </TableBody>
@@ -444,7 +461,7 @@ export default function ChannelList() {
           showLastButton
         />
       </Card>
-      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} groupOptions={groupOptions} />
+      <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} channelId={editChannelId} groupOptions={groupOptions} tokenGroupOptions={tokenGroupOptions} />
       <BatchModal open={openBatchModal} setOpen={setOpenBatchModal} />
     </>
   );

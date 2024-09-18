@@ -110,6 +110,7 @@ func (p *Pricing) GetPrice(modelName string) *model.Price {
 		ChannelType: config.ChannelTypeUnknown,
 		Input:       model.DefaultPrice,
 		Output:      model.DefaultPrice,
+		TokenGroup:  "default",
 	}
 }
 

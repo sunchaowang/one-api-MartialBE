@@ -33,31 +33,44 @@ func GetPricesList(c *gin.Context) {
 }
 
 func GetAllModelList(c *gin.Context) {
-	prices := relay_util.PricingInstance.GetAllPrices()
-	channelModel := model.ChannelGroup.Rule
+	// prices := relay_util.PricingInstance.GetAllPrices()
+	rule := model.ChannelGroup.Rule
 
-	modelsMap := make(map[string]bool)
-	for modelName := range prices {
-		modelsMap[modelName] = true
-	}
+	// modelsMap := make(map[string]bool)
 
-	for _, modelMap := range channelModel {
-		for modelName := range modelMap {
-			if _, ok := prices[modelName]; !ok {
-				modelsMap[modelName] = true
+	// 循环rule
+	groupsMap := make(map[string][]string)
+	for ruleName := range rule {
+		for ruleGroup := range rule[ruleName] {
+			for modelName := range rule[ruleName][ruleGroup] {
+				groupsMap[ruleName] = append(groupsMap[ruleName], modelName)
 			}
+			// groupsMap[ruleName] = append(groupsMap[ruleName], modelName)
 		}
 	}
 
-	var models []string
-	for modelName := range modelsMap {
-		models = append(models, modelName)
-	}
+	// for modelName := range prices {
+	// 	modelsMap[modelName] = true
+	// }
+
+	// for _, modelMap := range channelModel {
+
+	// for modelName := range modelMap {
+	// 	if _, ok := prices[modelName]; !ok {
+	// 		modelsMap[modelName] = true
+	// 	}
+	// }
+	// }
+
+	// var models []string
+	// for modelName := range modelsMap {
+	// 	models = append(models, modelName)
+	// }
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
-		"data":    models,
+		"data":    groupsMap,
 	})
 }
 

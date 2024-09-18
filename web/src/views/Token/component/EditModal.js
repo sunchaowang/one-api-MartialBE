@@ -34,11 +34,10 @@ const originInputs = {
   token_group: ''
 };
 
-const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRatio }) => {
+const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, tokenGroupRatio }) => {
   const { t } = useTranslation();
   const [inputs, setInputs] = useState(originInputs);
   const siteInfo = useSelector((state) => state.siteInfo);
-  const [directGroupRatio, setDirectGroupRatio] = useState([]);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -94,20 +93,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
     }
   }, [tokenId]);
 
-  useEffect(() => {
-    if (_directGroupRatio) {
-      setDirectGroupRatio(() =>
-        Object.keys(_directGroupRatio).map((key) => {
-          return {
-            label: key,
-            value: key,
-            ratio: _directGroupRatio[key]
-          };
-        })
-      );
-    }
-  }, [_directGroupRatio]);
-
   return (
     <Modal
       open={open}
@@ -135,7 +120,13 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
               <Select
                 name={'token_group'}
                 value={values.token_group}
-                options={directGroupRatio.map((item) => item)}
+                options={Object.keys(tokenGroupRatio).map((key) => {
+                  return {
+                    label: key,
+                    value: key,
+                    ratio: tokenGroupRatio[key]
+                  };
+                }).map((item) => item)}
                 onChange={(value) => setFieldValue('token_group', value)}
                 optionRender={(option) => (
                   <Space>
@@ -265,7 +256,7 @@ EditModal.propTypes = {
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   userIsAdmin: PropTypes.bool,
-  _directGroupRatio: PropTypes.object
+  tokenGroupRatio: PropTypes.object
 };
 
 export default EditModal;

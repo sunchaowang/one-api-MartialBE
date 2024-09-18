@@ -42,7 +42,7 @@ const getValidationSchema = (t) =>
     input: Yup.number().required(t('pricing_edit.requiredInput')),
     output: Yup.number().required(t('pricing_edit.requiredOutput')),
     models: Yup.array().min(1, t('pricing_edit.requiredModels')),
-    token_groups: Yup.array().min(1, t('模型分组不能为空'))
+    token_group: Yup.array().min(1, t('模型分组不能为空'))
   });
 
 const originInputs = {
@@ -52,15 +52,14 @@ const originInputs = {
   input: 0,
   output: 0,
   models: [],
-  token_groups: []
+  token_group: 'default'
 };
 
-const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, _directGroupRatio }) => {
+const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, tokenGroupRatio }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
   const [selectModel, setSelectModel] = useState([]);
-  const [directGroupRatio, setDirectGroupRatio] = useState([]);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -74,7 +73,8 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, _d
           type: values.type,
           channel_type: values.channel_type,
           input: values.input,
-          output: values.output
+          output: values.output,
+          token_group: values.token_group
         }
       });
       const { success, message } = res.data;
@@ -115,20 +115,6 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, _d
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pricesItem]);
-
-  useEffect(() => {
-    if (_directGroupRatio) {
-      setDirectGroupRatio(() =>
-        Object.keys(_directGroupRatio).map((key) => {
-          return {
-            label: key,
-            value: key,
-            ratio: _directGroupRatio[key]
-          };
-        })
-      );
-    }
-  }, [_directGroupRatio]);
 
   return (
     <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
@@ -204,13 +190,13 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, _d
                 )}
               </FormControl>
 
-              <FormControl fullWidth error={Boolean(touched.token_groups && errors.token_groups)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="token_groups-label">{t('模型渠道分组')}</InputLabel>
+              <FormControl fullWidth error={Boolean(touched.token_group && errors.token_group)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="token_group-label">{t('模型渠道分组')}</InputLabel>
                 <Select
-                  id="token_groups-label"
+                  id="token_group-label"
                   label={t('模型渠道分组')}
-                  value={values.token_groups}
-                  name="token_groups"
+                  value={values.token_group}
+                  name="token_group"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   MenuProps={{
@@ -220,20 +206,26 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, _d
                       }
                     }
                   }}
-                  multiple
-                  renderValue={(selected) => selected.join(', ')}
                 >
-                  {directGroupRatio.map((option) => {
-                    return (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    );
-                  })}
+                  {Object.keys(tokenGroupRatio)
+                    .map((key) => {
+                      return {
+                        label: key,
+                        value: key,
+                        ratio: tokenGroupRatio[key]
+                      };
+                    })
+                    .map((option) => {
+                      return (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      );
+                    })}
                 </Select>
-                {touched.token_groups && errors.token_groups && (
-                  <FormHelperText error id="helper-tex-token_groups-label">
-                    {errors.token_groups}
+                {touched.token_group && errors.token_group && (
+                  <FormHelperText error id="helper-tex-token_group-label">
+                    {errors.token_group}
                   </FormHelperText>
                 )}
               </FormControl>
@@ -350,5 +342,6 @@ EditModal.propTypes = {
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   ownedby: PropTypes.array,
-  noPriceModel: PropTypes.array
+  noPriceModel: PropTypes.array,
+  tokenGroupRatio: PropTypes.array
 };
