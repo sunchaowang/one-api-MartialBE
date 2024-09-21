@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"one-api/common/config"
 	"one-api/common/logger"
@@ -145,7 +144,6 @@ func (cc *ChannelsChooser) Next(group, modelName string, tokenGroup string, filt
 	if _, ok := cc.Rule[group]; !ok {
 		return nil, errors.New("group not found")
 	}
-	fmt.Println("cc.Rule[group]", cc.Rule[group])
 	if _, ok := cc.Rule[group][tokenGroup]; !ok {
 		return nil, errors.New("token group not found")
 	}

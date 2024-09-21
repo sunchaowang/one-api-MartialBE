@@ -116,17 +116,19 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, tokenGroupRatio
             </Form.Item>
 
             <Form.Item label={'令牌分组'} name={'token_group'}>
-              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(directGroupRatio)}</Typography.Text>
+              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(tokenGroupRatio)}</Typography.Text>
               <Select
                 name={'token_group'}
                 value={values.token_group}
-                options={Object.keys(tokenGroupRatio).map((key) => {
-                  return {
-                    label: key,
-                    value: key,
-                    ratio: tokenGroupRatio[key]
-                  };
-                }).map((item) => item)}
+                options={Object.keys(tokenGroupRatio)
+                  .map((key) => {
+                    return {
+                      label: key,
+                      value: key,
+                      ratio: tokenGroupRatio[key]
+                    };
+                  })
+                  .map((item) => item)}
                 onChange={(value) => setFieldValue('token_group', value)}
                 optionRender={(option) => (
                   <Space>

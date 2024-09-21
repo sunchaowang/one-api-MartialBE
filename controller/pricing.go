@@ -129,6 +129,7 @@ func DeletePrice(c *gin.Context) {
 }
 
 type PriceBatchRequest struct {
+	TokenGroup string `json:"token_group"`
 	OriginalModels []string `json:"original_models"`
 	relay_util.BatchPrices
 }
@@ -140,13 +141,12 @@ func BatchSetPrices(c *gin.Context) {
 		return
 	}
 
-	tokenGroup := c.Param("token_group")
-	if tokenGroup == "" {
+	if pricesBatch.TokenGroup == "" {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchSetPrices(tokenGroup, &pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil { // 修改调用
+	if err := relay_util.PricingInstance.BatchSetPrices(pricesBatch.TokenGroup, &pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}

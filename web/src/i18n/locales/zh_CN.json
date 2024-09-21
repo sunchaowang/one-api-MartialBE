@@ -555,7 +555,7 @@
           "label": "分组倍率",
           "placeholder": "为一个 JSON 文本，键为分组名称，值为倍率"
         },
-        "directGroupRatio": {
+        "tokenGroupRatio": {
           "label": "令牌分组倍率",
           "placeholder": "为一个 JSON 文本，键为分组名称，值为倍率"
         },

@@ -261,7 +261,7 @@ TokensTableRow.propTypes = {
   setModalTokenId: PropTypes.func
 };
 
-export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpenModal, { directGroupRatio }) {
+export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpenModal, { tokenGroupRatio }) {
   const handleStatus = async (item) => {
     const switchValue = item.status === 1 ? 2 : 1;
     const { success } = await manageToken(item.id, 'status', switchValue);
@@ -285,7 +285,7 @@ export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpe
         return (
           <>
             <Tag color={colorMap.get(item.token_group)}>{item.token_group}</Tag>
-            <Tag>倍率 {directGroupRatio[item.token_group]}</Tag>
+            <Tag>倍率 {tokenGroupRatio[item.token_group]}</Tag>
           </>
         );
       }

@@ -137,19 +137,20 @@ func ListModelsForUser(c *gin.Context) {
 func ListModelsForAdmin(c *gin.Context) {
 	prices := relay_util.PricingInstance.GetAllPrices()
 	var openAIModels []OpenAIModels
-	for tokenGroup, groupPrices := range prices { // 遍历 tokenGroup
-		for modelId, price := range groupPrices {
-			openAIModels = append(openAIModels, OpenAIModels{
-				Id:         modelId,
-				Object:     "model",
-				Created:    1677649963,
-				OwnedBy:    getModelOwnedBy(price.ChannelType),
-				Permission: nil,
-				Root:       nil,
-				Parent:     nil,
-				TokenGroup: tokenGroup, // 添加 tokenGroup
-			})
-		}
+	// for tokenGroup, groupPrices := range prices { // 遍历 tokenGroup
+		
+	// }
+	for modelId, price := range prices["default"] {
+		openAIModels = append(openAIModels, OpenAIModels{
+			Id:         modelId,
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    getModelOwnedBy(price.ChannelType),
+			Permission: nil,
+			Root:       nil,
+			Parent:     nil,
+			TokenGroup: "default", // 添加 tokenGroup
+		})
 	}
 
 	// 根据 OwnedBy 排序

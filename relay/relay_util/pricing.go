@@ -95,7 +95,7 @@ func (p *Pricing) Init() error {
 }
 
 // GetPrice returns the price of a model
-func (p *Pricing) GetPrice(tokenGroup, modelName string) *model.Price {
+func (p *Pricing) GetPrice(modelName string, tokenGroup string) *model.Price {
 	p.RLock()
 	defer p.RUnlock()
 
@@ -105,8 +105,20 @@ func (p *Pricing) GetPrice(tokenGroup, modelName string) *model.Price {
 		}
 	}
 
+	if groupPrices, ok := p.Prices["default"]; ok {
+		if price, ok := groupPrices[modelName]; ok {
+			return price
+		}
+	}
+
 	matchModel := utils.GetModelsWithMatch(&p.Match, modelName)
 	if groupPrices, ok := p.Prices[tokenGroup]; ok {
+		if price, ok := groupPrices[matchModel]; ok {
+			return price
+		}
+	}
+
+	if groupPrices, ok := p.Prices["default"]; ok {
 		if price, ok := groupPrices[matchModel]; ok {
 			return price
 		}

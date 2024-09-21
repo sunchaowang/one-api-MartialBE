@@ -68,6 +68,7 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, to
       const res = await API.post(`/api/prices/multiple`, {
         original_models: inputs.models,
         models: values.models,
+        token_group: values.token_group,
         price: {
           model: 'batch',
           type: values.type,

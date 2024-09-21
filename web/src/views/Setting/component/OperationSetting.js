@@ -687,13 +687,13 @@ const OperationSetting = () => {
               multiline
               maxRows={15}
               id="channel-TokenGroupRatio-label"
-              label={t('setting_index.operationSettings.rateSettings.directGroupRatio.label')}
+              label={t('setting_index.operationSettings.rateSettings.tokenGroupRatio.label')}
               value={inputs.TokenGroupRatio}
               name="TokenGroupRatio"
               onChange={handleInputChange}
               aria-describedby="helper-text-channel-TokenGroupRatio-label"
               minRows={5}
-              placeholder={t('setting_index.operationSettings.rateSettings.directGroupRatio.placeholder')}
+              placeholder={t('setting_index.operationSettings.rateSettings.tokenGroupRatio.placeholder')}
             />
           </FormControl>
           <Button
