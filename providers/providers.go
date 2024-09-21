@@ -18,6 +18,7 @@ import (
 	"one-api/providers/doubao"
 	"one-api/providers/fireworks"
 	"one-api/providers/gemini"
+	"one-api/providers/github"
 	"one-api/providers/groq"
 	"one-api/providers/hunyuan"
 	"one-api/providers/jina"
@@ -85,6 +86,7 @@ func init() {
 		config.ChannelTypeFireworksAI:  fireworks.ProviderFactory{},
 		config.ChannelTypeSiliconflow:  siliconflow.SiliconflowProviderFactory{},
 		config.ChannelTypeJina:         jina.JinaProviderFactory{},
+		config.ChannelTypeGithub:       github.GithubProviderFactory{},
 	}
 }
 

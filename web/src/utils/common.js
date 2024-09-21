@@ -46,7 +46,6 @@ export function showError(error) {
         default:
           enqueueSnackbar('错误：' + error.message, getSnackbarOptions('ERROR'));
       }
-      return;
     }
   } else {
     enqueueSnackbar('错误：' + error, getSnackbarOptions('ERROR'));
@@ -107,6 +106,31 @@ export async function onGitHubOAuthClicked(github_client_id, openInNewTab = fals
     return;
   }
   let url = `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`;
+  if (openInNewTab) {
+    window.open(url);
+  } else {
+    window.location.href = url;
+  }
+}
+
+export async function getOIDCEndpoint() {
+  try {
+    const res = await API.get('/api/oauth/endpoint');
+    const { success, message, data } = res.data;
+    if (success) {
+      return data;
+    } else {
+      showError(message);
+      return '';
+    }
+  } catch (error) {
+    return '';
+  }
+}
+
+export async function onOIDCAuthClicked(openInNewTab = false) {
+  const url = await getOIDCEndpoint();
+  if (!url) return;
   if (openInNewTab) {
     window.open(url);
   } else {
@@ -254,7 +278,7 @@ export async function onLinuxDOAuthClicked(linuxdo_client_id, openInNewTab, linu
 }
 
 export function getChatLinks(filterShow = false) {
-  let links = [];
+  let links;
   let siteInfo = JSON.parse(localStorage.getItem('siteInfo'));
   let chatLinks = JSON.parse(siteInfo?.chat_links || '[]');
 

@@ -10,6 +10,7 @@ const AuthRegister = Loadable(lazy(() => import('@/views/Authentication/Auth/Reg
 const GitHubOAuth = Loadable(lazy(() => import('@/views/Authentication/Auth/GitHubOAuth')));
 const LinuxDoOAuth = Loadable(lazy(() => import('@/views/Authentication/Auth/LinuxDoOAuth')));
 const LarkOAuth = Loadable(lazy(() => import('@/views/Authentication/Auth/LarkOAuth')));
+const OIDCOAuth = Loadable(lazy(() => import('views/Authentication/Auth/OIDCOAuth')));
 const ForgetPassword = Loadable(lazy(() => import('@/views/Authentication/Auth/ForgetPassword')));
 const ResetPassword = Loadable(lazy(() => import('@/views/Authentication/Auth/ResetPassword')));
 const Home = Loadable(lazy(() => import('@/views/Home')));
@@ -17,7 +18,6 @@ const About = Loadable(lazy(() => import('@/views/About')));
 const NotFoundView = Loadable(lazy(() => import('@/views/Error')));
 const Jump = Loadable(lazy(() => import('@/views/Jump')));
 const Playground = Loadable(lazy(() => import('@/views/Playground')));
-
 
 // ==============================|| AUTHENTICATION ROUTING ||============================== //
 
@@ -56,6 +56,10 @@ const OtherRoutes = {
     {
       path: '/oauth/linuxdo',
       element: <LinuxDoOAuth />
+    },
+    {
+      path: '/oauth/oidc',
+      element: <OIDCOAuth />
     },
     {
       path: '/oauth/lark',

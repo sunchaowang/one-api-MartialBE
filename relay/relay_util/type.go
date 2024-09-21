@@ -44,5 +44,6 @@ func init() {
 		config.ChannelTypeSiliconflow:  "Siliconflow",
 		config.ChannelTypeJina:         "Jina",
 		config.ChannelTypeRerank:       "Rerank",
+		config.ChannelTypeGithub:       "Github",
 	}
 }

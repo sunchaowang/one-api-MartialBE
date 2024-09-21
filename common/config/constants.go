@@ -39,6 +39,7 @@ var WeChatAuthEnabled = false
 var LarkAuthEnabled = false
 var TurnstileCheckEnabled = false
 var RegisterEnabled = true
+var OIDCAuthEnabled = false
 
 // chat cache
 var ChatCacheEnabled = false
@@ -89,6 +90,12 @@ var WeChatAccountQRCodeImageURL = ""
 
 var TurnstileSiteKey = ""
 var TurnstileSecretKey = ""
+
+var OIDCClientId = ""
+var OIDCClientSecret = ""
+var OIDCIssuer = ""
+var OIDCScopes = ""
+var OIDCUsernameClaims = ""
 
 var QuotaForNewUser = 0
 var QuotaForInviter = 0
@@ -204,6 +211,7 @@ const (
 	ChannelTypeFlux           = 50
 	ChannelTypeJina           = 51
 	ChannelTypeRerank         = 52
+	ChannelTypeGithub         = 53
 )
 
 var ChannelBaseURLs = []string{
@@ -260,6 +268,7 @@ var ChannelBaseURLs = []string{
 	"",                                      //50
 	"https://api.jina.ai",                   //51
 	"",                                      //52
+	"https://models.inference.ai.azure.com" 
 }
 
 const (
