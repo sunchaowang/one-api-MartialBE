@@ -34,7 +34,13 @@ function getLocale() {
 }
 
 root.render(
-  <ConfigProvider theme={{ algorithm: [isMobile() ? theme.compactAlgorithm : theme.compactAlgorithm] }} locale={getLocale()}>
+  <ConfigProvider
+    theme={{
+      algorithm: [isMobile() ? theme.compactAlgorithm : theme.compactAlgorithm],
+      token: { wireframe: true, borderRadius: 4, fontSize: 14 }
+    }}
+    locale={getLocale()}
+  >
     <Provider store={store}>
       <BrowserRouter basename={config.basename}>
         <App />

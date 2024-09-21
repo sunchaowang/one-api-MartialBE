@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Formik, useFormik } from 'formik';
 import dayjs from 'dayjs';
-import { Modal, Form, Input, InputNumber, Switch, DatePicker, Button, Alert, Divider, Space, Select, Tag, Typography } from 'antd';
+import { Modal, Form, Input, InputNumber, Switch, DatePicker, Button, Alert, Divider, Space, Select, Tag, Typography, Drawer } from 'antd';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { renderQuotaWithPrompt, showSuccess, showError } from '@/utils/common';
@@ -93,94 +93,110 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, tokenGroupRatio
     }
   }, [tokenId]);
 
+  const formik = useFormik({
+    initialValues: inputs,
+    validationSchema: validationSchema,
+    enableReinitialize: true,
+    onSubmit: submit
+  });
+
   return (
-    <Modal
+    <Drawer
       open={open}
       onCancel={onCancel}
+      onClose={onCancel}
       title={tokenId ? t('token_index.editToken') : t('token_index.createToken')}
-      footer={null}
-      width={800}
+      footer={
+        <Space>
+          <Button onClick={onCancel}>取消</Button>
+          <Button type="primary" onClick={formik.handleSubmit} loading={formik.isSubmitting}>
+            提交
+          </Button>
+        </Space>
+      }
+      width={600}
       destroyOnClose={true}
     >
-      <Divider />
       <Alert message={t('token_index.quotaNote')} type="info" style={{ marginBottom: 16 }} />
-      <Formik initialValues={inputs} enableReinitialize validationSchema={validationSchema} onSubmit={submit}>
-        {({ errors, touched, values, handleChange, handleBlur, handleSubmit, setFieldValue, isSubmitting }) => (
-          <Form layout="vertical" onFinish={handleSubmit}>
-            <Form.Item
-              label={t('token_index.name')}
-              validateStatus={touched.name && errors.name ? 'error' : ''}
-              help={touched.name && errors.name}
-            >
-              <Input name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} />
-            </Form.Item>
+      <Form layout="vertical">
+        <Form.Item
+          label={t('token_index.name')}
+          validateStatus={formik.touched.name && formik.errors.name ? 'error' : ''}
+          help={formik.touched.name && formik.errors.name}
+        >
+          <Input name="name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+        </Form.Item>
 
-            <Form.Item label={'令牌分组'} name={'token_group'}>
-              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(tokenGroupRatio)}</Typography.Text>
-              <Select
-                name={'token_group'}
-                value={values.token_group}
-                options={Object.keys(tokenGroupRatio)
-                  .map((key) => {
-                    return {
-                      label: key,
-                      value: key,
-                      ratio: tokenGroupRatio[key]
-                    };
-                  })
-                  .map((item) => item)}
-                onChange={(value) => setFieldValue('token_group', value)}
-                optionRender={(option) => (
-                  <Space>
-                    <span role="img" aria-label={option.data.label}>
-                      {option.data.value}
-                    </span>
-                    <Tag>倍率 {option.data.ratio}</Tag>
-                  </Space>
-                )}
-              ></Select>
-            </Form.Item>
-
-            <Form.Item label={t('token_index.expiryTime')}>
-              <DatePicker
-                showTime
-                disabled={values.expired_time === -1}
-                value={values.expired_time !== -1 ? dayjs.unix(values.expired_time) : null}
-                onChange={(date) => setFieldValue('expired_time', date ? date.unix() : -1)}
-              />
-              <Switch
-                size={'small'}
-                checked={values.expired_time === -1}
-                onChange={(checked) => setFieldValue('expired_time', checked ? -1 : dayjs().unix())}
-                style={{ marginLeft: 8 }}
-              />
-              <span style={{ marginLeft: 8 }}>{t('token_index.neverExpires')}</span>
-            </Form.Item>
-
-            <Form.Item
-              label={t('token_index.quota')}
-              validateStatus={touched.remain_quota && errors.remain_quota ? 'error' : ''}
-              help={touched.remain_quota && errors.remain_quota}
-            >
-              <InputNumber
-                name="remain_quota"
-                value={values.remain_quota}
-                onChange={(value) => setFieldValue('remain_quota', value)}
-                onBlur={handleBlur}
-                disabled={values.unlimited_quota}
-                addonAfter={renderQuotaWithPrompt(values.remain_quota, 6)}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-
-            <Form.Item>
+        <Form.Item label={'令牌分组'} name={'token_group'}>
+          <Typography.Text style={{ display: 'none' }}>{JSON.stringify(tokenGroupRatio)}</Typography.Text>
+          <Select
+            name={'token_group'}
+            value={formik.values.token_group}
+            options={Object.keys(tokenGroupRatio)
+              .map((key) => {
+                return {
+                  label: key,
+                  value: key,
+                  ratio: tokenGroupRatio[key]
+                };
+              })
+              .map((item) => item)}
+            onChange={(value) => formik.setFieldValue('token_group', value)}
+            optionRender={(option) => (
               <Space>
-                <Switch size={'small'} checked={values.unlimited_quota} onChange={(checked) => setFieldValue('unlimited_quota', checked)} />
-                <span>{t('token_index.unlimitedQuota')}</span>
+                <span role="img" aria-label={option.data.label}>
+                  {option.data.value}
+                </span>
+                <Tag>倍率 {option.data.ratio}</Tag>
               </Space>
-            </Form.Item>
+            )}
+          ></Select>
+        </Form.Item>
 
-            {/* {siteInfo.chat_cache_enabled && (
+        <Form.Item label={t('token_index.expiryTime')}>
+          <DatePicker
+            showTime
+            disabled={formik.values.expired_time === -1}
+            value={formik.values.expired_time !== -1 ? dayjs.unix(formik.values.expired_time) : null}
+            onChange={(date) => formik.setFieldValue('expired_time', date ? date.unix() : -1)}
+          />
+          <Switch
+            size={'small'}
+            checked={formik.values.expired_time === -1}
+            onChange={(checked) => formik.setFieldValue('expired_time', checked ? -1 : dayjs().unix())}
+            style={{ marginLeft: 8 }}
+          />
+          <span style={{ marginLeft: 8 }}>{t('token_index.neverExpires')}</span>
+        </Form.Item>
+
+        <Form.Item
+          label={t('token_index.quota')}
+          validateStatus={formik.touched.remain_quota && formik.errors.remain_quota ? 'error' : ''}
+          help={formik.touched.remain_quota && formik.errors.remain_quota}
+        >
+          <InputNumber
+            name="remain_quota"
+            value={formik.values.remain_quota}
+            onChange={(value) => formik.setFieldValue('remain_quota', value)}
+            onBlur={formik.handleBlur}
+            disabled={formik.values.unlimited_quota}
+            addonAfter={renderQuotaWithPrompt(formik.values.remain_quota, 6)}
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <Space>
+            <Switch
+              size={'small'}
+              checked={formik.values.unlimited_quota}
+              onChange={(checked) => formik.setFieldValue('unlimited_quota', checked)}
+            />
+            <span>{t('token_index.unlimitedQuota')}</span>
+          </Space>
+        </Form.Item>
+
+        {/* {siteInfo.chat_cache_enabled && (
               <Form.Item>
                 <Space>
                   <Switch size={'small'} checked={values.chat_cache} onChange={(checked) => setFieldValue('chat_cache', checked)} />
@@ -189,14 +205,38 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, tokenGroupRatio
               </Form.Item>
             )} */}
 
-            <Form.Item label="模型限制">
+        <Form.Item label="模型限制">
+          <Input.TextArea
+            name="model_limits"
+            value={formik.values.model_limits}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            disabled={!formik.values.model_limits_enabled}
+            placeholder="用逗号分隔模型名称，如：gpt-3.5-turbo,text-davinci-003"
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <Space>
+            <Switch
+              size={'small'}
+              checked={formik.values.model_limits_enabled}
+              onChange={(checked) => formik.setFieldValue('model_limits_enabled', checked)}
+            />
+            <span>模型限制</span>
+          </Space>
+        </Form.Item>
+
+        {userIsAdmin && (
+          <>
+            <Form.Item label="渠道限制">
               <Input.TextArea
-                name="model_limits"
-                value={values.model_limits}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={!values.model_limits_enabled}
-                placeholder="用逗号分隔模型名称，如：gpt-3.5-turbo,text-davinci-003"
+                name="channel_limits"
+                value={formik.values.channel_limits}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={!formik.values.channel_limits_enabled}
+                placeholder="用逗号分隔渠道名称"
               />
             </Form.Item>
 
@@ -204,51 +244,16 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, tokenGroupRatio
               <Space>
                 <Switch
                   size={'small'}
-                  checked={values.model_limits_enabled}
-                  onChange={(checked) => setFieldValue('model_limits_enabled', checked)}
+                  checked={formik.values.channel_limits_enabled}
+                  onChange={(checked) => formik.setFieldValue('channel_limits_enabled', checked)}
                 />
-                <span>模型限制</span>
+                <span>渠道限制</span>
               </Space>
             </Form.Item>
-
-            {userIsAdmin && (
-              <>
-                <Form.Item label="渠道限制">
-                  <Input.TextArea
-                    name="channel_limits"
-                    value={values.channel_limits}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    disabled={!values.channel_limits_enabled}
-                    placeholder="用逗号分隔渠道名称"
-                  />
-                </Form.Item>
-
-                <Form.Item>
-                  <Space>
-                    <Switch
-                      size={'small'}
-                      checked={values.channel_limits_enabled}
-                      onChange={(checked) => setFieldValue('channel_limits_enabled', checked)}
-                    />
-                    <span>渠道限制</span>
-                  </Space>
-                </Form.Item>
-              </>
-            )}
-
-            <Form.Item>
-              <Space>
-                <Button onClick={onCancel}>{t('token_index.cancel')}</Button>
-                <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                  {t('token_index.submit')}
-                </Button>
-              </Space>
-            </Form.Item>
-          </Form>
+          </>
         )}
-      </Formik>
-    </Modal>
+      </Form>
+    </Drawer>
   );
 };
 

@@ -278,13 +278,9 @@ export function tableRowColumns(t, isAdmin, manageToken, searchTokens, handleOpe
       label: '令牌分组',
       disableSort: false,
       render(col, item, index) {
-        const colorMap = new Map();
-        colorMap.set('default', 'blue');
-        colorMap.set('openai_direct', stringToTagColor('openai_direct'));
-        colorMap.set('claude_direct', stringToTagColor('claude_direct'));
         return (
           <>
-            <Tag color={colorMap.get(item.token_group)}>{item.token_group}</Tag>
+            <Tag color={stringToTagColor(item.token_group)}>{item.token_group}</Tag>
             <Tag>倍率 {tokenGroupRatio[item.token_group]}</Tag>
           </>
         );

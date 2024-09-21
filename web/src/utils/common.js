@@ -368,6 +368,9 @@ export function stringToRGB(str = '', opacity = 1) {
 }
 
 export function stringToTagColor(str = '') {
+  if (str === 'default') {
+    return 'blue';
+  }
   const colors = ['pink', 'red', 'orange', 'green', 'cyan', 'purple'];
   let hash = 0;
 
