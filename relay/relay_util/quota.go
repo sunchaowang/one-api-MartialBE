@@ -44,7 +44,7 @@ func NewQuota(c *gin.Context, modelName string, promptTokens int) (*Quota, *type
 		tokenGroup:   c.GetString("token_group"),
 	}
 
-	quota.price = *PricingInstance.GetPrice(quota.modelName)
+	quota.price = *PricingInstance.GetPrice(quota.modelName, quota.tokenGroup)
 	// 日志
 	fmt.Println("quota.price", quota.price)
 	quota.groupRatio = common.GetGroupRatio(c.GetString("group"))

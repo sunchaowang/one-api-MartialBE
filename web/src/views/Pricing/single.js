@@ -206,7 +206,14 @@ const Single = ({ ownedby, prices, reloadData, tokenGroupRatio }) => {
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
-        valueOptions: tokenGroupRatio ?? [],
+        valueOptions:
+          Object.keys(tokenGroupRatio).map((key) => {
+            return {
+              label: key,
+              value: key,
+              ratio: tokenGroupRatio[key]
+            };
+          }) ?? [],
         editable: true
       },
       {

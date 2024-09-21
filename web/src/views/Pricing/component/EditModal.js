@@ -42,7 +42,7 @@ const getValidationSchema = (t) =>
     input: Yup.number().required(t('pricing_edit.requiredInput')),
     output: Yup.number().required(t('pricing_edit.requiredOutput')),
     models: Yup.array().min(1, t('pricing_edit.requiredModels')),
-    token_group: Yup.array().min(1, t('模型分组不能为空'))
+    token_group: Yup.string().required(t('模型分组不能为空'))
   });
 
 const originInputs = {

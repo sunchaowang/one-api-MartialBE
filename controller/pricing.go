@@ -33,39 +33,18 @@ func GetPricesList(c *gin.Context) {
 }
 
 func GetAllModelList(c *gin.Context) {
-	// prices := relay_util.PricingInstance.GetAllPrices()
 	rule := model.ChannelGroup.Rule
 
-	// modelsMap := make(map[string]bool)
-
-	// 循环rule
-	groupsMap := make(map[string][]string)
-	for ruleName := range rule {
-		for ruleGroup := range rule[ruleName] {
-			for modelName := range rule[ruleName][ruleGroup] {
-				groupsMap[ruleName] = append(groupsMap[ruleName], modelName)
+	groupsMap := make(map[string]map[string][]string)
+	for userGroupName := range rule {
+		groupsMap[userGroupName] = make(map[string][]string)
+		for tokenGroupName := range rule[userGroupName] {
+			groupsMap[userGroupName][tokenGroupName] = make([]string, 0)
+			for modelName := range rule[userGroupName][tokenGroupName] {
+				groupsMap[userGroupName][tokenGroupName] = append(groupsMap[userGroupName][tokenGroupName], modelName)
 			}
-			// groupsMap[ruleName] = append(groupsMap[ruleName], modelName)
 		}
 	}
-
-	// for modelName := range prices {
-	// 	modelsMap[modelName] = true
-	// }
-
-	// for _, modelMap := range channelModel {
-
-	// for modelName := range modelMap {
-	// 	if _, ok := prices[modelName]; !ok {
-	// 		modelsMap[modelName] = true
-	// 	}
-	// }
-	// }
-
-	// var models []string
-	// for modelName := range modelsMap {
-	// 	models = append(models, modelName)
-	// }
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -94,8 +73,13 @@ func AddPrice(c *gin.Context) {
 
 func UpdatePrice(c *gin.Context) {
 	modelName := c.Param("model")
+	tokenGroup := c.Param("token_group")
 	if modelName == "" || len(modelName) < 2 {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("model name is required"))
+		return
+	}
+	if tokenGroup == "" {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
 		return
 	}
 	modelName = modelName[1:]
@@ -106,8 +90,9 @@ func UpdatePrice(c *gin.Context) {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
+	price.TokenGroup = tokenGroup
 
-	if err := relay_util.PricingInstance.UpdatePrice(modelName, &price); err != nil {
+	if err := relay_util.PricingInstance.UpdatePrice(tokenGroup, modelName, &price); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -120,14 +105,19 @@ func UpdatePrice(c *gin.Context) {
 
 func DeletePrice(c *gin.Context) {
 	modelName := c.Param("model")
+	tokenGroup := c.Param("token_group")
 	if modelName == "" || len(modelName) < 2 {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("model name is required"))
+		return
+	}
+	if tokenGroup == "" {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
 		return
 	}
 	modelName = modelName[1:]
 	modelName, _ = url.PathUnescape(modelName)
 
-	if err := relay_util.PricingInstance.DeletePrice(modelName); err != nil {
+	if err := relay_util.PricingInstance.DeletePrice(tokenGroup, modelName); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -150,7 +140,13 @@ func BatchSetPrices(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchSetPrices(&pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil {
+	tokenGroup := c.Param("token_group")
+	if tokenGroup == "" {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
+		return
+	}
+
+	if err := relay_util.PricingInstance.BatchSetPrices(tokenGroup, &pricesBatch.BatchPrices, pricesBatch.OriginalModels); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
@@ -172,7 +168,13 @@ func BatchDeletePrices(c *gin.Context) {
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchDeletePrices(pricesBatch.Models); err != nil {
+	tokenGroup := c.Param("token_group")
+	if tokenGroup == "" {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
+		return
+	}
+
+	if err := relay_util.PricingInstance.BatchDeletePrices(tokenGroup, pricesBatch.Models); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}

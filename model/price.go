@@ -80,6 +80,7 @@ func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
 			ChannelType: prices.ChannelType,
 			Input:       prices.Input,
 			Output:      prices.Output,
+			TokenGroup:  prices.TokenGroup,
 		}).Error
 
 	return err
