@@ -353,7 +353,7 @@ export function useStateWithCallback(initialState) {
 
 
 
-export function stringToRGB(str, opacity = 1) {
+export function stringToRGB(str = '', opacity = 1) {
   let hash = 0;
   // Create a hash from the string
   for (let i = 0; i < str.length; i++) {
@@ -367,7 +367,7 @@ export function stringToRGB(str, opacity = 1) {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
-export function stringToTagColor(str) {
+export function stringToTagColor(str = '') {
   const colors = ['pink', 'red', 'orange', 'green', 'cyan', 'purple'];
   let hash = 0;
 

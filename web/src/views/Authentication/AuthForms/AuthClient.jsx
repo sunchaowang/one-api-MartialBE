@@ -1,12 +1,14 @@
 import { Box, useMediaQuery } from '@mui/material';
 import AnimateButton from '@/ui-component/extended/AnimateButton';
 import { Button, Row, Col, Space, Divider } from 'antd';
-import { onGitHubOAuthClicked, onLarkOAuthClicked, onLinuxDOAuthClicked } from '@/utils/common';
+import { onGitHubOAuthClicked, onLarkOAuthClicked, onLinuxDOAuthClicked, onOIDCAuthClicked } from '@/utils/common';
 import Github from '@/assets/images/icons/github.svg';
 import LinuxDo from '@/assets/images/icons/linuxdo.svg?react';
 import Wechat from '@/assets/images/icons/wechat.svg';
 import WechatModal from '@/views/Authentication/AuthForms/WechatModal';
 import Lark from '@/assets/images/icons/lark.svg';
+import Oidc from '@/assets/images/icons/oidc.svg';
+
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useLogin from '@/hooks/useLogin';
@@ -31,9 +33,13 @@ const AuthClient = () => {
   }
 
   // 寻找 oauth 为 true 的个数
-  const oauthClientCounts = [siteInfo.github_oauth, siteInfo.linuxdo_oauth, siteInfo.wechat_login, siteInfo.lark_client_id].filter(
-    (item) => !!item
-  ).length;
+  const oauthClientCounts = [
+    siteInfo.github_oauth,
+    siteInfo.linuxdo_oauth,
+    siteInfo.wechat_login,
+    siteInfo.lark_client_id,
+    siteInfo.oidc_oauth
+  ].filter((item) => !!item).length;
 
   const handleWechatOpen = () => {
     setOpenWechat(true);
@@ -140,6 +146,28 @@ const AuthClient = () => {
                   </Button>
                 </AnimateButton>
               </Col>
+            )}
+            {/*OIDC配置*/}
+            {siteInfo.oidc_auth && (
+              <Grid item xs={12}>
+                <AnimateButton>
+                  <Button
+                    disableElevation
+                    fullWidth
+                    onClick={() => onOIDCAuthClicked()}
+                    size="large"
+                    variant="outlined"
+                    sx={{
+                      ...theme.typography.LoginButton
+                    }}
+                  >
+                    <Box sx={{ mr: { xs: 1, sm: 2, width: 20 }, display: 'flex', alignItems: 'center' }}>
+                      <img src={Oidc} alt="oidc" width={25} height={25} style={{ marginRight: matchDownSM ? 8 : 16 }} />
+                    </Box>
+                    {t('login.useOIDCLogin')}
+                  </Button>
+                </AnimateButton>
+              </Grid>
             )}
             <Col item xs={12}>
               <Box
