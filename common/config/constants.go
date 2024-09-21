@@ -268,7 +268,7 @@ var ChannelBaseURLs = []string{
 	"",                                      //50
 	"https://api.jina.ai",                   //51
 	"",                                      //52
-	"https://models.inference.ai.azure.com" 
+	"https://models.inference.ai.azure.com", //53
 }
 
 const (

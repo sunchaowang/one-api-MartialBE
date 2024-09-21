@@ -201,13 +201,6 @@ export const CHANNEL_OPTIONS = {
     color: 'orange',
     url: 'https://portal.azure.com/'
   },
-  49: {
-    key: 49,
-    text: 'Github',
-    value: 49,
-    color: 'default',
-    url: 'https://github.com/marketplace/models'
-  },
   8: {
     key: 8,
     text: '自定义渠道',
@@ -256,5 +249,12 @@ export const CHANNEL_OPTIONS = {
     value: 51,
     color: 'orange',
     url: 'https://jina.ai/'
+  },
+  53: {
+    key: 53,
+    text: 'Github',
+    value: 53,
+    color: 'default',
+    url: 'https://github.com/marketplace/models'
   }
 };
