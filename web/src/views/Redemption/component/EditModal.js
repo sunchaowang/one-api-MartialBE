@@ -1,23 +1,9 @@
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
-import { useTheme } from '@mui/material/styles';
+import { Formik, useFormik } from 'formik';
 import { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Divider,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  FormHelperText
-} from '@mui/material';
+import { Modal, Form, Input, Button, InputNumber } from 'antd';
 import { useTranslation } from 'react-i18next';
-
 import { renderQuotaWithPrompt, showSuccess, showError, downloadTextAsFile, trims } from '@/utils/common';
 import { API } from '@/utils/api';
 
@@ -25,12 +11,14 @@ const getValidationSchema = (t) =>
   Yup.object().shape({
     is_edit: Yup.boolean(),
     name: Yup.string().required(t('validation.requiredName')),
-    quota: Yup.number().min(0, t('redemption_edit.requiredQuota')),
-    count: Yup.number().when('is_edit', {
-      is: false,
-      then: Yup.number().min(1, t('redemption_edit.requiredCount')),
-      otherwise: Yup.number()
-    })
+    quota: Yup.number().min(0, t('redemption_edit.requiredQuota')).required(t('validation.requiredQuota')),
+    count: Yup.number()
+      .when('is_edit', {
+        is: false,
+        then: Yup.number().min(1, t('redemption_edit.requiredCount')),
+        otherwise: Yup.number()
+      })
+      .required(t('validation.requiredCount'))
   });
 
 const originInputs = {
@@ -42,7 +30,6 @@ const originInputs = {
 
 const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
   const { t } = useTranslation();
-  const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
@@ -77,7 +64,7 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
         setErrors({ submit: message });
       }
     } catch (error) {
-      return;
+      setSubmitting(false);
     }
   };
 
@@ -98,97 +85,76 @@ const EditModal = ({ open, redemptiondId, onCancel, onOk }) => {
 
   useEffect(() => {
     if (redemptiondId) {
-      loadRedemptiond().then();
+      loadRedemptiond();
     } else {
       setInputs(originInputs);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redemptiondId]);
 
+  const formik = useFormik({
+    initialValues: inputs,
+    validationSchema: getValidationSchema(t),
+    onSubmit: submit,
+    enableReinitialize: true
+  });
+
   return (
-    <Dialog open={open} onClose={onCancel} fullWidth maxWidth={'md'}>
-      <DialogTitle sx={{ margin: '0px', fontWeight: 700, lineHeight: '1.55556', padding: '24px', fontSize: '1.125rem' }}>
-        {redemptiondId ? t('common.edit') : t('common.create')}
-      </DialogTitle>
-      <Divider />
-      <DialogContent>
-        <Formik initialValues={inputs} enableReinitialize validationSchema={getValidationSchema(t)} onSubmit={submit}>
-          {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isSubmitting }) => (
-            <form noValidate onSubmit={handleSubmit}>
-              <FormControl fullWidth error={Boolean(touched.name && errors.name)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-name-label">{t('redemptionPage.headLabels.name')}</InputLabel>
-                <OutlinedInput
-                  id="channel-name-label"
-                  label={t('redemptionPage.headLabels.name')}
-                  type="text"
-                  value={values.name}
-                  name="name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  inputProps={{ autoComplete: 'name' }}
-                  aria-describedby="helper-text-channel-name-label"
-                />
-                {touched.name && errors.name && (
-                  <FormHelperText error id="helper-tex-channel-name-label">
-                    {errors.name}
-                  </FormHelperText>
-                )}
-              </FormControl>
+    <Modal
+      open={open}
+      onCancel={onCancel}
+      onClose={onCancel}
+      title={redemptiondId ? t('common.edit') : t('common.create')}
+      footer={[
+        <Button onClick={onCancel}>{t('common.cancel')}</Button>,
+        <Button type="primary" onClick={formik.handleSubmit}>
+          {t('common.submit')}
+        </Button>
+      ]}
+    >
+      <Form layout="vertical">
+        <Form.Item
+          label={t('redemptionPage.headLabels.name')}
+          required={true}
+          validateStatus={formik.touched.name && formik.errors.name ? 'error' : ''}
+          help={formik.touched.name && formik.errors.name}
+        >
+          <Input name="name" value={formik.values.name} onBlur={formik.handleBlur} onChange={formik.handleChange} />
+        </Form.Item>
 
-              <FormControl fullWidth error={Boolean(touched.quota && errors.quota)} sx={{ ...theme.typography.otherInput }}>
-                <InputLabel htmlFor="channel-quota-label">{t('redemptionPage.headLabels.quota')}</InputLabel>
-                <OutlinedInput
-                  id="channel-quota-label"
-                  label={t('redemptionPage.headLabels.quota')}
-                  type="number"
-                  value={values.quota}
-                  name="quota"
-                  endAdornment={<InputAdornment position="end">{renderQuotaWithPrompt(values.quota)}</InputAdornment>}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  aria-describedby="helper-text-channel-quota-label"
-                  disabled={values.unlimited_quota}
-                />
+        <Form.Item
+          label={t('redemptionPage.headLabels.quota')}
+          required={true}
+          validateStatus={formik.touched.quota && formik.errors.quota ? 'error' : ''}
+          help={formik.touched.quota && formik.errors.quota}
+        >
+          <InputNumber
+            name="quota"
+            value={formik.values.quota}
+            onBlur={formik.handleBlur}
+            onChange={(value) => formik.setFieldValue('quota', value)}
+            addonAfter={renderQuotaWithPrompt(formik.values.quota)}
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
 
-                {touched.quota && errors.quota && (
-                  <FormHelperText error id="helper-tex-channel-quota-label">
-                    {errors.quota}
-                  </FormHelperText>
-                )}
-              </FormControl>
-
-              {!values.is_edit && (
-                <FormControl fullWidth error={Boolean(touched.count && errors.count)} sx={{ ...theme.typography.otherInput }}>
-                  <InputLabel htmlFor="channel-count-label">{t('redemption_edit.number')}</InputLabel>
-                  <OutlinedInput
-                    id="channel-count-label"
-                    label={t('redemption_edit.number')}
-                    type="number"
-                    value={values.count}
-                    name="count"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    aria-describedby="helper-text-channel-count-label"
-                  />
-
-                  {touched.count && errors.count && (
-                    <FormHelperText error id="helper-tex-channel-count-label">
-                      {errors.count}
-                    </FormHelperText>
-                  )}
-                </FormControl>
-              )}
-              <DialogActions>
-                <Button onClick={onCancel}>{t('common.cancel')}</Button>
-                <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                  {t('common.submit')}
-                </Button>
-              </DialogActions>
-            </form>
-          )}
-        </Formik>
-      </DialogContent>
-    </Dialog>
+        {!formik.values.is_edit && (
+          <Form.Item
+            label={t('redemption_edit.number')}
+            required={true}
+            validateStatus={formik.touched.count && formik.errors.count ? 'error' : ''}
+            help={formik.touched.count && formik.errors.count}
+          >
+            <InputNumber
+              name="count"
+              value={formik.values.count}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
+        )}
+      </Form>
+    </Modal>
   );
 };
 

@@ -1,29 +1,17 @@
 import { useState, useEffect } from 'react';
 import { showError, showSuccess, trims } from '@/utils/common';
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableContainer from '@mui/material/TableContainer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import TablePagination from '@mui/material/TablePagination';
-import LinearProgress from '@mui/material/LinearProgress';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Toolbar from '@mui/material/Toolbar';
-
-import { Button, Card, Box, Stack, Container, Typography } from '@mui/material';
-import RedemptionTableRow from './component/TableRow';
+import { Table, Button, Card, Typography, Space, Row, Col, Modal, Input, Form, Spin } from 'antd';
+import { RedemptionTableRowRender } from './component/TableRow';
 import KeywordTableHead from '@/ui-component/TableHead';
-import TableToolBar from '@/ui-component/TableToolBar';
 import { API } from '@/utils/api';
 import { ITEMS_PER_PAGE } from '@/constants';
-import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
 export default function Redemption() {
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [order, setOrder] = useState('desc');
   const [orderBy, setOrderBy] = useState('id');
   const [rowsPerPage, setRowsPerPage] = useState(ITEMS_PER_PAGE);
@@ -36,7 +24,7 @@ export default function Redemption() {
   const [openModal, setOpenModal] = useState(false);
   const [editRedemptionId, setEditRedemptionId] = useState(0);
 
-  const handleSort = (event, id) => {
+  const handleSort = (id) => {
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
       setOrder(isAsc ? 'desc' : 'asc');
@@ -44,35 +32,33 @@ export default function Redemption() {
     }
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = (page) => {
+    setPage(page);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+  const handleChangeRowsPerPage = (value) => {
+    setPage(1);
+    setRowsPerPage(value);
   };
 
   const searchRedemptions = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    setPage(0);
+    setPage(1);
     setSearchKeyword(formData.get('keyword'));
   };
 
-  const fetchData = async (page, rowsPerPage, keyword, order, orderBy) => {
+  const fetchData = async () => {
     setSearching(true);
-    keyword = trims(keyword);
+    const keyword = trims(searchKeyword);
+    const orderStr = order === 'desc' ? '-' + orderBy : orderBy;
     try {
-      if (orderBy) {
-        orderBy = order === 'desc' ? '-' + orderBy : orderBy;
-      }
       const res = await API.get(`/api/redemption/`, {
         params: {
-          page: page + 1,
+          page,
           size: rowsPerPage,
-          keyword: keyword,
-          order: orderBy
+          keyword,
+          order: orderStr
         }
       });
       const { success, message, data } = res.data;
@@ -88,15 +74,14 @@ export default function Redemption() {
     setSearching(false);
   };
 
-  // 处理刷新
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setOrderBy('id');
     setOrder('desc');
     setRefreshFlag(!refreshFlag);
   };
 
   useEffect(() => {
-    fetchData(page, rowsPerPage, searchKeyword, order, orderBy);
+    fetchData();
   }, [page, rowsPerPage, searchKeyword, order, orderBy, refreshFlag]);
 
   const manageRedemptions = async (id, action, value) => {
@@ -125,7 +110,6 @@ export default function Redemption() {
       } else {
         showError(message);
       }
-
       return res.data;
     } catch (error) {
       return;
@@ -151,77 +135,107 @@ export default function Redemption() {
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">{t('redemptionPage.pageTitle')}</Typography>
-
-        <Button variant="contained" color="primary" startIcon={<IconPlus />} onClick={() => handleOpenModal(0)}>
-          {t('redemptionPage.createRedemptionCode')}
-        </Button>
-      </Stack>
-      <Card>
-        <Box component="form" onSubmit={searchRedemptions} noValidate>
-          <TableToolBar placeholder={t('redemptionPage.searchPlaceholder')} />
-        </Box>
-        <Toolbar
-          sx={{
-            textAlign: 'right',
-            height: 50,
-            display: 'flex',
-            justifyContent: 'space-between',
-            p: (theme) => theme.spacing(0, 1, 0, 3)
+      <Card
+        title={t('redemptionPage.pageTitle')}
+        extra={
+          <Button type="primary" onClick={() => handleOpenModal(0)}>
+            {t('redemptionPage.createRedemptionCode')}
+          </Button>
+        }
+      >
+        <Form layout="horizontal">
+          <Form.Item>
+            <Input placeholder={t('redemptionPage.searchPlaceholder')} onChange={(value) => setSearchKeyword(value.target.value)} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" onClick={searchRedemptions}>
+              搜索
+            </Button>
+            {/* <Button onClick={handleReset}>重置</Button> */}
+          </Form.Item>
+        </Form>
+        <Table
+          columns={[
+            {
+              id: 'id',
+              dataIndex: 'id',
+              key: 'id',
+              title: t('redemptionPage.headLabels.id'),
+              disableSort: false,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'id', t, manageRedemptions)
+            },
+            {
+              id: 'name',
+              dataIndex: 'name',
+              key: 'name',
+              title: t('redemptionPage.headLabels.name'),
+              disableSort: false,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'name', t, manageRedemptions)
+            },
+            {
+              id: 'status',
+              dataIndex: 'status',
+              key: 'status',
+              title: t('redemptionPage.headLabels.status'),
+              disableSort: false,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'status', t, manageRedemptions)
+            },
+            {
+              id: 'quota',
+              dataIndex: 'quota',
+              key: 'quota',
+              title: t('redemptionPage.headLabels.quota') + '($)',
+              disableSort: false,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'quota', t, manageRedemptions)
+            },
+            {
+              id: 'created_time',
+              dataIndex: 'created_time',
+              key: 'created_time',
+              title: t('redemptionPage.headLabels.createdTime'),
+              disableSort: false,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'created_time', t, manageRedemptions)
+            },
+            {
+              id: 'redeemed_time',
+              dataIndex: 'redeemed_time',
+              key: 'redeemed_time',
+              title: t('redemptionPage.headLabels.redeemedTime'),
+              disableSort: false,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'redeemed_time', t, manageRedemptions)
+            },
+            {
+              id: 'action',
+              dataIndex: 'action',
+              key: 'action',
+              title: t('redemptionPage.headLabels.action'),
+              disableSort: true,
+              render: (text, record, index) => RedemptionTableRowRender(text, record, index, 'action', t, manageRedemptions)
+            }
+          ]}
+          dataSource={redemptions}
+          rowKey="id"
+          pagination={{
+            current: page,
+            pageSize: rowsPerPage,
+            total: listCount,
+            onChange: handleChangePage,
+            pageSizeOptions: [10, 25, 30],
+            onShowSizeChange: handleChangeRowsPerPage
           }}
         >
-          <Container>
-            <ButtonGroup variant="outlined" aria-label="outlined small primary button group">
-              <Button onClick={handleRefresh} startIcon={<IconRefresh width={'18px'} />}>
-                {t('redemptionPage.refreshButton')}
-              </Button>
-            </ButtonGroup>
-          </Container>
-        </Toolbar>
-        {searching && <LinearProgress />}
-        <PerfectScrollbar component="div">
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }} size={'small'}>
-              <KeywordTableHead
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'id', label: t('redemptionPage.headLabels.id'), disableSort: false },
-                  { id: 'name', label: t('redemptionPage.headLabels.name'), disableSort: false },
-                  { id: 'status', label: t('redemptionPage.headLabels.status'), disableSort: false },
-                  { id: 'quota', label: t('redemptionPage.headLabels.quota'), disableSort: false },
-                  { id: 'created_time', label: t('redemptionPage.headLabels.createdTime'), disableSort: false },
-                  { id: 'redeemed_time', label: t('redemptionPage.headLabels.redeemedTime'), disableSort: false },
-                  { id: 'action', label: t('redemptionPage.headLabels.action'), disableSort: true }
-                ]}
+          {/* <Table.Body>
+            {redemptions.map((row) => (
+              <RedemptionTableRow
+                item={row}
+                manageRedemption={manageRedemptions}
+                key={row.id}
+                handleOpenModal={handleOpenModal}
+                setModalRedemptionId={setEditRedemptionId}
               />
-              <TableBody>
-                {redemptions.map((row) => (
-                  <RedemptionTableRow
-                    item={row}
-                    manageRedemption={manageRedemptions}
-                    key={row.id}
-                    handleOpenModal={handleOpenModal}
-                    setModalRedemptionId={setEditRedemptionId}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </PerfectScrollbar>
-        <TablePagination
-          page={page}
-          component="div"
-          count={listCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[10, 25, 30]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          showFirstButton
-          showLastButton
-        />
+            ))}
+          </Table.Body> */}
+        </Table>
       </Card>
       <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} redemptiondId={editRedemptionId} />
     </>
