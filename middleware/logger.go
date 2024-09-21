@@ -42,7 +42,7 @@ func GinzapWithConfig() gin.HandlerFunc {
 			zap.Int("token_id", c.GetInt("token_id")),
 			zap.String("token_name", c.GetString("token_name")),
 			zap.Int("channel_id", c.GetInt("channel_id")),
-			zap.String("direct_group", c.GetString("token_channel_direct_group")),
+			zap.String("token_group", c.GetString("token_group")),
 		}
 
 		if len(c.Errors) > 0 {

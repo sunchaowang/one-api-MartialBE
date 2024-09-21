@@ -11,10 +11,11 @@ var GroupRatio = map[string]float64{
 	"svip":    1,
 }
 
-var DirectGroupRatio = map[string]float64{
+var TokenGroupRatio = map[string]float64{
 	"default":       1,
 	"openai_direct": 1,
 	"claude_direct": 1,
+	"azure_direct":  1,
 }
 
 func GroupRatio2JSONString() string {
@@ -25,9 +26,9 @@ func GroupRatio2JSONString() string {
 	return string(jsonBytes)
 }
 
-func DirectGroupRatio2JSONString() string {
-	jsonBytes, err := json.Marshal(DirectGroupRatio)
-	if err!= nil {
+func TokenGroupRatio2JSONString() string {
+	jsonBytes, err := json.Marshal(TokenGroupRatio)
+	if err != nil {
 		logger.SysError("error marshalling model ratio: " + err.Error())
 	}
 	return string(jsonBytes)
@@ -38,9 +39,9 @@ func UpdateGroupRatioByJSONString(jsonStr string) error {
 	return json.Unmarshal([]byte(jsonStr), &GroupRatio)
 }
 
-func UpdateDirectGroupRatioByJSONString(jsonStr string) error {
-	DirectGroupRatio = make(map[string]float64)
-	return json.Unmarshal([]byte(jsonStr), &DirectGroupRatio)
+func UpdateTokenGroupRatioByJSONString(jsonStr string) error {
+	TokenGroupRatio = make(map[string]float64)
+	return json.Unmarshal([]byte(jsonStr), &TokenGroupRatio)
 }
 
 func GetGroupRatio(name string) float64 {
@@ -52,9 +53,9 @@ func GetGroupRatio(name string) float64 {
 	return ratio
 }
 
-func GetDirectGroupRatio(name string) float64 {
-	ratio, ok := DirectGroupRatio[name]
-	if!ok {
+func GetTokenGroupRatio(name string) float64 {
+	ratio, ok := TokenGroupRatio[name]
+	if !ok {
 		logger.SysError("direct group ratio not found: " + name)
 		return 1
 	}

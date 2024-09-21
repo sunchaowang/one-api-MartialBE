@@ -3,7 +3,6 @@ package relay_util
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"one-api/common/config"
 	"one-api/common/logger"
 	"one-api/common/utils"
@@ -22,7 +21,7 @@ var PricingInstance *Pricing
 type Pricing struct {
 	sync.RWMutex
 	Prices map[string]map[string]*model.Price `json:"models"`
-	Match  []string                `json:"-"`
+	Match  []string                           `json:"-"`
 }
 
 type BatchPrices struct {
@@ -70,10 +69,10 @@ func (p *Pricing) Init() error {
 	newMatch := make(map[string]bool)
 
 	for _, price := range prices {
-		if _, ok := newPrices[price.DirectGroup]; !ok {
-			newPrices[price.DirectGroup] = make(map[string]*model.Price)
+		if _, ok := newPrices[price.TokenGroup]; !ok {
+			newPrices[price.TokenGroup] = make(map[string]*model.Price)
 		}
-		newPrices[price.DirectGroup][price.Model] = price
+		newPrices[price.TokenGroup][price.Model] = price
 		if strings.HasSuffix(price.Model, "*") {
 			if _, ok := newMatch[price.Model]; !ok {
 				newMatch[price.Model] = true
@@ -96,18 +95,33 @@ func (p *Pricing) Init() error {
 }
 
 // GetPrice returns the price of a model
-func (p *Pricing) GetPrice(modelName string, directGroup string) *model.Price {
+func (p *Pricing) GetPrice(modelName string, tokenGroup string) *model.Price {
 	p.RLock()
 	defer p.RUnlock()
 
-	fmt.Println("GetPrice p.Prices", modelName, directGroup)
-	if price, ok := p.Prices[directGroup][modelName]; ok {
-		return price
+	if groupPrices, ok := p.Prices[tokenGroup]; ok {
+		if price, ok := groupPrices[modelName]; ok {
+			return price
+		}
+	}
+
+	if groupPrices, ok := p.Prices["default"]; ok {
+		if price, ok := groupPrices[modelName]; ok {
+			return price
+		}
 	}
 
 	matchModel := utils.GetModelsWithMatch(&p.Match, modelName)
-	if price, ok := p.Prices[directGroup][matchModel]; ok {
-		return price
+	if groupPrices, ok := p.Prices[tokenGroup]; ok {
+		if price, ok := groupPrices[matchModel]; ok {
+			return price
+		}
+	}
+
+	if groupPrices, ok := p.Prices["default"]; ok {
+		if price, ok := groupPrices[matchModel]; ok {
+			return price
+		}
 	}
 
 	return &model.Price{
@@ -115,7 +129,7 @@ func (p *Pricing) GetPrice(modelName string, directGroup string) *model.Price {
 		ChannelType: config.ChannelTypeUnknown,
 		Input:       model.DefaultPrice,
 		Output:      model.DefaultPrice,
-		DirectGroup: "default",
+		TokenGroup:  "default",
 	}
 }
 
@@ -125,8 +139,8 @@ func (p *Pricing) GetAllPrices() map[string]map[string]*model.Price {
 
 func (p *Pricing) GetAllPricesList() []*model.Price {
 	var prices []*model.Price
-	for _, group := range p.Prices {
-		for _, price := range group {
+	for _, groupPrices := range p.Prices {
+		for _, price := range groupPrices {
 			prices = append(prices, price)
 		}
 	}
@@ -134,16 +148,19 @@ func (p *Pricing) GetAllPricesList() []*model.Price {
 	return prices
 }
 
-func (p *Pricing) updateRawPrice(modelName string, price *model.Price) error {
-	if _, ok := p.Prices[modelName]; !ok {
+func (p *Pricing) updateRawPrice(tokenGroup, modelName string, price *model.Price) error {
+	if _, ok := p.Prices[tokenGroup]; !ok {
+		return errors.New("token group not found")
+	}
+	if _, ok := p.Prices[tokenGroup][modelName]; !ok {
 		return errors.New("model not found")
 	}
 
-	if _, ok := p.Prices[price.Model]; modelName != price.Model && ok {
+	if _, ok := p.Prices[price.TokenGroup][price.Model]; modelName != price.Model && ok {
 		return errors.New("model names cannot be duplicated")
 	}
 
-	if err := p.deleteRawPrice(modelName, price.DirectGroup); err != nil {
+	if err := p.deleteRawPrice(tokenGroup, modelName); err != nil {
 		return err
 	}
 
@@ -151,9 +168,9 @@ func (p *Pricing) updateRawPrice(modelName string, price *model.Price) error {
 }
 
 // UpdatePrice updates the price of a model
-func (p *Pricing) UpdatePrice(modelName string, price *model.Price) error {
+func (p *Pricing) UpdatePrice(tokenGroup, modelName string, price *model.Price) error {
 
-	if err := p.updateRawPrice(modelName, price); err != nil {
+	if err := p.updateRawPrice(tokenGroup, modelName, price); err != nil {
 		return err
 	}
 
@@ -163,7 +180,10 @@ func (p *Pricing) UpdatePrice(modelName string, price *model.Price) error {
 }
 
 func (p *Pricing) addRawPrice(price *model.Price) error {
-	if _, ok := p.Prices[price.Model]; ok {
+	if _, ok := p.Prices[price.TokenGroup]; !ok {
+		p.Prices[price.TokenGroup] = make(map[string]*model.Price)
+	}
+	if _, ok := p.Prices[price.TokenGroup][price.Model]; ok {
 		return errors.New("model already exists")
 	}
 
@@ -181,8 +201,11 @@ func (p *Pricing) AddPrice(price *model.Price) error {
 	return err
 }
 
-func (p *Pricing) deleteRawPrice(modelName string, directGroup string) error {
-	item, ok := p.Prices[directGroup][modelName]
+func (p *Pricing) deleteRawPrice(tokenGroup, modelName string) error {
+	if _, ok := p.Prices[tokenGroup]; !ok {
+		return errors.New("token group not found")
+	}
+	item, ok := p.Prices[tokenGroup][modelName]
 	if !ok {
 		return errors.New("model not found")
 	}
@@ -191,8 +214,8 @@ func (p *Pricing) deleteRawPrice(modelName string, directGroup string) error {
 }
 
 // DeletePrice deletes a price from the Pricing instance
-func (p *Pricing) DeletePrice(modelName string, directGroup string) error {
-	if err := p.deleteRawPrice(modelName, directGroup); err != nil {
+func (p *Pricing) DeletePrice(tokenGroup, modelName string) error {
+	if err := p.deleteRawPrice(tokenGroup, modelName); err != nil {
 		return err
 	}
 
@@ -240,7 +263,9 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 	var newPrices []*model.Price
 
 	for _, price := range pricing {
-		if _, ok := p.Prices[price.Model]; !ok {
+		if _, ok := p.Prices[price.TokenGroup]; !ok {
+			newPrices = append(newPrices, price)
+		} else if _, ok := p.Prices[price.TokenGroup][price.Model]; !ok {
 			newPrices = append(newPrices, price)
 		}
 	}
@@ -263,10 +288,10 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 }
 
 // BatchDeletePrices deletes the prices of multiple models
-func (p *Pricing) BatchDeletePrices(models []string, directGroup string) error {
+func (p *Pricing) BatchDeletePrices(tokenGroup string, models []string) error {
 	tx := model.DB.Begin()
 
-	err := model.DeletePrices(tx, models, directGroup)
+	err := model.DeletePrices(tx, models)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -277,14 +302,16 @@ func (p *Pricing) BatchDeletePrices(models []string, directGroup string) error {
 	p.Lock()
 	defer p.Unlock()
 
-	for _, model := range models {
-		delete(p.Prices, model)
+	if groupPrices, ok := p.Prices[tokenGroup]; ok {
+		for _, model := range models {
+			delete(groupPrices, model)
+		}
 	}
 
 	return nil
 }
 
-func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []string, directGroup string) error {
+func (p *Pricing) BatchSetPrices(tokenGroup string, batchPrices *BatchPrices, originalModels []string) error {
 	// 查找需要删除的model
 	var deletePrices []string
 	var addPrices []*model.Price
@@ -302,6 +329,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 		if !utils.Contains(model, originalModels) {
 			addPrice := batchPrices.Price
 			addPrice.Model = model
+			addPrice.TokenGroup = tokenGroup
 			addPrices = append(addPrices, &addPrice)
 		}
 	}
@@ -324,7 +352,7 @@ func (p *Pricing) BatchSetPrices(batchPrices *BatchPrices, originalModels []stri
 	}
 
 	if len(deletePrices) > 0 {
-		err := model.DeletePrices(tx, deletePrices, directGroup)
+		err := model.DeletePrices(tx, deletePrices)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -375,7 +403,7 @@ func GetOldPricesList() []*model.Price {
 
 	var prices []*model.Price
 	for modelName, oldPrice := range oldData {
-		price := PricingInstance.GetPrice(modelName, "default")
+		price := PricingInstance.GetPrice("default", modelName)
 		prices = append(prices, &model.Price{
 			Model:       modelName,
 			Type:        model.TokensPriceType,
@@ -387,26 +415,3 @@ func GetOldPricesList() []*model.Price {
 
 	return prices
 }
-
-// func ConvertBatchPrices(prices []*model.Price) []*BatchPrices {
-// 	batchPricesMap := make(map[string]*BatchPrices)
-// 	for _, price := range prices {
-// 		key := fmt.Sprintf("%s-%d-%g-%g", price.Type, price.ChannelType, price.Input, price.Output)
-// 		batchPrice, exists := batchPricesMap[key]
-// 		if exists {
-// 			batchPrice.Models = append(batchPrice.Models, price.Model)
-// 		} else {
-// 			batchPricesMap[key] = &BatchPrices{
-// 				Models: []string{price.Model},
-// 				Price:  *price,
-// 			}
-// 		}
-// 	}
-
-// 	var batchPrices []*BatchPrices
-// 	for _, batchPrice := range batchPricesMap {
-// 		batchPrices = append(batchPrices, batchPrice)
-// 	}
-
-// 	return batchPrices
-// }

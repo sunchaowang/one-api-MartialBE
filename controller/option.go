@@ -15,7 +15,7 @@ func GetOptions(c *gin.Context) {
 	var options []*model.Option
 	config.OptionMapRWMutex.Lock()
 	for k, v := range config.OptionMap {
-		if strings.HasSuffix(k, "Token") || strings.HasSuffix(k, "Secret") {
+		if (strings.HasSuffix(k, "Token") || strings.HasSuffix(k, "Secret")) && k != "TokenGroupRatio" {
 			continue
 		}
 		options = append(options, &model.Option{
@@ -43,7 +43,7 @@ func GetOptions(c *gin.Context) {
 		// 字符串类型
 		var val string
 		for _, key := range keysArr {
-			if strings.Contains(key, "Token") || strings.Contains(key, "Secret") {
+			if (strings.Contains(key, "Token") || strings.Contains(key, "Secret")) && key != "TokenGroupRatio" {
 				val = ""
 			} else {
 				val = config.OptionMap[key]

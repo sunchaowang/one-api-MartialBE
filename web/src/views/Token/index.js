@@ -30,7 +30,7 @@ export default function Token() {
   const [sortOrder, setSortOrder] = useState('descend');
 
   // 配置项
-  const [directGroupRatio, setDirectGroupRatio] = useState({});
+  const [tokenGroupRatio, setTokenGroupRatio] = useState({});
 
   const fetchData = async (params = {}) => {
     setLoading(true);
@@ -64,13 +64,13 @@ export default function Token() {
   async function fetchSettingOptions() {
     const res = await API.get('/api/site/option', {
       params: {
-        keys: 'DirectGroupRatio'
+        keys: 'TokenGroupRatio'
       }
     });
     const { success, message: msg, data } = res.data;
     if (success) {
-      const _directGroupRatio = data.find((item) => item.key === 'DirectGroupRatio');
-      setDirectGroupRatio(JSON.parse(_directGroupRatio.value));
+      const _directGroupRatio = data.find((item) => item.key === 'TokenGroupRatio');
+      setTokenGroupRatio(JSON.parse(_directGroupRatio.value));
     }
   }
 
@@ -193,7 +193,7 @@ export default function Token() {
         </Form>
         <Table
           columns={tableRowColumns(t, userIsAdmin, manageToken, handleSearch, handleOpenModal, {
-            directGroupRatio
+            tokenGroupRatio
           })}
           dataSource={tokens}
           rowKey="id"
@@ -213,7 +213,7 @@ export default function Token() {
         onOk={handleOkModal}
         tokenId={editTokenId}
         userIsAdmin={userIsAdmin}
-        _directGroupRatio={directGroupRatio}
+        tokenGroupRatio={tokenGroupRatio}
       />
     </Card>
   );

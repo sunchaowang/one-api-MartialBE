@@ -67,7 +67,7 @@ EditToolbar.propTypes = {
   setRowModesModel: PropTypes.func.isRequired
 };
 
-const Single = ({ ownedby, prices, reloadData }) => {
+const Single = ({ ownedby, prices, reloadData, tokenGroupRatio }) => {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
@@ -154,7 +154,8 @@ const Single = ({ ownedby, prices, reloadData }) => {
           newRow.input === oldRows.input &&
           newRow.output === oldRows.output &&
           newRow.type === oldRows.type &&
-          newRow.channel_type === oldRows.channel_type
+          newRow.channel_type === oldRows.channel_type &&
+          newRow.token_group === oldRows.token_group
         ) {
           return resolve(oldRows);
         }
@@ -196,6 +197,23 @@ const Single = ({ ownedby, prices, reloadData }) => {
         minWidth: 100,
         type: 'singleSelect',
         valueOptions: priceType,
+        editable: true
+      },
+      {
+        field: 'token_group',
+        sortable: true,
+        headerName: t('模型渠道分组'),
+        flex: 0.5,
+        minWidth: 100,
+        type: 'singleSelect',
+        valueOptions:
+          Object.keys(tokenGroupRatio).map((key) => {
+            return {
+              label: key,
+              value: key,
+              ratio: tokenGroupRatio[key]
+            };
+          }) ?? [],
         editable: true
       },
       {
@@ -373,5 +391,6 @@ export default Single;
 Single.propTypes = {
   prices: PropTypes.array,
   ownedby: PropTypes.array,
-  reloadData: PropTypes.func
+  reloadData: PropTypes.func,
+  tokenGroupRatio: PropTypes.array
 };

@@ -45,6 +45,7 @@ const Pricing = () => {
   const [errPrices, setErrPrices] = useState('');
   const [prices, setPrices] = useState([]);
   const [noPriceModel, setNoPriceModel] = useState([]);
+  const [tokenGroupRatio, setTokenGroupRatio] = useState([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -99,7 +100,21 @@ const Pricing = () => {
     }
   };
 
+  async function fetchSettingOptions() {
+    const res = await API.get('/api/site/option', {
+      params: {
+        keys: 'TokenGroupRatio'
+      }
+    });
+    const { success, message: msg, data } = res.data;
+    if (success) {
+      const _tokenGroupRatio = data.find((item) => item.key === 'TokenGroupRatio');
+      setTokenGroupRatio(JSON.parse(_tokenGroupRatio.value));
+    }
+  }
+
   useEffect(() => {
+    console.log('modelList', modelList);
     const missingModels = modelList.filter((model) => !prices.some((price) => price.model === model));
     setNoPriceModel(missingModels);
   }, [modelList, prices]);
@@ -130,6 +145,9 @@ const Pricing = () => {
     } catch (error) {
       console.error(error);
     }
+
+    // 获取配置项
+    fetchSettingOptions();
   }, []);
 
   const fetchModelList = useCallback(async () => {
@@ -137,7 +155,7 @@ const Pricing = () => {
       const res = await API.get('/api/prices/model_list');
       const { success, message, data } = res.data;
       if (success) {
-        setModelList(data.default);
+        setModelList(data.default.default);
       } else {
         showError(message);
       }
@@ -237,6 +255,7 @@ const Pricing = () => {
         pricesItem={editPricesItem}
         ownedby={ownedby}
         noPriceModel={noPriceModel}
+        tokenGroupRatio={tokenGroupRatio}
       />
       <Card>
         <AdminContainer>
@@ -248,10 +267,16 @@ const Pricing = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <Single ownedby={ownedby} reloadData={reloadData} prices={prices} />
+              <Single ownedby={ownedby} reloadData={reloadData} prices={prices} tokenGroupRatio={tokenGroupRatio} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <Multiple ownedby={ownedby} reloadData={reloadData} prices={prices} handleOpenModal={handleOpenaddModal} />
+              <Multiple
+                ownedby={ownedby}
+                reloadData={reloadData}
+                prices={prices}
+                handleOpenModal={handleOpenaddModal}
+                tokenGroupRatio={tokenGroupRatio}
+              />
             </CustomTabPanel>
           </Box>
         </AdminContainer>

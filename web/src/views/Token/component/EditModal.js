@@ -31,14 +31,13 @@ const originInputs = {
   model_limits: '',
   channel_limits_enabled: false,
   channel_limits: '',
-  direct_group: ''
+  token_group: ''
 };
 
-const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRatio }) => {
+const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, tokenGroupRatio }) => {
   const { t } = useTranslation();
   const [inputs, setInputs] = useState(originInputs);
   const siteInfo = useSelector((state) => state.siteInfo);
-  const [directGroupRatio, setDirectGroupRatio] = useState([]);
 
   const submit = async (values, { setErrors, setStatus, setSubmitting }) => {
     setSubmitting(true);
@@ -94,21 +93,6 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
     }
   }, [tokenId]);
 
-  useEffect(() => {
-    if (_directGroupRatio) {
-      console.log('directGroupRatio', _directGroupRatio);
-      setDirectGroupRatio(() =>
-        Object.keys(_directGroupRatio).map((key) => {
-          return {
-            label: key,
-            value: key,
-            ratio: _directGroupRatio[key]
-          };
-        })
-      );
-    }
-  }, [_directGroupRatio]);
-
   return (
     <Modal
       open={open}
@@ -131,13 +115,21 @@ const EditModal = ({ open, tokenId, onCancel, onOk, userIsAdmin, _directGroupRat
               <Input name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} />
             </Form.Item>
 
-            <Form.Item label={'令牌分组'} name={'direct_group'}>
-              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(directGroupRatio)}</Typography.Text>
+            <Form.Item label={'令牌分组'} name={'token_group'}>
+              <Typography.Text style={{ display: 'none' }}>{JSON.stringify(tokenGroupRatio)}</Typography.Text>
               <Select
-                name={'direct_group'}
-                value={values.direct_group}
-                options={directGroupRatio.map((item) => item)}
-                onChange={(value) => setFieldValue('direct_group', value)}
+                name={'token_group'}
+                value={values.token_group}
+                options={Object.keys(tokenGroupRatio)
+                  .map((key) => {
+                    return {
+                      label: key,
+                      value: key,
+                      ratio: tokenGroupRatio[key]
+                    };
+                  })
+                  .map((item) => item)}
+                onChange={(value) => setFieldValue('token_group', value)}
                 optionRender={(option) => (
                   <Space>
                     <span role="img" aria-label={option.data.label}>
@@ -266,7 +258,7 @@ EditModal.propTypes = {
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   userIsAdmin: PropTypes.bool,
-  _directGroupRatio: PropTypes.object
+  tokenGroupRatio: PropTypes.object
 };
 
 export default EditModal;

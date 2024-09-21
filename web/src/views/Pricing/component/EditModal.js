@@ -41,7 +41,8 @@ const getValidationSchema = (t) =>
     channel_type: Yup.number().min(1, t('pricing_edit.channelTypeErr')).required(t('pricing_edit.requiredChannelType')),
     input: Yup.number().required(t('pricing_edit.requiredInput')),
     output: Yup.number().required(t('pricing_edit.requiredOutput')),
-    models: Yup.array().min(1, t('pricing_edit.requiredModels'))
+    models: Yup.array().min(1, t('pricing_edit.requiredModels')),
+    token_group: Yup.string().required(t('模型分组不能为空'))
   });
 
 const originInputs = {
@@ -50,10 +51,11 @@ const originInputs = {
   channel_type: 1,
   input: 0,
   output: 0,
-  models: []
+  models: [],
+  token_group: 'default'
 };
 
-const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) => {
+const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel, tokenGroupRatio }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [inputs, setInputs] = useState(originInputs);
@@ -66,12 +68,14 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
       const res = await API.post(`/api/prices/multiple`, {
         original_models: inputs.models,
         models: values.models,
+        token_group: values.token_group,
         price: {
           model: 'batch',
           type: values.type,
           channel_type: values.channel_type,
           input: values.input,
-          output: values.output
+          output: values.output,
+          token_group: values.token_group
         }
       });
       const { success, message } = res.data;
@@ -183,6 +187,46 @@ const EditModal = ({ open, pricesItem, onCancel, onOk, ownedby, noPriceModel }) 
                 {touched.channel_type && errors.channel_type && (
                   <FormHelperText error id="helper-tex-channel_type-label">
                     {errors.channel_type}
+                  </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl fullWidth error={Boolean(touched.token_group && errors.token_group)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="token_group-label">{t('模型渠道分组')}</InputLabel>
+                <Select
+                  id="token_group-label"
+                  label={t('模型渠道分组')}
+                  value={values.token_group}
+                  name="token_group"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200
+                      }
+                    }
+                  }}
+                >
+                  {Object.keys(tokenGroupRatio)
+                    .map((key) => {
+                      return {
+                        label: key,
+                        value: key,
+                        ratio: tokenGroupRatio[key]
+                      };
+                    })
+                    .map((option) => {
+                      return (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      );
+                    })}
+                </Select>
+                {touched.token_group && errors.token_group && (
+                  <FormHelperText error id="helper-tex-token_group-label">
+                    {errors.token_group}
                   </FormHelperText>
                 )}
               </FormControl>
@@ -299,5 +343,6 @@ EditModal.propTypes = {
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   ownedby: PropTypes.array,
-  noPriceModel: PropTypes.array
+  noPriceModel: PropTypes.array,
+  tokenGroupRatio: PropTypes.array
 };

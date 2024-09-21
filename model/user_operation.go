@@ -24,6 +24,10 @@ func GetOperationCheckInByUserId(userId int) (userOperation UserOperation, err e
 	err = DB.Model(&UserOperation{}).
 		Where("user_id = ? AND type = ?", userId, 1).Order("id desc").First(&userOperation).Error
 
+	if err != nil {
+		return UserOperation{}, err // Return zero value of UserOperation
+	}
+
 	return userOperation, err
 }
 
@@ -62,6 +66,10 @@ func InsertOperationCheckIn(userId int, lastDayUsed int64, requestIP string) (qu
 func IsCheckInToday(userId int) (checkInTime string, lastDayUsed int64, err error) {
 	var userOperation UserOperation
 	userOperation, err = GetOperationCheckInByUserId(userId)
+	// Return zero value of UserOperation
+	if err != nil {
+		return "", -2, err
+	}
 
 	// 获取当前地区的当天零点时间
 	localZeroTime := utils.GetLocalZeroTime()

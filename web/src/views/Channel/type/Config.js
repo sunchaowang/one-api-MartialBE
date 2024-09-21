@@ -13,7 +13,8 @@ const defaultConfig = {
     plugin: {},
     tag: '',
     only_chat: false,
-    pre_cost: 1
+    pre_cost: 1,
+    token_group: []
   },
   inputLabel: {
     name: '渠道名称',
@@ -29,7 +30,8 @@ const defaultConfig = {
     only_chat: '仅支持聊天',
     tag: '标签',
     provider_models_list: '',
-    pre_cost: '预计费选项'
+    pre_cost: '预计费选项',
+    token_group: '模型渠道分组'
   },
   prompt: {
     type: '请选择渠道类型',

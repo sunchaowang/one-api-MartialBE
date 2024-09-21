@@ -24,6 +24,7 @@ export default function ModelPrice() {
   const [userModelList, setUserModelList] = useState([]);
   const [prices, setPrices] = useState({});
   const [ownedby, setOwnedby] = useState([]);
+  const [tokenGroupRatio, setTokenGroupRatio] = useState([]);
 
   const fetchOwnedby = useCallback(async () => {
     try {
@@ -92,10 +93,10 @@ export default function ModelPrice() {
         type: price?.type,
         channel_type: price?.channel_type,
         input: price?.input !== undefined && price?.input !== null ? price.input : 30,
-        output: price?.output !== undefined && price?.output !== null ? price.output : 30
+        output: price?.output !== undefined && price?.output !== null ? price.output : 30,
+        token_group: price?.token_group
       });
     });
-    console.log(newRows);
     setRows(newRows);
   }, [userModelList, ownedby, prices]);
 
@@ -130,14 +131,24 @@ export default function ModelPrice() {
         type: 'singleSelect',
         valueOptions: priceType
       },
+      // {
+      //   field: 'channel_type',
+      //   sortable: true,
+      //   headerName: t('modelpricePage.channelType'),
+      //   flex: 0.5,
+      //   minWidth: 100,
+      //   type: 'singleSelect',
+      //   valueOptions: ownedby,
+      //   needIsAdmin: true
+      // },
       {
-        field: 'channel_type',
+        field: 'token_group',
         sortable: true,
-        headerName: t('modelpricePage.channelType'),
+        headerName: t('模型渠道分组'),
         flex: 0.5,
         minWidth: 100,
         type: 'singleSelect',
-        valueOptions: ownedby,
+        valueOptions: tokenGroupRatio,
         needIsAdmin: true
       },
       {

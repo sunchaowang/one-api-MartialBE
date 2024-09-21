@@ -90,7 +90,7 @@ function statusInfo(t, status) {
   }
 }
 
-export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit }) {
+export default function ChannelTableRow({ item, manageChannel, handleOpenModal, setModalChannelId, hideEdit, tokenGroupOptions }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(null);
   const [openTest, setOpenTest] = useState(false);
@@ -463,6 +463,16 @@ export default function ChannelTableRow({ item, manageChannel, handleOpenModal, 
                   </Box>
                 </Grid>
               )}
+              {item.token_group && (
+                <Grid item xs={12}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', margin: 1 }}>
+                    <Typography variant="h6" gutterBottom component="div">
+                      {t('模型渠道分组') + ':'}
+                    </Typography>
+                    {item.token_group}
+                  </Box>
+                </Grid>
+              )}
             </Grid>
           </Collapse>
         </TableCell>
@@ -490,7 +500,8 @@ ChannelTableRow.propTypes = {
   manageChannel: PropTypes.func,
   handleOpenModal: PropTypes.func,
   setModalChannelId: PropTypes.func,
-  hideEdit: PropTypes.bool
+  hideEdit: PropTypes.bool,
+  tokenGroupOptions: PropTypes.array
 };
 
 function renderBalance(type, balance) {

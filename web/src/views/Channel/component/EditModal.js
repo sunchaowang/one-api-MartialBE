@@ -77,10 +77,11 @@ const getValidationSchema = (t) =>
         return false;
       }
       return false;
-    })
+    }),
+    token_groups: Yup.array().min(1, '模型渠道分组不能为空')
   });
 
-const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => {
+const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, tokenGroupOptions }) => {
   const { t } = useTranslation();
   const { t: customizeT } = useCustomizeT();
   const theme = useTheme();
@@ -221,6 +222,7 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
     }
     let res;
     const modelsStr = values.models.map((model) => model.id).join(',');
+    const tokenGroupsStr = values.token_group.map((tokenGroup) => tokenGroup).join(',');
     values.group = values.groups.join(',');
 
     let baseApiUrl = '/api/channel/';
@@ -231,9 +233,9 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
 
     try {
       if (channelId) {
-        res = await API.put(baseApiUrl, { ...values, id: parseInt(channelId), models: modelsStr });
+        res = await API.put(baseApiUrl, { ...values, id: parseInt(channelId), models: modelsStr, token_group: tokenGroupsStr });
       } else {
-        res = await API.post(baseApiUrl, { ...values, models: modelsStr });
+        res = await API.post(baseApiUrl, { ...values, models: modelsStr, token_group: tokenGroupsStr });
       }
       const { success, message } = res.data;
       if (success) {
@@ -298,6 +300,11 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
           data.groups = [];
         } else {
           data.groups = data.group.split(',');
+        }
+        if (data.token_group === '') {
+          data.token_group = [];
+        } else {
+          data.token_group = data.token_group.split(',');
         }
         if (data.model_mapping !== '') {
           data.model_mapping = JSON.stringify(JSON.parse(data.model_mapping), null, 2);
@@ -738,27 +745,64 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag }) => 
               {inputPrompt.test_model && (
                 <FormControl fullWidth error={Boolean(touched.test_model && errors.test_model)} sx={{ ...theme.typography.otherInput }}>
                   <InputLabel htmlFor="channel-test_model-label">{customizeT(inputLabel.test_model)}</InputLabel>
-                  <OutlinedInput
+                  <Select
                     id="channel-test_model-label"
                     label={customizeT(inputLabel.test_model)}
-                    type="text"
-                    disabled={hasTag}
                     value={values.test_model}
                     name="test_model"
                     onBlur={handleBlur}
-                    onChange={handleChange}
-                    inputProps={{}}
-                    aria-describedby="helper-text-channel-test_model-label"
-                  />
-                  {touched.test_model && errors.test_model ? (
-                    <FormHelperText error id="helper-tex-channel-test_model-label">
-                      {errors.test_model}
-                    </FormHelperText>
-                  ) : (
-                    <FormHelperText id="helper-tex-channel-test_model-label"> {customizeT(inputPrompt.test_model)} </FormHelperText>
-                  )}
+                    onChange={(e, value) => {
+                      handleChange(e);
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200
+                        }
+                      }
+                    }}
+                  >
+                    {values.models.map((option) => {
+                      return (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.id}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
                 </FormControl>
               )}
+
+              <FormControl fullWidth error={Boolean(touched.token_group && errors.token_group)} sx={{ ...theme.typography.otherInput }}>
+                <InputLabel htmlFor="channel-token_group-label">{t('模型渠道分组')}</InputLabel>
+                <Select
+                  multiple
+                  id="channel-token_group-label"
+                  label={t('模型渠道分组')}
+                  value={values.token_group}
+                  name="token_group"
+                  onBlur={handleBlur}
+                  onChange={(e) => {
+                    console.log(e, "onChange");
+                    handleChange(e);
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200
+                      }
+                    }
+                  }}
+                >
+                  {tokenGroupOptions.map((option) => {
+                    return (
+                      <MenuItem key={option.key} value={option.key}>
+                        {option.key}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
 
               {inputPrompt.pre_cost && (
                 <FormControl fullWidth error={Boolean(touched.pre_cost && errors.pre_cost)} sx={{ ...theme.typography.otherInput }}>
@@ -885,5 +929,6 @@ EditModal.propTypes = {
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
   groupOptions: PropTypes.array,
-  isTag: PropTypes.bool
+  isTag: PropTypes.bool,
+  tokenGroupOptions: PropTypes.array
 };

@@ -30,7 +30,7 @@ type Token struct {
 	ChannelLimits        string `json:"channel_limits" gorm:"type:varchar(1024);default:''"`
 	UsedQuota            int    `json:"used_quota" gorm:"default:0"` // used quota
 	ChatCache            bool   `json:"chat_cache" gorm:"default:false"`
-	DirectGroup          string `json:"direct_group" gorm:"type:varchar(32);default:'default'"`
+	TokenGroup           string `json:"token_group" gorm:"type:varchar(32);default:'default'"`
 }
 
 var allowedTokenOrderFields = map[string]bool{
@@ -41,7 +41,7 @@ var allowedTokenOrderFields = map[string]bool{
 	"created_time": true,
 	"remain_quota": true,
 	"used_quota":   true,
-	"direct_group": true,
+	"token_group": true,
 }
 
 func GetUserTokensList(userId int, params *GenericParams) (*DataResult[Token], error) {
@@ -144,7 +144,7 @@ func (token *Token) Update() error {
 		token.ChatCache = false
 	}
 
-	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "chat_cache", "model_limits_enabled", "model_limits", "channel_limits_enabled", "channel_limits", "direct_group").Updates(token).Error
+	err := DB.Model(token).Select("name", "status", "expired_time", "remain_quota", "unlimited_quota", "chat_cache", "model_limits_enabled", "model_limits", "channel_limits_enabled", "channel_limits", "token_group").Updates(token).Error
 	// 防止Redis缓存不生效，直接删除
 	if err == nil && config.RedisEnabled {
 		redis.RedisDel(fmt.Sprintf("token:%s", token.Key))
@@ -346,7 +346,7 @@ func CreateInitialToken(userId int, username string) (err error) {
 		UnlimitedQuota: true,
 		UsedQuota:      0,
 		ChatCache:      false,
-		DirectGroup:    "default",
+		TokenGroup:    "default",
 	}
 	err = token.Insert()
 	if err != nil {

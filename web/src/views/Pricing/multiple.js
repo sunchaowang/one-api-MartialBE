@@ -15,7 +15,7 @@ import EditeModal from './component/EditModal';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------
-export default function Multiple({ prices, reloadData, handleOpenModal, ownedby }) {
+export default function Multiple({ prices, reloadData, handleOpenModal, ownedby, tokenGroupRatio }) {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
 
@@ -79,6 +79,7 @@ export default function Multiple({ prices, reloadData, handleOpenModal, ownedby 
                 headLabel={[
                   { id: 'collapse', label: '', disableSort: true },
                   { id: 'type', label: t('pricing_edit.type'), disableSort: true },
+                  { id: 'token_group', label: t('模型分组'), disableSort: true },
                   { id: 'channel_type', label: t('modelpricePage.channelType'), disableSort: true },
                   { id: 'input', label: t('modelpricePage.inputMultiplier'), disableSort: true },
                   { id: 'output', label: t('modelpricePage.outputMultiplier'), disableSort: true },
@@ -103,5 +104,6 @@ Multiple.propTypes = {
   prices: PropTypes.array,
   ownedby: PropTypes.array,
   handleOpenModal: PropTypes.func,
-  reloadData: PropTypes.func
+  reloadData: PropTypes.func,
+  tokenGroupRatio: PropTypes.array
 };

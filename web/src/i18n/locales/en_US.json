@@ -642,7 +642,7 @@
           "label": "Group Ratio",
           "placeholder": "It is a JSON text, the key is the group name, and the value is the ratio"
         },
-        "directGroupRatio": {
+        "tokenGroupRatio": {
           "label": "Direct Group Ratio",
           "placeholder": "It is a JSON text, the key is the group name, and the value is the ratio"
         },
