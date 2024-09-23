@@ -4,7 +4,9 @@ import { store } from '@/store';
 import { LOGIN } from '@/store/actions';
 
 export const API = axios.create({
-  // baseURL: import.meta.env.VITE_REACT_APP_SERVER ? import.meta.env.VITE_REACT_APP_SERVER : '/'
+    // ... 其他代码 ...
+
+    // baseURL: import.meta.env.VITE_APP_SERVER || '/'});
 });
 
 API.interceptors.response.use(

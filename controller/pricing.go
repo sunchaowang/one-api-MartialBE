@@ -73,15 +73,12 @@ func AddPrice(c *gin.Context) {
 
 func UpdatePrice(c *gin.Context) {
 	modelName := c.Param("model")
-	tokenGroup := c.Param("token_group")
+	// 接受 body 参数 token_group
 	if modelName == "" || len(modelName) < 2 {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("model name is required"))
 		return
 	}
-	if tokenGroup == "" {
-		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
-		return
-	}
+	
 	modelName = modelName[1:]
 	modelName, _ = url.PathUnescape(modelName)
 
@@ -90,9 +87,12 @@ func UpdatePrice(c *gin.Context) {
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}
-	price.TokenGroup = tokenGroup
+	if price.TokenGroup == "" {
+		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
+		return
+	}
 
-	if err := relay_util.PricingInstance.UpdatePrice(tokenGroup, modelName, &price); err != nil { // 修改调用
+	if err := relay_util.PricingInstance.UpdatePrice(price.TokenGroup, modelName, &price); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}

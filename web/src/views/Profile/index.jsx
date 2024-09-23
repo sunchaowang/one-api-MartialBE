@@ -26,7 +26,7 @@ import WechatModal from '@/views/Authentication/AuthForms/WechatModal';
 import { useSelector } from 'react-redux';
 import EmailModal from './component/EmailModal';
 import Turnstile from 'react-turnstile';
-import Lark from '@/assets/images/icons/lark.svg?react';
+import LarkIcon from '@/assets/images/icons/lark.svg?react';
 import LinuxDo from '@/assets/images/icons/linuxdo.svg?react';
 import { useTheme } from '@mui/material/styles';
 
@@ -167,14 +167,14 @@ export default function Profile() {
               )}
               {status.lark_login && (
                 <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
-                  <SvgIcon component={Lark} inheritViewBox="0 0 24 24" /> {inputs.lark_id || t('profilePage.notBound')}
+                  <SvgIcon component={LarkIcon} inheritViewBox="0 0 24 24" /> {inputs.lark_id || t('profilePage.notBound')}
                 </Label>
               )}
               <Label variant="ghost" color={inputs.linuxdo_id ? 'primary' : 'default'}>
                 <LinuxDo style={{ width: 24, height: 24 }} alt={''} /> {inputs.linuxdo_id || '未绑定'}
               </Label>
               <Label variant="ghost" color={inputs.lark_id ? 'primary' : 'default'}>
-                <Lark style={{ width: 24, height: 24 }} alt={''} /> {inputs.lark_id || '未绑定'}
+                <LarkIcon style={{ width: 24, height: 24 }} alt={''} /> {inputs.lark_id || '未绑定'}
               </Label>
             </Stack>
             <SubCard title={t('profilePage.personalInfo')}>

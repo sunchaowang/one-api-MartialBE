@@ -1,9 +1,12 @@
-import react from '@vitejs/plugin-react';
+// https://github.com/vitejs/vite/discussions/3448
+import path from 'path';
 import { defineConfig, transformWithEsbuild, loadEnv } from 'vite';
-import * as path from 'node:path';
+import react from '@vitejs/plugin-react';
+import jsconfigPaths from 'vite-jsconfig-paths';
 import svgr from 'vite-plugin-svgr'; // 新增
 
-// https://vitejs.dev/config/
+// ----------------------------------------------------------------------
+
 export default defineConfig(({ command, mode }) => {
   const root = process.cwd();
   const env = loadEnv(process.env.NODE_ENV ?? mode, root);
@@ -26,8 +29,29 @@ export default defineConfig(({ command, mode }) => {
         }
       },
       react(),
+      jsconfigPaths(),
       svgr({ include: 'src/assets/images/**/*.svg?react' })
     ],
+    // https://github.com/jpuri/react-draft-wysiwyg/issues/1317
+    //   define: {
+    //     global: 'window'
+    //   },
+    resolve: {
+      alias: [
+        // {
+        //   find: /^~(.+)/,
+        //   replacement: path.join(process.cwd(), 'node_modules/$1')
+        // },
+        // {
+        //   find: /^src(.+)/,
+        //   replacement: path.join(process.cwd(), 'src/$1')
+        // },
+        {
+          find: '@',
+          replacement: path.resolve(__dirname, 'src')
+        }
+      ]
+    },
     optimizeDeps: {
       force: true,
       esbuildOptions: {
@@ -36,19 +60,11 @@ export default defineConfig(({ command, mode }) => {
         }
       }
     },
-    build: {
-      outDir: 'build',
-      rollupOptions: {
-        output: {
-          // manualChunks: {
-          //   'react-core': ['react', 'react-dom', 'react-router-dom'],
-          //   tools: ['axios', 'history', 'marked'],
-          //   'react-components': ['react-dropzone', 'react-fireworks', 'react-toastify', 'react-turnstile']
-          // }
-        }
-      }
-    },
     server: {
+      // this ensures that the browser opens upon server start
+      open: true,
+      // this sets a default port to 3000
+      port: 5173,
       proxy: {
         '/api': {
           target: env.VITE_REACT_APP_SERVER || 'http://localhost:3000',
@@ -56,10 +72,11 @@ export default defineConfig(({ command, mode }) => {
         }
       }
     },
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, 'src')
-      }
+    preview: {
+      // this ensures that the browser opens upon preview start
+      open: true,
+      // this sets a default port to 3000
+      port: 3010
     }
   };
 });

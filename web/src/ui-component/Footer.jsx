@@ -18,8 +18,8 @@ const Footer = () => {
         ) : (
           <>
             <Link href="https://github.com/MartialBE/one-hub" target="_blank">
-              {siteInfo.system_name} {import.meta.env.VITE_REACT_APP_VERSION}{' '}
-            </Link>{' '}
+              {siteInfo.system_name} {import.meta.env.VITE_APP_VERSION}{' '}
+            </Link>
             {t('footer.developedBy')}{' '}
             <Link href="https://github.com/MartialBE" target="_blank">
               MartialBE

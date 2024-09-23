@@ -5,6 +5,7 @@ import { InputAdornment, OutlinedInput, Stack, FormControl, InputLabel } from '@
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
 import { useTranslation } from 'react-i18next';
 // ----------------------------------------------------------------------
 

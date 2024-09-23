@@ -39,10 +39,10 @@ import { useTranslation } from 'react-i18next';
 import useCustomizeT from '@/hooks/useCustomizeT';
 
 import { PreCostType } from '../type/other';
+import ModelMappingInput from './ModelMappingInput';
 
-const pluginList = import.meta.glob('../type/Plugin.json', {
-  eager: true
-});
+import pluginList from '../type/Plugin.json';
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -64,21 +64,7 @@ const getValidationSchema = (t) =>
       then: Yup.string().required(t('channel_edit.requiredBaseUrl')), // base_url 是必需的
       otherwise: Yup.string() // 在其他情况下，base_url 可以是任意字符串
     }),
-    model_mapping: Yup.string().test('is-json', t('channel_edit.validJson'), function (value) {
-      try {
-        if (value === '' || value === null || value === undefined) {
-          return true;
-        }
-        const parsedValue = JSON.parse(value);
-        if (typeof parsedValue === 'object') {
-          return true;
-        }
-      } catch (e) {
-        return false;
-      }
-      return false;
-    }),
-    token_groups: Yup.array().min(1, '模型渠道分组不能为空')
+    model_mapping: Yup.array()
   });
 
 const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, tokenGroupOptions }) => {
@@ -221,8 +207,45 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, token
       values.other = 'v2.1';
     }
     let res;
-    const modelsStr = values.models.map((model) => model.id).join(',');
+
+    let modelMappingModel = [];
+
+    if (values.model_mapping) {
+      try {
+        const modelMapping = values.model_mapping.reduce((acc, item) => {
+          if (item.key && item.value) {
+            acc[item.key] = item.value;
+          }
+          return acc;
+        }, {});
+        const cleanedMapping = {};
+
+        for (const [key, value] of Object.entries(modelMapping)) {
+          if (key && value && !(key in cleanedMapping)) {
+            cleanedMapping[key] = value;
+            modelMappingModel.push(key);
+          }
+        }
+
+        values.model_mapping = JSON.stringify(cleanedMapping, null, 2);
+      } catch (error) {
+        showError('Error parsing model_mapping:' + error.message);
+      }
+    }
+
+    // 获取现有的模型 ID
+    const existingModelIds = values.models.map((model) => model.id);
+
+    // 找出在 modelMappingModel 中存在但不在 existingModelIds 中的模型
+    const newModelIds = modelMappingModel.filter((id) => !existingModelIds.includes(id));
+
+    // 合并现有的模型 ID 和新的模型 ID，并去重
+    const allUniqueModelIds = Array.from(new Set([...existingModelIds, ...newModelIds]));
+
+    // 创建新的 modelsStr
+    const modelsStr = allUniqueModelIds.join(',');
     const tokenGroupsStr = values.token_group.map((tokenGroup) => tokenGroup).join(',');
+
     values.group = values.groups.join(',');
 
     let baseApiUrl = '/api/channel/';
@@ -301,13 +324,20 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, token
         } else {
           data.groups = data.group.split(',');
         }
+
+        data.model_mapping =
+          data.model_mapping !== ''
+            ? Object.entries(JSON.parse(data.model_mapping)).map(([key, value], index) => ({
+                index,
+                key,
+                value
+              }))
+            : [];
+
         if (data.token_group === '') {
           data.token_group = [];
         } else {
           data.token_group = data.token_group.split(',');
-        }
-        if (data.model_mapping !== '') {
-          data.model_mapping = JSON.stringify(JSON.parse(data.model_mapping), null, 2);
         }
 
         data.base_url = data.base_url ?? '';
@@ -697,26 +727,20 @@ const EditModal = ({ open, channelId, onCancel, onOk, groupOptions, isTag, token
                   error={Boolean(touched.model_mapping && errors.model_mapping)}
                   sx={{ ...theme.typography.otherInput }}
                 >
-                  {/* <InputLabel htmlFor="channel-model_mapping-label">{inputLabel.model_mapping}</InputLabel> */}
-                  <TextField
-                    multiline
-                    id="channel-model_mapping-label"
-                    label={customizeT(inputLabel.model_mapping)}
+                  <ModelMappingInput
                     value={values.model_mapping}
-                    name="model_mapping"
-                    onBlur={handleBlur}
+                    onChange={(newValue) => {
+                      setFieldValue('model_mapping', newValue);
+                    }}
                     disabled={hasTag}
-                    onChange={handleChange}
-                    aria-describedby="helper-text-channel-model_mapping-label"
-                    minRows={5}
-                    placeholder={customizeT(inputPrompt.model_mapping)}
+                    error={Boolean(touched.model_mapping && errors.model_mapping)}
                   />
                   {touched.model_mapping && errors.model_mapping ? (
                     <FormHelperText error id="helper-tex-channel-model_mapping-label">
                       {errors.model_mapping}
                     </FormHelperText>
                   ) : (
-                    <FormHelperText id="helper-tex-channel-model_mapping-label"> {customizeT(inputPrompt.model_mapping)} </FormHelperText>
+                    <FormHelperText id="helper-tex-channel-model_mapping-label">{customizeT(inputPrompt.model_mapping)}</FormHelperText>
                   )}
                 </FormControl>
               )}
