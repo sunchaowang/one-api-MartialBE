@@ -22,13 +22,13 @@ func SetRelayRouter(router *gin.Engine) {
 }
 
 func setOpenAIRouter(router *gin.RouterGroup) {
-	modelsRouter := router.Group("/v1/models")
+	modelsRouter := router.Group("/models")
 	modelsRouter.Use(middleware.OpenaiAuth(), middleware.Distribute())
 	{
 		modelsRouter.GET("", relay.ListModels)
 		modelsRouter.GET("/:model", relay.RetrieveModel)
 	}
-	relayV1Router := router.Group("/v1")
+	relayV1Router := router.Group("")
 	relayV1Router.Use(middleware.RelayPanicRecover(), middleware.OpenaiAuth(), middleware.Distribute())
 	{
 		relayV1Router.POST("/completions", relay.Relay)
@@ -62,12 +62,12 @@ func setOpenAIRouter(router *gin.RouterGroup) {
 }
 
 func setOpenAIAPIRouter(router gin.IRouter) {
-	relayV1Router := router.Group("/api")
+	relayV1Router := router.Group("/api/v1")
 	setOpenAIRouter(relayV1Router)
 }
 
 func setOpenAIV1Router(router gin.IRouter) {
-	relayV1Router := router.Group("")
+	relayV1Router := router.Group("/v1")
 	setOpenAIRouter(relayV1Router)
 }
 

@@ -291,7 +291,7 @@ func (p *Pricing) SyncPriceWithoutOverwrite(pricing []*model.Price) error {
 func (p *Pricing) BatchDeletePrices(tokenGroup string, models []string) error {
 	tx := model.DB.Begin()
 
-	err := model.DeletePrices(tx, models)
+	err := model.DeletePrices(tx, models, tokenGroup)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -344,7 +344,7 @@ func (p *Pricing) BatchSetPrices(tokenGroup string, batchPrices *BatchPrices, or
 	}
 
 	if len(updatePrices) > 0 {
-		err := model.UpdatePrices(tx, updatePrices, &batchPrices.Price)
+		err := model.UpdatePrices(tx, updatePrices, &batchPrices.Price, tokenGroup)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -352,7 +352,7 @@ func (p *Pricing) BatchSetPrices(tokenGroup string, batchPrices *BatchPrices, or
 	}
 
 	if len(deletePrices) > 0 {
-		err := model.DeletePrices(tx, deletePrices)
+		err := model.DeletePrices(tx, deletePrices, tokenGroup)
 		if err != nil {
 			tx.Rollback()
 			return err

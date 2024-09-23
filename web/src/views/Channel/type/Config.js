@@ -515,7 +515,7 @@ const typeConfig = {
     },
     modelGroup: 'Jina'
   },
-  49: {
+  53: {
     input: {
       models: ['gpt-4o', 'gpt-4o-mini', 'text-embedding-3-large', 'text-embedding-3-small', 'Cohere-command-r-plus', 'Cohere-command-r'],
       test_model: 'gpt-4o-mini'

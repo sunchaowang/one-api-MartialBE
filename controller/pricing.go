@@ -78,7 +78,7 @@ func UpdatePrice(c *gin.Context) {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("model name is required"))
 		return
 	}
-	
+
 	modelName = modelName[1:]
 	modelName, _ = url.PathUnescape(modelName)
 
@@ -129,7 +129,7 @@ func DeletePrice(c *gin.Context) {
 }
 
 type PriceBatchRequest struct {
-	TokenGroup string `json:"token_group"`
+	TokenGroup     string   `json:"token_group"`
 	OriginalModels []string `json:"original_models"`
 	relay_util.BatchPrices
 }
@@ -158,7 +158,8 @@ func BatchSetPrices(c *gin.Context) {
 }
 
 type PriceBatchDeleteRequest struct {
-	Models []string `json:"models" binding:"required"`
+	Models     []string `json:"models" binding:"required"`
+	TokenGroup string   `json:"token_group" binding:"required"`
 }
 
 func BatchDeletePrices(c *gin.Context) {
@@ -168,13 +169,12 @@ func BatchDeletePrices(c *gin.Context) {
 		return
 	}
 
-	tokenGroup := c.Param("token_group")
-	if tokenGroup == "" {
+	if pricesBatch.TokenGroup == "" {
 		common.APIRespondWithError(c, http.StatusOK, errors.New("token group is required"))
 		return
 	}
 
-	if err := relay_util.PricingInstance.BatchDeletePrices(tokenGroup, pricesBatch.Models); err != nil { // 修改调用
+	if err := relay_util.PricingInstance.BatchDeletePrices(pricesBatch.TokenGroup, pricesBatch.Models); err != nil { // 修改调用
 		common.APIRespondWithError(c, http.StatusOK, err)
 		return
 	}

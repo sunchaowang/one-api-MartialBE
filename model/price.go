@@ -73,8 +73,8 @@ func (price *Price) FetchOutputCurrencyPrice(rate float64) string {
 	return r.String()
 }
 
-func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
-	err := tx.Model(Price{}).Where("model IN (?)", models).Select("*").Omit("model").Updates(
+func UpdatePrices(tx *gorm.DB, models []string, prices *Price, tokenGroup string) error {
+	err := tx.Model(Price{}).Where("model IN (?) AND token_group = ?", models, tokenGroup).Select("*").Omit("model").Updates(
 		Price{
 			Type:        prices.Type,
 			ChannelType: prices.ChannelType,
@@ -86,8 +86,8 @@ func UpdatePrices(tx *gorm.DB, models []string, prices *Price) error {
 	return err
 }
 
-func DeletePrices(tx *gorm.DB, models []string) error {
-	err := tx.Where("model IN (?)", models).Delete(&Price{}).Error
+func DeletePrices(tx *gorm.DB, models []string, tokenGroup string) error {
+	err := tx.Where("model IN (?) AND token_group = ?", models, tokenGroup).Delete(&Price{}).Error
 
 	return err
 }
