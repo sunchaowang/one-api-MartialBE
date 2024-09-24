@@ -328,13 +328,13 @@ func GetDefaultPrice() []*Price {
 		"hunyuan-pro":           {[]float64{2.1429, 7.1429}, config.ChannelTypeHunyuan},
 
 		// doubao
-		"doubao-pro-128k":  {[]float64{0, 0}, config.ChannelTypeDoubao},
-		"doubao-pro-32k":   {[]float64{0, 0}, config.ChannelTypeDoubao},
-		"doubao-pro-4k":    {[]float64{0, 0}, config.ChannelTypeDoubao},
-		"doubao-lite-128k": {[]float64{0, 0}, config.ChannelTypeDoubao},
-		"doubao-lite-32k":  {[]float64{0, 0}, config.ChannelTypeDoubao},
-		"doubao-lite-4k":   {[]float64{0, 0}, config.ChannelTypeDoubao},
-		"doubao-embedding": {[]float64{0, 0}, config.ChannelTypeDoubao},
+		"doubao-pro-128k":  {[]float64{0.3575, 0.6435}, config.ChannelTypeDoubao},
+		"doubao-pro-32k":   {[]float64{0.0572, 0.143}, config.ChannelTypeDoubao},
+		"doubao-pro-4k":    {[]float64{0.0572, 0.143}, config.ChannelTypeDoubao},
+		"doubao-lite-128k": {[]float64{0.0572, 0.0715}, config.ChannelTypeDoubao},
+		"doubao-lite-32k":  {[]float64{0.02145, 0.0429}, config.ChannelTypeDoubao},
+		"doubao-lite-4k":   {[]float64{0.02145, 0.0429}, config.ChannelTypeDoubao},
+		"doubao-embedding": {[]float64{0.03575, 0.03575}, config.ChannelTypeDoubao},
 
 		// together
 		//"meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo":   {[]float64{0.09, 0.09}, config.ChannelTypeTogetherAI},
