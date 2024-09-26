@@ -34,5 +34,5 @@ func defaultConfig() {
 	viper.SetDefault("global.api_rate_limit", 180)
 	viper.SetDefault("global.web_rate_limit", 100)
 	viper.SetDefault("connect_timeout", 5)
-	viper.SetDefault("auto_price_updates", true)
+	viper.SetDefault("auto_price_updates", false)
 }
