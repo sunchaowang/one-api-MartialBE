@@ -38,6 +38,9 @@ export default function CheckInModal(props) {
       showInfo('请稍后几秒重试，Turnstile 正在检查用户环境！');
       return;
     }
+    // TODO
+    showInfo('签到系统正在维护中！');
+    return;
     setCheckinLoading(true);
     try {
       let res = await API.post(`/api/operation/checkin?turnstile=${turnstileToken}`);
