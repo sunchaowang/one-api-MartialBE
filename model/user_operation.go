@@ -45,7 +45,7 @@ func InsertOperationCheckIn(userId int, lastDayUsed int64, requestIP string) (qu
 	rand.Seed(time.Now().UnixNano())
 
 	// 随机生成一个额度
-	quota = int(rand.Float64() * rand.Float64() * float64(lastDayUsed))
+	quota = int(rand.Float64() * float64(lastDayUsed))
 
 	operationRemark := []string{"签到", ", ", fmt.Sprintf("获得额度 %v", common.LogQuota(quota))}
 
@@ -113,17 +113,21 @@ func GetUserQuotaUsedByPeriod(userId int, zeroTime time.Time) (used int64, err e
 	} else {
 		used = 0
 	}
-	fmt.Printf("used: %v\n", used)
-	if used == 0 {
-		return -2, nil
-	}
+	// fmt.Printf("used: %v\n", used)
+	// if used == 0 {
+	// 	return -2, nil
+	// }
 	// 保底值
 	if float64(used) < (config.QuotaPerUnit * 0.5) {
 		used = int64(config.QuotaPerUnit * 0.45)
 	} else if float64(used) < (config.QuotaPerUnit * 5) {
 		used = int64(float64(used) * 0.35)
 	} else if float64(used) < (config.QuotaPerUnit * 15) {
-		used = int64(float64(used) * 0.2)
+		used = int64(float64(used) * 0.25)
+	} else if float64(used) < (config.QuotaPerUnit * 30) {
+		used = int64(float64(used) * 0.15)
+	} else {
+		used = int64(float64(used) * 0.1)
 	}
 
 	return used, err

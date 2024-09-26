@@ -99,6 +99,14 @@ func (p *ChatCacheProps) StoreCache(channelId, promptTokens, completionTokens in
 	p.CompletionTokens = completionTokens
 	p.ModelName = modelName
 	p.Request = utils.Marshal(request)
+	// 获取 p.Request 中 message 的最后一个数据
+	var lastMessage string // Declare lastMessage here
+	if messages, ok := request.([]string); ok && len(messages) > 0 {
+		lastMessage = messages[len(messages)-1] // Assign to lastMessage
+		// Do something with lastMessage if needed
+	}
+	p.Request = lastMessage
+
 	p.RequestId = requestId
 	p.OriginModelName = originModelName
 
