@@ -39,8 +39,8 @@ export default function CheckInModal(props) {
       return;
     }
     // TODO
-    showInfo('签到系统正在维护中！');
-    return;
+    // showInfo('签到系统正在维护中！');
+    // return;
     setCheckinLoading(true);
     try {
       let res = await API.post(`/api/operation/checkin?turnstile=${turnstileToken}`);
