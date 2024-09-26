@@ -8,6 +8,8 @@ import (
 	"one-api/common/utils"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type UserOperation struct {
@@ -24,8 +26,9 @@ func GetOperationCheckInByUserId(userId int) (userOperation UserOperation, err e
 	err = DB.Model(&UserOperation{}).
 		Where("user_id = ? AND type = ?", userId, 1).Order("id desc").First(&userOperation).Error
 
-	if err != nil {
-		return UserOperation{}, err // Return zero value of UserOperation
+	fmt.Printf("userOperation: %v\n", err)
+	if err == gorm.ErrRecordNotFound {
+		return UserOperation{}, nil // Return zero value of UserOperation
 	}
 
 	return userOperation, err
@@ -67,9 +70,9 @@ func IsCheckInToday(userId int) (checkInTime string, lastDayUsed int64, err erro
 	var userOperation UserOperation
 	userOperation, err = GetOperationCheckInByUserId(userId)
 	// Return zero value of UserOperation
-	if err != nil {
-		return "", -2, err
-	}
+	// if err != nil {
+	// 	return "", -2, err
+	// }
 
 	// 获取当前地区的当天零点时间
 	localZeroTime := utils.GetLocalZeroTime()
@@ -101,6 +104,7 @@ func GetUserQuotaUsedByPeriod(userId int, zeroTime time.Time) (used int64, err e
 	if err != nil {
 		return -1, err
 	}
+	fmt.Printf("dashboards: %v\n", dashboards)
 	// dashboards 是个数组, 循环获取每个Quota, 接下来获取昨日的累计使用额度
 	if len(dashboards) > 0 {
 		for _, v := range dashboards {
@@ -109,7 +113,7 @@ func GetUserQuotaUsedByPeriod(userId int, zeroTime time.Time) (used int64, err e
 	} else {
 		used = 0
 	}
-
+	fmt.Printf("used: %v\n", used)
 	if used == 0 {
 		return -2, nil
 	}
