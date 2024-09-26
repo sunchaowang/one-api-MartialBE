@@ -31,10 +31,7 @@ type BatchPrices struct {
 
 // NewPricing creates a new Pricing instance
 func NewPricing() {
-	if !config.IsMasterNode {
-		logger.SysLog("Init Pricing is disabled on slave node")
-		return
-	}
+
 	logger.SysLog("Initializing Pricing")
 
 	PricingInstance = &Pricing{
